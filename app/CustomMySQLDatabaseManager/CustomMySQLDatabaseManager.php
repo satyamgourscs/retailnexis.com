@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\CustomMySQLDatabaseManager;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\TenantDatabaseManagers\MySQLDatabaseManager;
 use Throwable;
@@ -60,6 +62,35 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
         } catch (Throwable $e) {
             // Often denied without RELOAD privilege; hPanel assignment still works.
         }
+    }
+
+    /**
+     * Fail fast with a clear message if the app user still cannot USE the tenant DB (MySQL 1044 on shared hosts).
+     */
+    protected function assertTenantDatabaseUsable(string $database): void
+    {
+        $base = $this->database()->getConfig();
+        $base['database'] = $database;
+        $connName = '_tenant_access_check_' . substr(md5($database), 0, 16);
+        config(["database.connections.{$connName}" => $base]);
+        DB::purge($connName);
+
+        try {
+            DB::connection($connName)->getPdo()->query('SELECT 1');
+        } catch (Throwable $e) {
+            $msg = $e->getMessage();
+            DB::purge($connName);
+            $user = (string) ($base['username'] ?? '');
+            if (str_contains($msg, '1044') || str_contains($msg, 'Access denied for user')) {
+                throw new RuntimeException(
+                    "MySQL 1044: user [{$user}] cannot access database [{$database}]. "
+                    . 'Hostinger: hPanel → Websites → Databases → open this database → Privileged users → '
+                    . "add [{$user}] with ALL privileges. Then retry client provisioning. Raw error: {$msg}"
+                );
+            }
+            throw $e;
+        }
+        DB::purge($connName);
     }
 
     public function createDatabase(TenantWithDatabase $tenant): bool
@@ -142,21 +173,29 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
 
         // localhost, hostinger (hPanel), VPS: master MySQL user runs CREATE DATABASE; tenant connection reuses same user.
         if (in_array($this->serverType(), ['localhost', 'hostinger', 'vps'], true)) {
-            $ok = $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
-            if ($ok) {
-                $this->grantMysqlUserAccessToDatabase($database);
+            if (! $this->databaseExists($database)) {
+                $ok = $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
+                if (! $ok) {
+                    return false;
+                }
             }
+            $this->grantMysqlUserAccessToDatabase($database);
+            $this->assertTenantDatabaseUsable($database);
 
-            return $ok;
+            return true;
         }
 
         // Default: same as Stancl — master user must have CREATE DATABASE (typical on VPS; verify on Hostinger plan).
-        $ok = $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
-        if ($ok) {
-            $this->grantMysqlUserAccessToDatabase($database);
+        if (! $this->databaseExists($database)) {
+            $ok = $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
+            if (! $ok) {
+                return false;
+            }
         }
+        $this->grantMysqlUserAccessToDatabase($database);
+        $this->assertTenantDatabaseUsable($database);
 
-        return $ok;
+        return true;
     }
 
     public function deleteDatabase(TenantWithDatabase $tenant): bool
