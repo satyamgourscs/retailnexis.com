@@ -54,6 +54,12 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    /*
+    | Optional: force public site URL on shared hosting when Host / proxy headers are wrong.
+    | Example: https://retailnexis.com (no trailing slash). Leave empty to derive from the request.
+    */
+    'public_url' => env('APP_PUBLIC_URL'),
+
     'asset_url' => env('ASSET_URL', null),
 
     /*

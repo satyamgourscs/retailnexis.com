@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\App;
 use Stancl\Tenancy\Events\TenancyBootstrapped;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -38,25 +37,6 @@ class AppServiceProvider extends ServiceProvider
 
         if (app()->runningInConsole()) {
             return;
-        }
-
-        // Production behind real domain: if .env still has APP_URL from local (127.0.0.1 / localhost),
-        // Laravel builds absolute redirects (e.g. installer) to the wrong host. Force URL root from HTTP request.
-        $request = request();
-        if ($request && $request->getHost()) {
-            $host = $request->getHost();
-            $appUrl = (string) config('app.url', '');
-            $looksLocalAppUrl = $appUrl === ''
-                || str_contains($appUrl, '127.0.0.1')
-                || str_contains($appUrl, 'localhost')
-                || str_contains($appUrl, '::1');
-            $hostIsLocal = in_array($host, ['127.0.0.1', 'localhost', '::1'], true);
-            if (! $hostIsLocal && $looksLocalAppUrl) {
-                URL::forceRootUrl($request->getSchemeAndHttpHost());
-                if ($request->secure()) {
-                    URL::forceScheme('https');
-                }
-            }
         }
 
         $isLandlordConfigured = ! empty(config('app.landlord_db'));

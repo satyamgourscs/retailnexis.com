@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Artisan;
 
 
@@ -69,7 +70,8 @@ Route::controller(landlord\LandingPageController::class)->group(function () {
     // Use config (not env): after `config:cache`, env('LANDLORD_DB') is always null in routes → endless installer redirect.
     if (empty(config('app.landlord_db'))) {
         Route::get('/', function () {
-            return redirect('/saas/install/step-1');
+            // Path-only: Laravel's redirect() absolutizes via APP_URL and can send users to 127.0.0.1.
+            return new RedirectResponse('/saas/install/step-1');
         });
     } else {
         Route::get('/', 'index');
