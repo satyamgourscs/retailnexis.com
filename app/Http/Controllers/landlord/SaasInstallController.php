@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\QueryException;
 
 class SaasInstallController extends Controller
@@ -200,8 +201,19 @@ class SaasInstallController extends Controller
             // Ignore ini failures; import may still succeed.
         }
 
-        // Ensure landlord connection is used explicitly during install.
-        DB::connection('saleprosaas_landlord')->unprepared($dbdata);
+        $connectionName = 'saleprosaas_landlord';
+
+        // Re-importing the full dump fails with "Table 'migrations' already exists" if the DB was
+        // partially or fully installed before. Skip the dump when landlord schema is already present.
+        try {
+            if (Schema::connection($connectionName)->hasTable('migrations')) {
+                return;
+            }
+        } catch (\Throwable $e) {
+            // If we cannot inspect schema, attempt import anyway.
+        }
+
+        DB::connection($connectionName)->unprepared($dbdata);
     }
 
     protected static function optimizeClear(): void
@@ -234,6 +246,11 @@ class SaasInstallController extends Controller
 
         if ($code === 2002 || str_contains($message, 'SQLSTATE[HY000] [2002]')) {
             return 'Cannot reach MySQL server. Confirm MySQL is running and Host/Port are correct (use 127.0.0.1 and 3306 for XAMPP).';
+        }
+
+        if (str_contains($message, '42S01') || str_contains($message, 'Base table or view already exists') || str_contains($message, '1050')) {
+            return 'This database already contains landlord tables (e.g. from a previous install). '
+                . 'Use a new empty database, or drop all tables in the selected database, then run the installer again.';
         }
 
         return $message;
