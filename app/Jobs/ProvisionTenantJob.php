@@ -261,15 +261,30 @@ class ProvisionTenantJob implements ShouldQueue
                 }
             }
         } catch (Throwable $e) {
+            $errorText = $e->getMessage();
+            if (str_contains($errorText, '1044') || preg_match('/Access denied for user.*to database/i', $errorText)) {
+                try {
+                    $t = Tenant::find($this->tenantId);
+                    if ($t) {
+                        $dbName = $t->database()->getName();
+                        $mysqlUser = (string) config('database.connections.saleprosaas_tenant.username');
+                        $errorText .= ' [Fix: hPanel → Websites → Databases → open database ' . $dbName
+                            . ' → Privileged users → add ' . $mysqlUser . ' with ALL privileges. Or delete this tenant and recreate after deploying the latest CustomMySQLDatabaseManager GRANT fix.]';
+                    }
+                } catch (Throwable) {
+                    // ignore
+                }
+            }
+
             Log::error('ProvisionTenantJob failed', [
                 'tenant_id' => $this->tenantId,
-                'error' => $e->getMessage(),
+                'error' => $errorText,
             ]);
 
             DB::table('tenants')->where('id', $this->tenantId)->update([
                 'provisioning_status' => 'failed',
                 'provisioning_completed_at' => now(),
-                'provisioning_error' => mb_substr($e->getMessage(), 0, 2000),
+                'provisioning_error' => mb_substr($errorText, 0, 2000),
             ]);
 
             // Let the queue retry.

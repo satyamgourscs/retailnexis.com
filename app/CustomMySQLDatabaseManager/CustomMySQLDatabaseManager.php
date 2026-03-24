@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\CustomMySQLDatabaseManager;
 
-use Stancl\Tenancy\TenantDatabaseManagers\MySQLDatabaseManager;
+use Illuminate\Support\Facades\Log;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
+use Stancl\Tenancy\TenantDatabaseManagers\MySQLDatabaseManager;
+use Throwable;
 
 /**
  * Tenant database lifecycle for Stancl Tenancy.
@@ -14,12 +16,50 @@ use Stancl\Tenancy\Contracts\TenantWithDatabase;
  * is used for landlord + all tenants. New tenant DBs are created with CREATE DATABASE over the
  * saleprosaas_tenant template connection; the same user must retain ALL privileges on databases it creates.
  * Hostinger may require CREATE DATABASE privilege — if denied, create DBs in hPanel and assign the user.
+ *
+ * SQLSTATE[HY000] [1044]: MySQL user has no privilege on the new DB. After CREATE DATABASE, some hosts do not
+ * auto-assign the panel user; we try GRANT (requires GRANT OPTION). If that fails, link DB + user in hPanel
+ * (Databases → select DB → assign user with ALL privileges).
  */
 class CustomMySQLDatabaseManager extends MySQLDatabaseManager
 {
     protected function serverType(): string
     {
         return (string) config('app.server_type', '');
+    }
+
+    /**
+     * Ensure the same MySQL user used for tenant connections can use this schema (fixes 1044 on some shared hosts).
+     */
+    protected function grantMysqlUserAccessToDatabase(string $database): void
+    {
+        $username = (string) $this->database()->getConfig('username');
+        if ($username === '') {
+            return;
+        }
+
+        $db = str_replace('`', '``', $database);
+        $user = str_replace('`', '``', $username);
+
+        foreach (['127.0.0.1', 'localhost', '%'] as $host) {
+            $h = str_replace('`', '``', $host);
+            try {
+                $this->database()->statement("GRANT ALL PRIVILEGES ON `{$db}`.* TO `{$user}`@`{$h}`");
+            } catch (Throwable $e) {
+                Log::debug('Tenant DB GRANT not applied (expected on hosts without GRANT OPTION)', [
+                    'database' => $database,
+                    'mysql_user' => $username,
+                    'mysql_host' => $host,
+                    'message' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        try {
+            $this->database()->statement('FLUSH PRIVILEGES');
+        } catch (Throwable $e) {
+            // Often denied without RELOAD privilege; hPanel assignment still works.
+        }
     }
 
     public function createDatabase(TenantWithDatabase $tenant): bool
@@ -102,11 +142,21 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
 
         // localhost, hostinger (hPanel), VPS: master MySQL user runs CREATE DATABASE; tenant connection reuses same user.
         if (in_array($this->serverType(), ['localhost', 'hostinger', 'vps'], true)) {
-            return $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
+            $ok = $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
+            if ($ok) {
+                $this->grantMysqlUserAccessToDatabase($database);
+            }
+
+            return $ok;
         }
 
         // Default: same as Stancl — master user must have CREATE DATABASE (typical on VPS; verify on Hostinger plan).
-        return $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
+        $ok = $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
+        if ($ok) {
+            $this->grantMysqlUserAccessToDatabase($database);
+        }
+
+        return $ok;
     }
 
     public function deleteDatabase(TenantWithDatabase $tenant): bool

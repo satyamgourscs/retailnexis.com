@@ -76,7 +76,7 @@
                     <td>{{ $blog->title }}</td>
                     <td>
                         <button type="button" data-id="{{$blog->id}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal" ><i class="dripicons-document-edit"></i></button>
-                        <form class="d-inline" method="post" action="{{ route('blog.delete', $blog->id) }}">
+                        <form class="d-inline" method="post" action="{{ route('blog.delete', $blog->id, false) }}">
                         @csrf
                             <button type="submit" class="btn btn-link" onclick="return confirm('{{__('db.Are you sure you want to delete?')}}')"><i class="dripicons-trash"></i></button>
                         </form>

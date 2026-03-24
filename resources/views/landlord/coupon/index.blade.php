@@ -202,9 +202,7 @@
 @push('scripts')
 <script type="text/javascript">
 
-    $("ul#sale").siblings('a').attr('aria-expanded','true');
-    $("ul#sale").addClass("show");
-    $("ul#sale #coupon-menu").addClass("active");
+    $("#coupon-menu").addClass("active");
 
     var coupon_id = [];
     var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;

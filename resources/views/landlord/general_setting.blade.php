@@ -341,9 +341,7 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#setting").siblings('a').attr('aria-expanded','true');
-    $("ul#setting").addClass("show");
-    $("ul#setting #general-setting-menu").addClass("active");
+    $("#general-setting-menu").addClass("active");
     $('.selectpicker').selectpicker('refresh');
     $('[data-toggle="tooltip"]').tooltip();
     $('.card-header').on('click', function() {

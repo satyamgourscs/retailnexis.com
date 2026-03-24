@@ -109,9 +109,7 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#setting").siblings('a').attr('aria-expanded','true');
-    $("ul#setting").addClass("show");
-    $("ul#setting #user-menu").addClass("active");
+    $("#superadmin-profile-menu").addClass("active");
 
 
 

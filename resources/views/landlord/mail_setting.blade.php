@@ -66,8 +66,6 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#setting").siblings('a').attr('aria-expanded','true');
-    $("ul#setting").addClass("show");
-    $("ul#setting #mail-setting-menu").addClass("active");
+    $("#mail-setting-menu").addClass("active");
 </script>
 @endpush

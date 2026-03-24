@@ -37,7 +37,7 @@
     <link rel="preload" href="<?php echo asset('vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="<?php echo asset('vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" rel="stylesheet"></noscript>
 
-    @if(Route::current()->getName() != '/')
+    @if(optional(Route::current())->getName() != '/')
     <!-- date range stylesheet-->
     <link rel="preload" href="<?php echo asset('vendor/daterange/css/daterangepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="<?php echo asset('vendor/daterange/css/daterangepicker.min.css') ?>" rel="stylesheet"></noscript>
@@ -94,7 +94,7 @@
     <link rel="preload" href="<?php echo asset('../../vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="<?php echo asset('../../vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" rel="stylesheet"></noscript>
 
-    @if(Route::current()->getName() != '/')
+    @if(optional(Route::current())->getName() != '/')
     <!-- date range stylesheet-->
     <link rel="preload" href="<?php echo asset('../../vendor/daterange/css/daterangepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="<?php echo asset('../../vendor/daterange/css/daterangepicker.min.css') ?>" rel="stylesheet"></noscript>
@@ -147,7 +147,7 @@
                 </ul>
             </li>
             <li><a href="{{ route('payments.index', [], false) }}"><i class="dripicons-card"></i> {{__('db.Payments')}}</a></li>
-            <li><a href="{{ route('coupon.index', [], false) }}"><i class="dripicons-card"></i> {{__('db.Coupon List')}}</a></li>
+            <li id="coupon-menu"><a href="{{ route('coupon.index', [], false) }}"><i class="dripicons-card"></i> {{__('db.Coupon List')}}</a></li>
             <li><a href="#package" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-archive"></i><span>{{__('db.Package')}}</span><span></a>
                 <ul id="package" class="collapse list-unstyled ">
                     <li id="package-list-menu"><a href="{{ route('packages.index', [], false) }}">{{__('db.Package List')}}</a></li>
@@ -171,8 +171,8 @@
             @if(!$general_setting->disable_tenant_support_tickets)
             <li><a href="{{ route('superadmin.tickets.index', [], false) }}"><i class="dripicons-ticket"></i> {{__('db.support_tickets')}}</a></li>
             @endif
-            <li><a href="{{ route('superadminGeneralSetting', [], false) }}"><i class="dripicons-gear"></i> {{__('db.settings')}}</a></li>
-            <li><a href="{{ route('superadminMailSetting', [], false) }}"><i class="dripicons-mail"></i> {{__('db.Mail Setting')}}</a></li>
+            <li id="general-setting-menu"><a href="{{ route('superadminGeneralSetting', [], false) }}"><i class="dripicons-gear"></i> {{__('db.settings')}}</a></li>
+            <li id="mail-setting-menu"><a href="{{ route('superadminMailSetting', [], false) }}"><i class="dripicons-mail"></i> {{__('db.Mail Setting')}}</a></li>
             <li><a href="{{url('superadmin/addon-list')}}"><i class="dripicons-flag"></i> {{__('db.Addons')}}</a></li>
         </ul>
       </nav>
@@ -266,7 +266,7 @@
                 <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst($headerDisplayName)}}</span> <i class="fa fa-angle-down"></i>
                 </a>
                 <ul class="right-sidebar">
-                    <li>
+                    <li id="superadmin-profile-menu">
                         <a href="{{ route('user.superadminProfile', ['id' => Auth::id()], false) }}"><i class="dripicons-user"></i> {{__('db.profile')}}</a>
                     </li>
                     <li>
@@ -330,7 +330,7 @@
           <script type="text/javascript" src="<?php echo asset('js/front.js') ?>"></script>
         @endif
 
-        @if(Route::current()->getName() != '/')
+        @if(optional(Route::current())->getName() != '/')
         <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/moment.min.js') ?>"></script>
         <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/knockout-3.4.2.js') ?>"></script>
         <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/daterangepicker.min.js') ?>"></script>
@@ -384,7 +384,7 @@
           <script type="text/javascript" src="<?php echo asset('../../js/front.js') ?>"></script>
         @endif
 
-        @if(Route::current()->getName() != '/')
+        @if(optional(Route::current())->getName() != '/')
         <script type="text/javascript" src="<?php echo asset('../../vendor/daterange/js/moment.min.js') ?>"></script>
         <script type="text/javascript" src="<?php echo asset('../../vendor/daterange/js/knockout-3.4.2.js') ?>"></script>
         <script type="text/javascript" src="<?php echo asset('../../vendor/daterange/js/daterangepicker.min.js') ?>"></script>
