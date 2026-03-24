@@ -55,7 +55,7 @@ class PageController extends Controller
 
     public function store(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
 
         $this->validate($request, [
@@ -82,7 +82,7 @@ class PageController extends Controller
 
     public function update(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $input = $request->all();
         Page::find($input['page_id'])->update($input);
@@ -92,7 +92,7 @@ class PageController extends Controller
 
     public function sort(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $pages = Page::all();
         foreach ($pages as $page) {
@@ -109,7 +109,7 @@ class PageController extends Controller
 
     public function delete($id)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $page = Page::find($id);
         $page->delete();

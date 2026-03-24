@@ -66,7 +66,7 @@ class AddonInstallController extends Controller
         if(!config('database.connections.saleprosaas_landlord')) {
             $db_str = 'db.';
         }
-        if(!env('USER_VERIFIED')) {
+        if(!config('app.user_verified')) {
             return redirect()->back()->with('not_permitted', __($db_str.'This feature is disable for demo!'));
         }
 

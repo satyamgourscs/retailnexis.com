@@ -32,7 +32,7 @@ class CouponController extends Controller
 
     public function store(Request $request)
     {
-        if (!env('USER_VERIFIED'))
+        if (!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         
         $data = $request->all();

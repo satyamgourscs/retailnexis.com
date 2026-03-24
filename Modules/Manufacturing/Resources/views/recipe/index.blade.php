@@ -168,7 +168,7 @@
     var product_id = [];
     var all_permission = <?php echo json_encode($all_permission) ?>;
     var role_id = <?php echo json_encode($role_id) ?>;
-    var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
+    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
     var logoUrl = <?php echo json_encode(url('logo', $general_setting->site_logo)) ?>;
     var warehouse_id = <?php echo json_encode($warehouse_id); ?>;
 

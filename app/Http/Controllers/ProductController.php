@@ -1187,7 +1187,7 @@ class ProductController extends Controller
     public function updateProduct(Request $request)
     {
 
-        if(!env('USER_VERIFIED')) {
+        if(!config('app.user_verified')) {
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
         }
 
@@ -2075,7 +2075,7 @@ if (!empty($data['image']) && $data['image'] != 'zummXD2dvAtI.png') {
 
     public function destroy($id)
     {
-        if(!env('USER_VERIFIED')) {
+        if(!config('app.user_verified')) {
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
         }
         else {

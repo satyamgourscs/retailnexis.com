@@ -20,7 +20,7 @@ class PaymentController extends Controller
 
     public function tenantCheckout(Request $request)
     {
-        if (!env('USER_VERIFIED')) {
+        if (!config('app.user_verified')) {
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         }
         // Check if email is verified

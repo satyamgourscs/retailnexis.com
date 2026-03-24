@@ -22,7 +22,7 @@ class HeroController extends Controller
 
     public function store(Request $request)
     {
-        if (!env('USER_VERIFIED'))
+        if (!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         
         $heroes = DB::table('heroes')->get()->keyBy('lang_id');

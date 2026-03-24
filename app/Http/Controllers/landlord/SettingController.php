@@ -24,7 +24,7 @@ class SettingController extends Controller
 
     public function superadminGeneralSettingStore(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $this->validate($request, [
@@ -136,7 +136,7 @@ class SettingController extends Controller
 
     public function superadminMailSettingStore(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         try {

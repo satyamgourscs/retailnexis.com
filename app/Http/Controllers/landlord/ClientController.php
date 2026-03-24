@@ -45,7 +45,7 @@ class ClientController extends Controller
         // Tenant create + migrate + tenants:seed can exceed PHP's default 30s limit on local XAMPP.
         $this->raiseRuntimeLimitsForLongOperations();
 
-        if (!env('USER_VERIFIED'))
+        if (!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
 
         if (cache()->has('general_setting')) {
@@ -454,7 +454,7 @@ class ClientController extends Controller
 
     public function addCustomDomain(Request $request)
     {
-        if (!env('USER_VERIFIED'))
+        if (!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
 
         $validated = $request->validate([
@@ -591,7 +591,7 @@ class ClientController extends Controller
 
     public function renew(Request $request)
     {
-        if (!env('USER_VERIFIED'))
+        if (!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
 
         $validated = $request->validate([
@@ -630,7 +630,7 @@ class ClientController extends Controller
 
     public function changePackage(Request $request)
     {
-        if (!env('USER_VERIFIED'))
+        if (!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $validated = $request->validate([
             'client_id' => ['required', 'string', 'exists:tenants,id'],
@@ -704,7 +704,7 @@ class ClientController extends Controller
 
     public function destroy($id)
     {
-        if (!env('USER_VERIFIED'))
+        if (!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $tenant = Tenant::find($id);
         if (! $tenant) {
@@ -730,7 +730,7 @@ class ClientController extends Controller
 
     public function deleteBySelection(Request $request)
     {
-        if (!env('USER_VERIFIED'))
+        if (!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
 
         $validated = $request->validate([

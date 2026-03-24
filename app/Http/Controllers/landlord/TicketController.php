@@ -41,7 +41,7 @@ class TicketController extends Controller
     public function store(Request $request)
     {
 
-        if (!env('USER_VERIFIED')) {
+        if (!config('app.user_verified')) {
             return redirect()->back()->with('not_permitted', 'This feature is disabled for demo!');
         }
 
@@ -107,7 +107,7 @@ class TicketController extends Controller
 
     public function reply(Request $request, $id)
     {
-        if (!env('USER_VERIFIED')) {
+        if (!config('app.user_verified')) {
             return redirect()->back()->with('not_permitted', 'This feature is disabled for demo!');
         }
 
@@ -168,7 +168,7 @@ class TicketController extends Controller
 
     public function destroy($id)
     {
-        if (!env('USER_VERIFIED')) {
+        if (!config('app.user_verified')) {
             return redirect()->back()->with('not_permitted', 'This feature is disabled for demo!');
         }
 

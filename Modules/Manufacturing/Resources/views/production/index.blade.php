@@ -144,7 +144,7 @@
 
 
     var production_id = [];
-    var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
+    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
     var starting_date = <?php echo json_encode($starting_date); ?>;
     var ending_date = <?php echo json_encode($ending_date); ?>;
     var warehouse_id = <?php echo json_encode($warehouse_id); ?>;

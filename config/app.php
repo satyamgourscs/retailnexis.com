@@ -75,6 +75,14 @@ return [
     'landlord_db' => env('LANDLORD_DB') ?: (env('DB_CONNECTION') === 'saleprosaas_landlord' ? env('DB_DATABASE') : null),
 
     /*
+    | Legacy "demo mode" gate (was env USER_VERIFIED only). Defaults to true so production works
+    | without .env; set USER_VERIFIED=false to enable demo restrictions / LionCoders-style locks.
+    */
+    'user_verified' => env('USER_VERIFIED') === null || env('USER_VERIFIED') === ''
+        ? true
+        : filter_var(env('USER_VERIFIED'), FILTER_VALIDATE_BOOLEAN),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------

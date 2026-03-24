@@ -437,7 +437,7 @@
         $("ul#client #client-list-menu").addClass("active");
 
         var client_id = [];
-        var user_verified = <?php echo json_encode((string) env('USER_VERIFIED')); ?>;
+        var user_verified = <?php echo json_encode((string) config('app.user_verified')); ?>;
         var checkSubdomainUrl = '{{ route('clients.checkSubdomain', [], false) }}';
 
         let tenantTouched = false;

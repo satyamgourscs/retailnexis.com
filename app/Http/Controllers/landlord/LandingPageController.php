@@ -300,7 +300,7 @@ class LandingPageController extends Controller
 
     public function updateTenantDB()
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $tenant_all = Tenant::all();
         if(count($tenant_all)) {
@@ -314,7 +314,7 @@ class LandingPageController extends Controller
 
     public function updateSuperadminDB()
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         \Artisan::call('migrate --path=/database/migrations/landlord');
         \Artisan::call('db:seed');
@@ -323,7 +323,7 @@ class LandingPageController extends Controller
 
     public function backupTenantDB()
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $tenants = Tenant::select('id')->get();
         if (count($tenants)) {
@@ -426,7 +426,7 @@ class LandingPageController extends Controller
 
     public function renewSubscription(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         //return $request;
         $tenant = Tenant::find($request->id);

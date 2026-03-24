@@ -41,7 +41,7 @@ class SettingController extends Controller
 
     public function emptyDatabase()
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
         //clearing all the cached queries
         $this->cacheForget('biller_list');
@@ -99,7 +99,7 @@ class SettingController extends Controller
 
     public function generalSettingStore(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $this->validate($request, [
@@ -185,7 +185,7 @@ class SettingController extends Controller
 
     public function backup()
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         // Database configuration
@@ -297,7 +297,7 @@ class SettingController extends Controller
 
     public function mailSettingStore(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $data = $request->all();
@@ -408,7 +408,7 @@ class SettingController extends Controller
 
     public function smsSettingStore(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $data = $request->all();
@@ -553,7 +553,7 @@ class SettingController extends Controller
                 ->with('not_permitted', __('db.Sorry! You are not allowed to access this module'));
         }
 
-        if (!env('USER_VERIFIED')) {
+        if (!config('app.user_verified')) {
             Session::flash('message', 'This feature is disabled for demo!');
             Session::flash('type', 'error');
             return redirect()->back();
@@ -650,7 +650,7 @@ class SettingController extends Controller
 
     public function posSettingStore(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $data = $request->all();

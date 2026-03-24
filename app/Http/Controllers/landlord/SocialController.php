@@ -20,7 +20,7 @@ class SocialController extends Controller
 
     public function store(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         foreach ($request->name as $key => $name) {
             $data = array(
@@ -38,7 +38,7 @@ class SocialController extends Controller
 
     public function update(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $input = array(
             'icon'          => $request->icon,
@@ -68,7 +68,7 @@ class SocialController extends Controller
 
     public function delete($id)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $social = Social::find($id);
         $social->delete();

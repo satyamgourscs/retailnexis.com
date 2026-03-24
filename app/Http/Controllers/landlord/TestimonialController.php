@@ -22,7 +22,7 @@ class TestimonialController extends Controller
 
     public function store(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $this->validate($request, [
             'image.*' => 'image|mimes:jpg,jpeg,png|max:100000',
@@ -59,7 +59,7 @@ class TestimonialController extends Controller
 
     public function update(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $input = array(
             'name'            => $request->name,
@@ -74,7 +74,7 @@ class TestimonialController extends Controller
 
     public function sort(Request $request)
     {
-        if(!env('USER_VERIFIED'))
+        if(!config('app.user_verified'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $testimonials = Testimonial::all();
 

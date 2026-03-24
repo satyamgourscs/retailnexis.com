@@ -52,7 +52,7 @@
     @endif
     <!--Header-->
     <!--Header Area starts-->
-    @if(env('USER_VERIFIED')==1)
+    @if(config('app.user_verified')==1)
     <div style="display:none;position:fixed;right:0;top:200px;z-index:99">
         <span id="light-theme" class="btn btn-light d-block"><i class="fa fa-sun-o"></i></span>
         <span id="dark-theme" class="btn btn-dark d-block"><i class="fa fa-moon-o"></i></span>
@@ -1053,7 +1053,7 @@
     {!!$general_setting->chat_script!!}
     @endif
 
-    @if(env('USER_VERIFIED')==1)
+    @if(config('app.user_verified')==1)
     <script>
         $('#light-theme').on('click',function(){
             var css = $('#switch-style').attr('href');

@@ -383,7 +383,7 @@
                 @foreach ($languages as $language)
                 <a class="dropdown-item premium-top-menu-link" href="{{ url('language_switch/'.$language->id) }}">{{ $language->name }}</a>
                 @endforeach
-                @if (!env('USER_VERIFIED'))
+                @if (!config('app.user_verified'))
                   @if ($language_setting_active)
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item premium-top-menu-link premium-top-menu-link--accent" href="{{ route('languages') }}">{{ __('db.Languages') }} <span class="float-right">→</span></a>

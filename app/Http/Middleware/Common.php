@@ -17,7 +17,7 @@ class Common
 
     public function handle(Request $request, Closure $next)
     {
-        if (!env('USER_VERIFIED') && session()->has('database')) {
+        if (!config('app.user_verified') && session()->has('database')) {
             \Config::set('database.connections.mysql.database', session('database'));
             DB::purge('mysql');
         }

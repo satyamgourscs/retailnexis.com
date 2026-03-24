@@ -20,7 +20,7 @@
 
 @section('content')
 <!-- Alert Section for version upgrade-->
-@if (env('USER_VERIFIED'))
+@if (config('app.user_verified'))
     @if(isset($versionUpgradeData['alert_version_upgrade_enable']) && $versionUpgradeData['alert_version_upgrade_enable']==true)
         <div id="alertSection" class="alert not-slide alert-primary alert-dismissible fade show" role="alert">
             <p id="announce"><strong>Announce !!!</strong> A new version {{$versionUpgradeData['demo_version']}} has been released. Please <i><b><a href="{{route('saas-new-release')}}">Click here</a></b></i> to check upgrade details.</p>
