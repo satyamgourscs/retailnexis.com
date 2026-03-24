@@ -83,6 +83,13 @@ return [
         : filter_var(env('USER_VERIFIED'), FILTER_VALIDATE_BOOLEAN),
 
     /*
+    | Deployment target for tenant DB creation (CustomMySQLDatabaseManager / Stancl tenancy).
+    | Values: hostinger | cpanel | plesk | localhost | vps | (empty = generic MySQL CREATE DATABASE).
+    | Read via config('app.server_type') so php artisan config:cache works.
+    */
+    'server_type' => env('SERVER_TYPE', ''),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------

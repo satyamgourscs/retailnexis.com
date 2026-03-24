@@ -23,7 +23,7 @@ class SaasInstallationRequest extends FormRequest
     {
 
         $rules = [
-            'server_type' => 'required',
+            'server_type' => 'required|in:cpanel,plesk,localhost,hostinger,vps',
             'purchasecode' => 'required',
             'db_host' => 'required|string',
             'db_port' => 'required|numeric',

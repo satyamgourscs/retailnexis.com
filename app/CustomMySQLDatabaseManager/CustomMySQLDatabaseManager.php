@@ -4,15 +4,23 @@ declare(strict_types=1);
 
 namespace App\CustomMySQLDatabaseManager;
 
-use Illuminate\Database\Connection;
-use Illuminate\Support\Facades\DB;
-use Stancl\Tenancy\Contracts\TenantDatabaseManager;
 use Stancl\Tenancy\TenantDatabaseManagers\MySQLDatabaseManager;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
-use Stancl\Tenancy\Exceptions\NoConnectionSetException;
 
+/**
+ * Tenant database lifecycle for Stancl Tenancy.
+ *
+ * Hostinger shared hosting (SERVER_TYPE=hostinger): one "master" MySQL user (DB_USERNAME / DB_PASSWORD)
+ * is used for landlord + all tenants. New tenant DBs are created with CREATE DATABASE over the
+ * saleprosaas_tenant template connection; the same user must retain ALL privileges on databases it creates.
+ * Hostinger may require CREATE DATABASE privilege — if denied, create DBs in hPanel and assign the user.
+ */
 class CustomMySQLDatabaseManager extends MySQLDatabaseManager
 {
+    protected function serverType(): string
+    {
+        return (string) config('app.server_type', '');
+    }
 
     public function createDatabase(TenantWithDatabase $tenant): bool
     {
@@ -20,7 +28,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
         $charset = $this->database()->getConfig('charset');
         $collation = $this->database()->getConfig('collation');
 
-        if (env('SERVER_TYPE') == 'cpanel') {
+        if ($this->serverType() === 'cpanel') {
             $headers = array(
                 "Authorization: cpanel " . env('CPANEL_USER_NAME') . ":" . env('CPANEL_API_KEY'),
                 "Content-Type: text/plain"
@@ -56,7 +64,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
 
             return true;
 
-        } elseif (env('SERVER_TYPE') == 'plesk') {
+        } elseif ($this->serverType() === 'plesk') {
             $host = config('app.central_domain');
             $username = env('PLESK_USER_NAME');
             $password = env('PLESK_PASSWORD');
@@ -92,13 +100,12 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             return true;
         }
 
-        // localhost, hostinger (hPanel), VPS: same MySQL user must be able to use the new DB after CREATE.
-        // Hostinger shared: if CREATE DATABASE is denied, create DB in hPanel and assign user manually (see .env.example).
-        if (in_array(env('SERVER_TYPE'), ['localhost', 'hostinger', 'vps'], true)) {
+        // localhost, hostinger (hPanel), VPS: master MySQL user runs CREATE DATABASE; tenant connection reuses same user.
+        if (in_array($this->serverType(), ['localhost', 'hostinger', 'vps'], true)) {
             return $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
         }
 
-        // Default: Stancl behaviour — requires MySQL user with CREATE DATABASE privilege.
+        // Default: same as Stancl — master user must have CREATE DATABASE (typical on VPS; verify on Hostinger plan).
         return $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
     }
 
@@ -108,7 +115,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
         $charset = $this->database()->getConfig('charset');
         $collation = $this->database()->getConfig('collation');
 
-        if (env('SERVER_TYPE') == 'cpanel') {
+        if ($this->serverType() === 'cpanel') {
             $headers = array(
                 "Authorization: cpanel " . env('CPANEL_USER_NAME') . ":" . env('CPANEL_API_KEY'),
                 "Content-Type: text/plain"
@@ -126,7 +133,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             curl_exec($curl);
             curl_close($curl);
             return true;
-        } elseif (env('SERVER_TYPE') == 'plesk') {
+        } elseif ($this->serverType() === 'plesk') {
             $host = config('app.central_domain');
             $username = env('PLESK_USER_NAME');
             $password = env('PLESK_PASSWORD');
@@ -145,7 +152,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             curl_exec($ch);
             curl_close($ch);
             return true;
-        } elseif (in_array(env('SERVER_TYPE'), ['localhost', 'hostinger', 'vps'], true)) {
+        } elseif (in_array($this->serverType(), ['localhost', 'hostinger', 'vps'], true)) {
             return $this->database()->statement("DROP DATABASE `{$tenant->database()->getName()}`");
         }
 

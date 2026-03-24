@@ -43,6 +43,11 @@
                                 <input type="radio" class="form-check-input" value="localhost" name="server_type">localhost/VPS/Dedicated
                             </label>
                         </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" value="hostinger" name="server_type">Hostinger (shared, master MySQL user)
+                            </label>
+                        </div>
 
                         <br>
 
@@ -105,7 +110,7 @@
                 } else if ($(this).val() == 'plesk') {
                     $('#cpanel_fields').hide();
                     $('#plesk_fields').show();
-                } else if ($(this).val() == 'localhost') {
+                } else if ($(this).val() == 'localhost' || $(this).val() == 'hostinger') {
                     $('#cpanel_fields').hide();
                     $('#plesk_fields').hide();
                 }
