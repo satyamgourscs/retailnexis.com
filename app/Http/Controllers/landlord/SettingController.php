@@ -125,7 +125,7 @@ class SettingController extends Controller
         }
         /////////////////////////End payment gateway saved in external_services table////////////////////
 
-        return redirect()->back()->with('message', __('db.Data updated successfully'));
+        return redirect()->route('superadminGeneralSetting')->with('message', __('db.Data updated successfully'));
     }
 
     public function superadminMailSetting()
@@ -174,15 +174,13 @@ class SettingController extends Controller
                         ->subject(__('db.Test Mail'));
             });
 
-            $targetPath = parse_url(route('superadminMailSetting'), PHP_URL_PATH) ?: '/';
-            return redirect()->to($targetPath)->with(
+            return redirect()->route('superadminMailSetting')->with(
                 'message',
                 __('db.data_updated_mail_sent') . ' ' . $mail_setting->from_address
             );
         } catch (\Exception $e) {
             // Fail gracefully (avoid 500 "server snapped" pages)
-            $targetPath = parse_url(route('superadminMailSetting'), PHP_URL_PATH) ?: '/';
-            return redirect()->to($targetPath)->with(
+            return redirect()->route('superadminMailSetting')->with(
                 'not_permitted',
                 __('db.data_updated_mail_fail') . ' ' . mb_substr($e->getMessage(), 0, 2000)
             );

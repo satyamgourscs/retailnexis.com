@@ -20,6 +20,7 @@ use Session;
 use Mail;
 use ZipArchive;
 use Illuminate\Support\Facades\App;
+use Illuminate\Database\Eloquent\Model;
 
 class LandingPageController extends Controller
 {
@@ -170,6 +171,21 @@ class LandingPageController extends Controller
             abort(503, 'Landlord database has no general_settings row. Re-run the installer or restore the landlord database.');
         }
 
+        $this->applyNexaProBrandingToLandingCms(
+            $hero,
+            $module_description,
+            $faq_description,
+            $tenant_signup_description,
+            $packages,
+            $modules,
+            $features,
+            $faqs,
+            $testimonials,
+            $blogs,
+            $pages,
+            $coupon_list
+        );
+
         $layout = $general_setting->frontend_layout ?? 'regular';
 
         if ($layout === 'custom') {
@@ -177,6 +193,63 @@ class LandingPageController extends Controller
         }
 
         return view('landlord.index', compact('general_setting', 'hero', 'all_features', 'packages', 'faq_description', 'faqs', 'modules', 'module_description', 'features', 'testimonials', 'socials', 'blogs', 'pages', 'tenant_signup_description', 'present_lang', 'coupon_list'));
+    }
+
+    /**
+     * Replace legacy "SalePro" text from CMS DB rows with "NexaPro" on output (no DB migration).
+     */
+    private function applyNexaProBrandingToLandingCms(
+        $hero,
+        $module_description,
+        $faq_description,
+        $tenant_signup_description,
+        $packages,
+        $modules,
+        $features,
+        $faqs,
+        $testimonials,
+        $blogs,
+        $pages,
+        $coupon_list
+    ): void {
+        foreach ([$hero, $module_description, $faq_description, $tenant_signup_description] as $row) {
+            $this->replaceSaleProWithNexaProInObject($row);
+        }
+        foreach ([$packages, $modules, $features, $faqs, $testimonials, $blogs, $pages] as $collection) {
+            if (! $collection) {
+                continue;
+            }
+            foreach ($collection as $row) {
+                $this->replaceSaleProWithNexaProInObject($row);
+            }
+        }
+        if ($coupon_list) {
+            foreach ($coupon_list as $row) {
+                $this->replaceSaleProWithNexaProInObject($row);
+            }
+        }
+    }
+
+    private function replaceSaleProWithNexaProInObject($row): void
+    {
+        if (! $row || ! is_object($row)) {
+            return;
+        }
+        if ($row instanceof Model) {
+            foreach ($row->getAttributes() as $key => $val) {
+                if (is_string($val) && $val !== '' && stripos($val, 'SalePro') !== false) {
+                    $row->setAttribute($key, str_ireplace('SalePro', 'NexaPro', $val));
+                }
+            }
+
+            return;
+        }
+        foreach (array_keys(get_object_vars($row)) as $key) {
+            $val = $row->{$key};
+            if (is_string($val) && $val !== '' && stripos($val, 'SalePro') !== false) {
+                $row->{$key} = str_ireplace('SalePro', 'NexaPro', $val);
+            }
+        }
     }
 
 
