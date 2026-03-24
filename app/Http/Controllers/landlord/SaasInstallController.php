@@ -272,7 +272,10 @@ class SaasInstallController extends Controller
         return str_contains($m, '42S01')
             || str_contains($m, '1050')
             || str_contains($m, 'Base table or view already exists')
-            || str_contains($m, 'already exists');
+            || str_contains($m, 'already exists')
+            // Dump often does CREATE then ALTER ADD PRIMARY KEY; table may already have PK (1068).
+            || str_contains($m, '1068')
+            || str_contains($m, 'Multiple primary key');
     }
 
     /**
@@ -315,6 +318,9 @@ class SaasInstallController extends Controller
             return true;
         }
         if (str_contains($m, '1062') || str_contains($m, 'Duplicate entry')) {
+            return true;
+        }
+        if (str_contains($m, '1068') || str_contains($m, 'Multiple primary key')) {
             return true;
         }
 
