@@ -10,7 +10,7 @@
 
 
     <!-- Links -->
-    <link rel="icon" type="image/ico" href="{{ asset('frontend/images') }}/{{$ecommerce_setting->favicon ?? ''}}" />
+    <link rel="icon" type="image/ico" href="{{ isset($ecommerce_setting) ? asset('frontend/images/'.($ecommerce_setting->favicon ?? '')) : asset('favicon.ico') }}" />
     <!-- Plugins CSS -->
     <link href="{{ asset('frontend/css/plugins.css') }}" rel="stylesheet" />
 
