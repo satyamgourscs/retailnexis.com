@@ -106,19 +106,6 @@
                 </div>
             </div>
         </div>
-        <!-- This section for demo only-->
-        @if (!env('USER_VERIFIED'))
-            <div class="switch-theme" id="switch-theme"
-                style="background-color:rgba(255,255,255,0.9);border:1px solid #999;padding:15px;position:fixed;bottom:0px;left:0px;right:0px;z-index:99">
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <div class="" style="font-size:11px;color:#666;margin-bottom:15px">Login as</div>
-                        <button type="submit" class="btn btn-sm btn-success admin-btn">Super Admin</button>
-                    </div>
-                </div>
-            </div>
-        @endif
-        <!-- This section for demo only-->
     </div>
 </body>
 
@@ -128,14 +115,11 @@
 
 <script>
     $("div.alert").delay(4000).slideUp(800);
-    //switch theme code
     var theme = <?php echo json_encode($theme); ?>;
     if (theme == 'dark') {
         $('body').addClass('dark-mode');
-        $('#switch-theme i').addClass('dripicons-brightness-low');
     } else {
         $('body').removeClass('dark-mode');
-        $('#switch-theme i').addClass('dripicons-brightness-max');
     }
 
     $('#togglePassword').click(function() {
@@ -149,12 +133,6 @@
             passwordField.attr("type", "password"); // Hide password
             icon.removeClass("fa-eye").addClass("fa-eye-slash"); // Change back icon
         }
-    });
-
-    $('.admin-btn').on('click', function(){
-        $("input[name='name']").focus().val('superadmin');
-        $("input[name='password']").focus().val('superadmin');
-        $('#login-form').submit();
     });
     // ------------------------------------------------------- //
     // Material Inputs
