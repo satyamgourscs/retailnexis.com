@@ -9,8 +9,6 @@ use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\QueryException;
 
 class SaasInstallController extends Controller
 {
@@ -203,17 +201,98 @@ class SaasInstallController extends Controller
 
         $connectionName = 'saleprosaas_landlord';
 
-        // Re-importing the full dump fails with "Table 'migrations' already exists" if the DB was
-        // partially or fully installed before. Skip the dump when landlord schema is already present.
-        try {
-            if (Schema::connection($connectionName)->hasTable('migrations')) {
-                return;
-            }
-        } catch (\Throwable $e) {
-            // If we cannot inspect schema, attempt import anyway.
+        // Fully or partially installed DB: skip re-import (avoids 1050 Table already exists).
+        if (self::landlordDatabaseHasAnyTables($connectionName)) {
+            return;
         }
 
-        DB::connection($connectionName)->unprepared($dbdata);
+        $conn = DB::connection($connectionName);
+
+        try {
+            $conn->unprepared('SET FOREIGN_KEY_CHECKS=0');
+            $conn->unprepared($dbdata);
+        } catch (\Throwable $e) {
+            if (self::isDuplicateOrExistsSqlError($e)) {
+                self::importCentralDatabaseStatementWise($dbdata, $connectionName);
+            } else {
+                throw $e;
+            }
+        } finally {
+            try {
+                $conn->unprepared('SET FOREIGN_KEY_CHECKS=1');
+            } catch (\Throwable $e) {
+            }
+        }
+    }
+
+    /**
+     * True if the landlord database already has at least one table (SHOW TABLES).
+     */
+    protected static function landlordDatabaseHasAnyTables(string $connectionName): bool
+    {
+        try {
+            $rows = DB::connection($connectionName)->select('SHOW TABLES');
+
+            return is_array($rows) && count($rows) > 0;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    protected static function isDuplicateOrExistsSqlError(\Throwable $e): bool
+    {
+        $m = $e->getMessage();
+
+        return str_contains($m, '42S01')
+            || str_contains($m, '1050')
+            || str_contains($m, 'Base table or view already exists')
+            || str_contains($m, 'already exists');
+    }
+
+    /**
+     * Fallback when the single-shot dump fails: run statement chunks and ignore "already exists" /
+     * duplicate row so a re-run on a partly filled DB can complete.
+     */
+    protected static function importCentralDatabaseStatementWise(string $dbdata, string $connectionName): void
+    {
+        $sql = preg_replace('/\/\*[\s\S]*?\*\//', '', $dbdata);
+        $sql = preg_replace('/^\s*--.*$/m', '', (string) $sql);
+        $parts = preg_split('/;\s*[\r\n]+/', (string) $sql);
+        $conn = DB::connection($connectionName);
+
+        foreach ($parts as $part) {
+            $stmt = trim($part);
+            if ($stmt === '') {
+                continue;
+            }
+            $head = strtoupper(substr(ltrim($stmt), 0, 12));
+            if (str_starts_with($head, 'DELIMITER ')) {
+                continue;
+            }
+
+            try {
+                $conn->unprepared($stmt);
+            } catch (\Throwable $e) {
+                if (self::isIgnorableStatementImportError($e)) {
+                    continue;
+                }
+                throw $e;
+            }
+        }
+    }
+
+    protected static function isIgnorableStatementImportError(\Throwable $e): bool
+    {
+        $m = $e->getMessage();
+
+        if (self::isDuplicateOrExistsSqlError($e)) {
+            return true;
+        }
+        if (str_contains($m, '1062') || str_contains($m, 'Duplicate entry')) {
+            return true;
+        }
+
+        return false;
     }
 
     protected static function optimizeClear(): void
