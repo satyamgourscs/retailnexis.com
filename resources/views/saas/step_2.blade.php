@@ -91,7 +91,7 @@
                 <?php if ($passed == '11111111'): ?>
                     <br/><?php echo $ltext; ?><br/>
                     <h5>Great! System Test Completed. You can run SalepProSaaS on your server. Click Continue For Next Step.</h5>
-                    <a href="{{ route('saas-install-step-3') }}" class="btn btn-primary">Continue</a>
+                    <a href="{{ route('saas-install-step-3', [], false) }}" class="btn btn-primary">Continue</a>
 
                 <?php else: ?>
 

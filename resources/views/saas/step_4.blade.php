@@ -21,8 +21,8 @@
                 <h5 class="text-center">You have successfully installed SalepPro SaaS.</h5><br> 
                 <hr>   
                 <br>             
-                <p>Access SAAS landing page - <strong><a href="{{ url('/') }}" target="__blank">Click here</a></strong></p>
-                <p>Access superadmin login page - <strong><a href="{{ url('/superadmin-login') }}" target="__blank">Click here</a></strong></p>
+                <p>Access SAAS landing page - <strong><a href="{{ rtrim(request()->getBaseUrl(), '/') }}/" target="_blank">Click here</a></strong></p>
+                <p>Access superadmin login page - <strong><a href="{{ rtrim(request()->getBaseUrl(), '/') }}/superadmin-login" target="_blank">Click here</a></strong></p>
             </div>
             <hr>
             <footer>Copyright &copy; {{ config('app.name') }}. All rights reserved.</footer>

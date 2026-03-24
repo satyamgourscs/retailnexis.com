@@ -25,7 +25,7 @@
 		        	}
 		        }
 		        ?>
-		        <form action="{{ route('saas-install-process') }}" method="post">
+		        <form action="{{ route('saas-install-process', [], false) }}" method="post">
                     @csrf
 		            <fieldset>
                         <label>Server Type :</label>

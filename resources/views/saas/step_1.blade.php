@@ -17,7 +17,7 @@
 	        </header>
             <hr>
             <div class="content text-center">
-                <a id="letsstart" href="{{ route('saas-install-step-2') }}" class="btn btn-primary">Let's Start</a>
+                <a id="letsstart" href="{{ route('saas-install-step-2', [], false) }}" class="btn btn-primary">Let's Start</a>
                 <hr class="mt-lg-5">
                 <h6>If you need any help with installation, contact your hosting provider or system administrator.</h6>
             </div>
