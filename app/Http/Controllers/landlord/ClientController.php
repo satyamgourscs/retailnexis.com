@@ -508,7 +508,7 @@ class ClientController extends Controller
         });
 
         // Try creating cPanel addon domain when credentials are present.
-        if (env('SERVER_TYPE') === 'cpanel' && env('CPANEL_USER_NAME') && env('CPANEL_API_KEY') && env('CENTRAL_DOMAIN')) {
+        if (env('SERVER_TYPE') === 'cpanel' && env('CPANEL_USER_NAME') && env('CPANEL_API_KEY') && config('app.central_domain')) {
             $panelResult = $this->createAddonDomainInCpanel($domain);
             if (!($panelResult['ok'] ?? false)) {
                 // Roll back the app-level domain insert so we don't leave inconsistent state.
@@ -532,7 +532,7 @@ class ClientController extends Controller
     protected function createAddonDomainInCpanel(string $domain): array
     {
         try {
-            $host = trim((string) env('CENTRAL_DOMAIN'));
+            $host = trim((string) config('app.central_domain'));
             $cpUser = trim((string) env('CPANEL_USER_NAME'));
             $cpKey = trim((string) env('CPANEL_API_KEY'));
             if ($host === '' || $cpUser === '' || $cpKey === '') {

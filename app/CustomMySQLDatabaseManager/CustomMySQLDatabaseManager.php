@@ -27,7 +27,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             );
 
             //custom code for creating DB in a cPanel based server
-            $url = "https://" . env('CENTRAL_DOMAIN') . ":2083/execute/Mysql/create_database?name=" . $database;
+            $url = "https://" . config('app.central_domain') . ":2083/execute/Mysql/create_database?name=" . $database;
 
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_URL, $url);
@@ -41,7 +41,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             curl_close($curl);
 
             //custom code for assigning user to DB in a cPanel based server
-            $url = "https://" . env('CENTRAL_DOMAIN') . ":2083/execute/Mysql/set_privileges_on_database?user=" . env('DB_USERNAME') . "&database=" . $database . "&privileges=ALL";
+            $url = "https://" . config('app.central_domain') . ":2083/execute/Mysql/set_privileges_on_database?user=" . env('DB_USERNAME') . "&database=" . $database . "&privileges=ALL";
 
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_URL, $url);
@@ -55,7 +55,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             curl_close($curl);
 
         } elseif (env('SERVER_TYPE') == 'plesk') {
-            $host = env('CENTRAL_DOMAIN');
+            $host = config('app.central_domain');
             $username = env('PLESK_USER_NAME');
             $password = env('PLESK_PASSWORD');
             $server_id = env('PLESK_DATABASE_SERVER_ID');
@@ -104,7 +104,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
                 "Content-Type: text/plain"
             );
             //custom code for creating DB in a cPanel based server
-            $url = "https://" . env('CENTRAL_DOMAIN') . ":2083/execute/Mysql/delete_database?name=" . $database;
+            $url = "https://" . config('app.central_domain') . ":2083/execute/Mysql/delete_database?name=" . $database;
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_POST, true);
@@ -117,7 +117,7 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             curl_close($curl);
             return true;
         } elseif (env('SERVER_TYPE') == 'plesk') {
-            $host = env('CENTRAL_DOMAIN');
+            $host = config('app.central_domain');
             $username = env('PLESK_USER_NAME');
             $password = env('PLESK_PASSWORD');
             $db_id = $tenant->getInternal('db_id');

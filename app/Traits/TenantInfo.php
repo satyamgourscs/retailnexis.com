@@ -164,7 +164,7 @@ trait TenantInfo
             $paid_by = '';
         //creating tenant
         $tenant = Tenant::create(['id' => $request->tenant]);
-        $tenant->domains()->create(['domain' => $request->tenant . '.' . env('CENTRAL_DOMAIN')]);
+        $tenant->domains()->create(['domain' => $request->tenant . '.' . config('app.central_domain')]);
 
         if ($paid_by) {
             TenantPayment::create(['tenant_id' => $tenant->id, 'amount' => $request->price, 'paid_by' => $paid_by]);
@@ -384,11 +384,11 @@ trait TenantInfo
     {
         $subdomain = $tenant->id;
         if (env('SERVER_TYPE') == 'cpanel') {
-            $url = "https://" . env('CENTRAL_DOMAIN') . ":2083/json-api/cpanel?cpanel_jsonapi_func=addsubdomain&cpanel_jsonapi_module=SubDomain&cpanel_jsonapi_version=2&domain=" . $subdomain . "&rootdomain=" . env('CENTRAL_DOMAIN');
+            $url = "https://" . config('app.central_domain') . ":2083/json-api/cpanel?cpanel_jsonapi_func=addsubdomain&cpanel_jsonapi_module=SubDomain&cpanel_jsonapi_version=2&domain=" . $subdomain . "&rootdomain=" . config('app.central_domain');
             if (env('ROOT_DOMAIN'))
                 $url .= "&dir=public_html";
             else
-                $url .= "&dir=" . env('CENTRAL_DOMAIN');
+                $url .= "&dir=" . config('app.central_domain');
             //return $url;
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_URL, $url);
@@ -426,7 +426,7 @@ trait TenantInfo
                 }
             }
         } elseif (env('SERVER_TYPE') == 'plesk') {
-            $host = env('CENTRAL_DOMAIN');
+            $host = config('app.central_domain');
             $username = env('PLESK_USER_NAME');
             $password = env('PLESK_PASSWORD');
             $pleskApiUrl = 'https://' . $host . ':8443/api/v2/domains';
@@ -469,7 +469,7 @@ trait TenantInfo
     {
         if (env('SERVER_TYPE') == 'cpanel') {
             $subdomain = $tenant->id;
-            $url = "https://" . env('CENTRAL_DOMAIN') . ":2083/json-api/cpanel?cpanel_jsonapi_func=delsubdomain&cpanel_jsonapi_module=SubDomain&cpanel_jsonapi_version=2&domain=" . $subdomain . "." . env('CENTRAL_DOMAIN');
+            $url = "https://" . config('app.central_domain') . ":2083/json-api/cpanel?cpanel_jsonapi_func=delsubdomain&cpanel_jsonapi_module=SubDomain&cpanel_jsonapi_version=2&domain=" . $subdomain . "." . config('app.central_domain');
             //return $url;
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_URL, $url);
@@ -489,7 +489,7 @@ trait TenantInfo
             $resp = curl_exec($curl);
             curl_close($curl);
         } elseif (env('SERVER_TYPE') == 'plesk') {
-            $host = env('CENTRAL_DOMAIN');
+            $host = config('app.central_domain');
             $username = env('PLESK_USER_NAME');
             $password = env('PLESK_PASSWORD');
             $domain_id = $tenant->getInternal('domain_id');

@@ -21,9 +21,10 @@ class SslCommerz implements PaybleContract
         $post_data['total_amount'] = $request->price;
         $post_data['currency'] = "BDT";
         $post_data['tran_id'] = "SSLCZ_TEST_".uniqid();
-        $post_data['success_url'] = 'https://'.env('CENTRAL_DOMAIN')."/ssl_payment_success";
-        $post_data['fail_url'] = 'https://'.env('CENTRAL_DOMAIN');
-        $post_data['cancel_url'] = 'https://'.env('CENTRAL_DOMAIN');
+        $base = rtrim((string) config('app.url'), '/');
+        $post_data['success_url'] = $base.'/ssl_payment_success';
+        $post_data['fail_url'] = $base;
+        $post_data['cancel_url'] = $base;
         // return $post_data;
         # EMI INFO
         $post_data['emi_option'] = "1";

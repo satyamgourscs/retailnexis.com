@@ -276,7 +276,7 @@
                                         placeholder="subdomain..." aria-label="subdomain..."
                                         aria-describedby="basic-addon2">
                                     <span class="input-group-text"
-                                        id="basic-addon2">{{ '@' . env('CENTRAL_DOMAIN') }}</span>
+                                        id="basic-addon2">{{ '@' . config('app.central_domain') }}</span>
                                 </div>
                                 <small id="subdomain-hint" class="form-text text-muted"></small>
                             </div>

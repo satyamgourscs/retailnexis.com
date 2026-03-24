@@ -326,7 +326,7 @@
           @endif
           <li class="nav-item d-none d-lg-block"><a id="switch-theme" class="premium-top-icon" href="#" data-toggle="tooltip" title="{{ __('Switch Theme') }}"><i class="dripicons-brightness-max"></i></a></li>
           @if(config('database.connections.saleprosaas_landlord'))
-          <li class="nav-item"><a class="premium-top-icon" target="_blank" href="{{'https://'.env('CENTRAL_DOMAIN').'/contact-for-renewal?id='.$subdomain}}" data-toggle="tooltip" title="{{ __('Renew Subscription') }}"><i class="dripicons-clockwise"></i></a></li>
+          <li class="nav-item"><a class="premium-top-icon" target="_blank" href="{{ route('contactForRenewal', ['id' => $subdomain]) }}" data-toggle="tooltip" title="{{ __('Renew Subscription') }}"><i class="dripicons-clockwise"></i></a></li>
           @endif
           <li class="nav-item d-none d-lg-block"><a id="btnFullscreen" class="premium-top-icon" href="#" data-toggle="tooltip" title="{{ __('Full Screen') }}"><i class="dripicons-expand"></i></a></li>
           @if(\Auth::user()->role_id <= 2)

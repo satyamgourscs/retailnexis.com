@@ -40,7 +40,7 @@
                         @csrf
                         <input type="hidden" name="stripeToken">
                         <input type="hidden" name="requestData" value="{{ $requestData }}">
-                        <input type="hidden" name="central_domain" value="{{env('CENTRAL_DOMAIN')}}">
+                        <input type="hidden" name="central_domain" value="{{config('app.central_domain')}}">
                     
                         <div class="row form-row mt-4" id="stripe_details">
                             <div class="col-6 form-group">
@@ -114,7 +114,7 @@
             $('.error').addClass('hide').find('.alert').text('');
         
             var requestData = JSON.parse(@json($requestData));
-            var centralDomain = "{{ env('CENTRAL_DOMAIN') }}";
+            var centralDomain = "{{ config('app.central_domain') }}";
             var successUrl;
             if (requestData.tenant) {
                 successUrl = 'https://' + requestData.tenant + '.' + centralDomain;

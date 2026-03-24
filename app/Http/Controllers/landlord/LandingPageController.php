@@ -424,7 +424,7 @@ class LandingPageController extends Controller
                     $expiry_date,
                     $request->subscription_type
                 );
-                return \Redirect::to('https://' . $request->id . '.' . env('CENTRAL_DOMAIN'));
+                return \Redirect::to('https://' . $request->id . '.' . config('app.central_domain'));
             }
             else {
                 return view('payment.tenant_checkout', compact('request', 'payment_gateways', 'terms_and_condition_page'));

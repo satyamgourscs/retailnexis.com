@@ -61,7 +61,7 @@ class TicketController extends Controller
             ]);
 
             $mail_setting = MailSetting::latest()->first();
-            $ticketUrl = env('CENTRAL_DOMAIN') . "/superadmin/tickets/{$ticket->id}";
+            $ticketUrl = rtrim((string) config('app.url'), '/')."/superadmin/tickets/{$ticket->id}";
             $toEmail = DB::table('general_settings')->latest()->first()->email;
         });
 
@@ -127,7 +127,7 @@ class TicketController extends Controller
             ]);
 
             $mail_setting = MailSetting::latest()->first();
-            $ticketUrl = $ticket->tenant_id . '.' . env('CENTRAL_DOMAIN') . "/tickets/{$ticket->id}";
+            $ticketUrl = 'https://'.$ticket->tenant_id.'.'.config('app.central_domain')."/tickets/{$ticket->id}";
             $toEmail = Tenant::find($ticket->tenant_id)->email;
         }
         else {
@@ -144,7 +144,7 @@ class TicketController extends Controller
                 ]);
 
                 $mail_setting = MailSetting::latest()->first();
-                $ticketUrl = env('CENTRAL_DOMAIN') . "/superadmin/tickets/{$ticket->id}";
+                $ticketUrl = rtrim((string) config('app.url'), '/')."/superadmin/tickets/{$ticket->id}";
                 $toEmail = DB::table('general_settings')->latest()->first()->email;
             });
         }

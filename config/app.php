@@ -52,13 +52,18 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'https://retailnexis.com'),
 
     /*
     | Optional: force public site URL on shared hosting when Host / proxy headers are wrong.
     | Example: https://retailnexis.com (no trailing slash). Leave empty to derive from the request.
     */
     'public_url' => env('APP_PUBLIC_URL'),
+
+    /*
+    | Apex domain for tenant subdomains (tenant.{central_domain}). Defaults from APP_URL host.
+    */
+    'central_domain' => env('CENTRAL_DOMAIN', 'retailnexis.com'),
 
     'asset_url' => env('ASSET_URL', null),
 

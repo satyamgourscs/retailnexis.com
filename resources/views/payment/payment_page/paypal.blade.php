@@ -20,7 +20,7 @@
                     <form action="{{ route('payment.process') }}" method="post" id="paypalPaymentForm">
                         <input type="hidden" name="requestData" value="{{ $requestData }}">
                         <input type="hidden" name="total_amount" value="{{ $totalAmount }}">
-                        <input type="hidden" name="central_domain" value="{{ env('CENTRAL_DOMAIN') }}">
+                        <input type="hidden" name="central_domain" value="{{ config('app.central_domain') }}">
 
                         <div id="paypal-button-container"></div>
 
@@ -42,7 +42,7 @@
     <script type="text/javascript">
         var currency = @json($currency);
         var requestData = JSON.parse(@json($requestData));
-        var centralDomain = "{{ env('CENTRAL_DOMAIN') }}";
+        var centralDomain = "{{ config('app.central_domain') }}";
         if (requestData.tenant) {
             successUrl = 'https://' + requestData.tenant + '.' + centralDomain;
         }

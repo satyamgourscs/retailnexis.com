@@ -87,7 +87,7 @@ class SettingController extends Controller
         if(!config('database.connections.saleprosaas_landlord'))
             $installUrl = config('app.url');
         else
-            $installUrl = "https://" .$this->getTenantId().'.'.env('CENTRAL_DOMAIN');
+            $installUrl = "https://" .$this->getTenantId().'.'.config('app.central_domain');
 
         foreach(timezone_identifiers_list() as $key => $zone) {
             date_default_timezone_set($zone);

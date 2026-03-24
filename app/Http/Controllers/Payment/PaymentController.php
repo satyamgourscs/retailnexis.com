@@ -35,7 +35,7 @@ class PaymentController extends Controller
         $terms_and_condition_page = Page::select('slug')->where('title', 'LIKE', "%{$search}%")->first();
         if ($package->is_free_trial || $package->monthly_fee == 0 || $package->yearly_fee == 0) {
             $this->createTenant($request);
-            return \Redirect::to('https://' . $request->tenant . '.' . env('CENTRAL_DOMAIN'));
+            return \Redirect::to('https://' . $request->tenant . '.' . config('app.central_domain'));
         } else
             return view('payment.tenant_checkout', compact('request', 'payment_gateways', 'terms_and_condition_page'));
     }
@@ -167,7 +167,7 @@ class PaymentController extends Controller
             $requestData->expiry_date = session()->get('expiry_date');
             $this->createTenant($requestData);
             session(['tenant' => 0]);
-            return \Redirect::to('https://' . $requestData->tenant . '.' . env('CENTRAL_DOMAIN'));
+            return \Redirect::to('https://' . $requestData->tenant . '.' . config('app.central_domain'));
         } elseif (session()->get('renewal')) {
             $tenant = Tenant::find(session()->get('tenant_id'));
             $tenant->update(['expiry_date' => session()->get('expiry_date'), 'package_id' => session()->get('package_id'), 'subscription_type' => session()->get('subscription_type')]);
@@ -183,7 +183,7 @@ class PaymentController extends Controller
                 session()->get('subscription_type')
             );
 
-            return \Redirect::to('https://' . session()->get('tenant_id') . '.' . env('CENTRAL_DOMAIN'));
+            return \Redirect::to('https://' . session()->get('tenant_id') . '.' . config('app.central_domain'));
         }
     }
 
@@ -215,7 +215,7 @@ class PaymentController extends Controller
                 $requestData->tenant = $user_data[8];
                 $this->createTenant($requestData);
                 session(['tenant' => 0]);
-                return \Redirect::to('https://' . $requestData->tenant . '.' . env('CENTRAL_DOMAIN'));
+                return \Redirect::to('https://' . $requestData->tenant . '.' . config('app.central_domain'));
             } else {
                 $permission_ids = [];
                 if (!empty($request->value_c)) {
@@ -234,7 +234,7 @@ class PaymentController extends Controller
                     $user_data[7],
                     $user_data[0]
                 );
-                return \Redirect::to('https://' . $user_data[8] . '.' . env('CENTRAL_DOMAIN'));
+                return \Redirect::to('https://' . $user_data[8] . '.' . config('app.central_domain'));
             }
         }
     }

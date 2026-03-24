@@ -776,7 +776,7 @@
                             <div class="col-md-12">
                                 <div class="input-group mt-3">
                                     <input class="form-control mt-0" type="text" name="tenant"  placeholder="subdomain..." aria-label="subdomain..." aria-describedby="basic-addon2" required>
-                                <span class="input-group-text" id="basic-addon2">{{'@'.env('CENTRAL_DOMAIN')}}</span>
+                                <span class="input-group-text" id="basic-addon2">{{'@'.config('app.central_domain')}}</span>
                                 </div>
                             </div>
                             @if($general_setting->dedicated_ip)

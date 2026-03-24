@@ -92,7 +92,7 @@
                                 <div class="col-md-8 offset-md-2">
                                     <div class="input-group mt-3">
                                         <input class="form-control mt-0" type="text" name="id" value="{{$subdomain}}" required placeholder="Type your subdomain to renew..." aria-label="subdomain..." aria-describedby="basic-addon2">
-                                      <span class="input-group-text" id="basic-addon2">{{'@'.env('CENTRAL_DOMAIN')}}</span>
+                                      <span class="input-group-text" id="basic-addon2">{{'@'.config('app.central_domain')}}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-8 offset-md-2 mt-2 coupon-section">

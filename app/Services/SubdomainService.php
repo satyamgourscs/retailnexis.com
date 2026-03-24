@@ -52,7 +52,7 @@ class SubdomainService
 
     public function getCentralDomain(): string
     {
-        $central = trim((string) env('CENTRAL_DOMAIN'));
+        $central = trim((string) config('app.central_domain'));
         if ($central === '') {
             return '';
         }

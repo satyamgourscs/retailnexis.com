@@ -61,7 +61,7 @@ class Common
                 $expiry_date = date("Y-m-d", strtotime($general_setting->expiry_date));
                 if($todayDate > $expiry_date) {
                     auth()->logout();
-                    return redirect('https://'.env('CENTRAL_DOMAIN').'/contact-for-renewal?id='.$subdomain);
+                    return redirect()->route('contactForRenewal', ['id' => $subdomain]);
                 }
             }
             View::share('subdomain', $subdomain);
