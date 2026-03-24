@@ -188,8 +188,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\TenancyServiceProvider::class,
-        Barryvdh\Debugbar\ServiceProvider::class,
-
+        // barryvdh/laravel-debugbar is require-dev — do not register here or production (composer --no-dev) breaks.
+        // When installed locally, Laravel package discovery registers it automatically.
 
     ],
 
@@ -241,7 +241,6 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Keygen' => Keygen\Keygen::class,
-        'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
     ],
 
 ];
