@@ -19,9 +19,12 @@ class SaasInstallController extends Controller
     {
         $baseUrl = url('/');
         $host = parse_url($baseUrl, PHP_URL_HOST);
+        $host = $host !== null ? (string) $host : '';
         $path = parse_url($baseUrl, PHP_URL_PATH);
-        // Check if it's NOT a subdomain (e.g., only one dot in host like saleprosaas.test)
-        $isNotSubdomain = substr_count($host, '.') <= 1;
+        // Apex host for checks: www.example.com must count as root (not tenant.example.com).
+        // CENTRAL_DOMAIN is stored without www so tenant subdomains are tenant.apex.com.
+        $hostApex = preg_replace('/^www\./i', '', $host);
+        $isNotSubdomain = substr_count($hostApex, '.') <= 1;
         // Check if it's NOT a subfolder (path is just "/" or empty)
         $isNotSubfolder = $path === '/' || $path === '' || is_null($path);
 
@@ -32,7 +35,7 @@ class SaasInstallController extends Controller
 
         if ($isNotSubdomain && ($isNotSubfolder || $allowSubfolderOnLocalhost)) {
             $this->dataWriteInENVFile('APP_URL', $baseUrl);
-            $this->dataWriteInENVFile('CENTRAL_DOMAIN', $host);
+            $this->dataWriteInENVFile('CENTRAL_DOMAIN', $hostApex);
         }
         else {
             $allowed = 0;
