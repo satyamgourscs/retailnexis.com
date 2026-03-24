@@ -756,7 +756,7 @@
             var data = ui.item.value;
             $.ajax({
                 type: 'GET',
-                url: '{{ route("product.search") }}',
+                url: '{{ route("manufacturing.product.search") }}',
                 data: {
                     data: data
                 },

@@ -32,9 +32,9 @@ if(config('database.connections.saleprosaas_landlord')) {
         Route::resource('manufacturing/recipes',RecipeController::class)->except([ 'show']);
         Route::post('manufacturing/products/product-data',[ProductController::class,'productData'])->name ('get-products');
         Route::post('manufacturing/product-data',[RecipeController::class,'productData'])->name ('manufacturing.product-data');
-        Route::get('manufacturing/recipes/lims_product_search',[ProductController::class,'limsProductSearch'])->name ('product.search');
+        Route::get('manufacturing/recipes/lims_product_search',[ProductController::class,'limsProductSearch'])->name('manufacturing.product.search');
         Route::post('manufacturing/get-Ingredients',[ProductionController::class,'getIngredients'])->name ('get-Ingredients');
-        Route::post('products/getdata/{id}/{variant_id}',[ProductController::class,'getData'])->name('products.getdata');
+        Route::post('products/getdata/{id}/{variant_id}',[ProductController::class,'getData'])->name('manufacturing.products.getdata');
         Route::prefix('manufacturing')->group(function() {
             Route::get('/', 'ManufacturingController@index');
         });
@@ -53,9 +53,9 @@ else {
         Route::resource('manufacturing/recipes',RecipeController::class)->except([ 'show']);
         Route::post('manufacturing/products/product-data',[ProductController::class,'productData'])->name ('get-products');
         Route::post('manufacturing/product-data',[RecipeController::class,'productData'])->name ('manufacturing.product-data');
-        Route::get('manufacturing/recipes/lims_product_search',[ProductController::class,'limsProductSearch'])->name ('product.search');
+        Route::get('manufacturing/recipes/lims_product_search',[ProductController::class,'limsProductSearch'])->name('manufacturing.product.search');
         Route::post('manufacturing/get-Ingredients',[ProductionController::class,'getIngredients'])->name ('get-Ingredients');
-        Route::post('products/getdata/{id}/{variant_id}',[ProductController::class,'getData'])->name('products.getdata');
+        Route::post('products/getdata/{id}/{variant_id}',[ProductController::class,'getData'])->name('manufacturing.products.getdata');
         Route::prefix('manufacturing')->group(function() {
             Route::get('/', 'ManufacturingController@index');
         });

@@ -267,7 +267,7 @@
             $(product_list).each(function(i) {
                 if(!variant_list[i])
                     variant_list[i] = 0;
-                let url = '{{ route("products.getdata", [":product", ":variant"]) }}';
+                let url = '{{ route("manufacturing.products.getdata", [":product", ":variant"]) }}';
                 url = url.replace(':product', product_list[i]).replace(':variant', variant_list[i]);
                 $.get(url, function(data) {
                     var newRow = $("<tr>");

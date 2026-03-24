@@ -128,11 +128,8 @@ class TenancyServiceProvider extends ServiceProvider
 
     protected function mapRoutes()
     {
-        if (file_exists(base_path('routes/api.php'))) {
-            Route::prefix('api')
-                ->namespace(static::$controllerNamespace)
-                ->group(base_path('routes/api.php'));
-        }
+        // routes/api.php is registered in RouteServiceProvider (per central domain + api middleware).
+        // Do not load it here — duplicate names break `php artisan route:cache`.
         if (file_exists(base_path('routes/tenant.php'))) {
             Route::namespace(static::$controllerNamespace)
                 ->group(base_path('routes/tenant.php'));

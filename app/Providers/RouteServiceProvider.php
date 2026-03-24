@@ -63,16 +63,11 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes()
     {
-        /*Route::middleware('web')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/web.php'));*/
-        foreach ($this->centralDomains() as $domain) {
-            Route::middleware('web')
-                ->domain($domain)
-                ->namespace('App\Http\Controllers')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/web.php'));
-        }
+        // Register once: per-domain registration duplicates route names and breaks `php artisan route:cache`.
+        Route::middleware('web')
+            ->namespace('App\Http\Controllers')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/web.php'));
     }
 
     /**
@@ -84,17 +79,11 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapApiRoutes()
     {
-        /*Route::prefix('api')
-             ->middleware('api')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/api.php'));*/
-        foreach ($this->centralDomains() as $domain) {
-            Route::prefix('api')
-                ->domain($domain)
-                ->middleware('api')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/api.php'));
-        }
+        // Register once: naming the same routes per central domain breaks `php artisan route:cache`.
+        Route::prefix('api')
+            ->middleware('api')
+            ->namespace($this->namespace)
+            ->group(base_path('routes/api.php'));
     }
 
     /**
