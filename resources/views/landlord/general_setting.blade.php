@@ -61,7 +61,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['route' => 'superadminGeneralSetting.store', 'files' => true, 'method' => 'post']) !!}
+            {!! Form::open(['url' => route('superadminGeneralSetting.store', [], false), 'files' => true, 'method' => 'post']) !!}
                 <div class="card">
                     <div class="card-header d-flex align-items-center" data-toggle="collapse" href="#gs_collapse" aria-expanded="true" aria-controls="gs_collapse">
                         <h4 class="d-flex justify-content-between w-100">{{__('db.General Setting')}} <i class="icon dripicons-chevron-up"></i></h4>

@@ -61,7 +61,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['route' => 'module.store', 'files' => true, 'method' => 'post']) !!}
+            {!! Form::open(['url' => route('module.store', [], false), 'files' => true, 'method' => 'post']) !!}
 
 
                 <!-- HEADINGS PER LANGUAGE -->

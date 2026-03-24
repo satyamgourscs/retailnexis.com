@@ -14,7 +14,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['route' => 'heroSection.store', 'files' => true, 'method' => 'post']) !!}
+            {!! Form::open(['url' => route('heroSection.store', [], false), 'files' => true, 'method' => 'post']) !!}
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
                         <h4>{{__('db.Hero Section')}}</h4>

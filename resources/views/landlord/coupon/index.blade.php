@@ -57,7 +57,7 @@
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
                                 <li><button type="button" data-id="{{$coupon->id}}" data-name="{{$coupon->name}}" data-code="{{$coupon->code}}" data-type="{{$coupon->type}}" data-amount="{{$coupon->amount}}" data-minimum_amount="{{$coupon->minimum_amount}}" data-quantity="{{$coupon->quantity}}" data-expired_date="{{$coupon->expired_date}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> {{__('db.edit')}}</button></li>
-                                {{ Form::open(['route' => ['coupon.destroy', $coupon->id], 'method' => 'DELETE'] ) }}
+                                {{ Form::open(['url' => route('coupon.destroy', $coupon->id, false), 'method' => 'DELETE'] ) }}
                                 <li>
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{__('db.delete')}}</button>
                                 </li>
@@ -91,7 +91,7 @@
             </div>
             <div class="modal-body">
               <p class="italic"><small>{{__('db.The field labels marked with * are required input fields')}}.</small></p>
-                {!! Form::open(['route' => 'coupon.store', 'method' => 'post']) !!}
+                {!! Form::open(['url' => route('coupon.store', [], false), 'method' => 'post']) !!}
                   <div class="row">
                     <div class="col-md-6 form-group">
                         <label>{{__('db.Coupon Name')}} *</label>
@@ -147,7 +147,7 @@
           </div>
           <div class="modal-body">
             <p class="italic"><small>{{__('db.The field labels marked with * are required input fields')}}.</small></p>
-              {!! Form::open(['route' => ['coupon.update', 1], 'method' => 'put']) !!}
+              {!! Form::open(['url' => route('coupon.update', ['coupon' => 1], false), 'method' => 'put']) !!}
               <div class="row">
                 <div class="col-md-6 form-group">
                     <label>{{__('db.Coupon Name')}} *</label>

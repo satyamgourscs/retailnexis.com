@@ -9,7 +9,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['route' => 'superadmin.page.store', 'files' => true, 'method' => 'post']) !!}
+            {!! Form::open(['url' => route('superadmin.page.store', [], false), 'files' => true, 'method' => 'post']) !!}
                 <button type="button" class="btn btn-success mb-3" data-toggle="collapse" href="#collapse" aria-expanded="false" aria-controls="collapse"/>{{__('db.Add Page')}}</button>
                 <div class="collapse" id="collapse">
                     <div class="card">

@@ -50,14 +50,14 @@
 
                                 <li>
                                     <button type="button" class="btn btn-link"
-                                    onclick="window.location='{{ route('languages.editTranslation', $language->code) }}'">
+                                    onclick="window.location='{{ route('languages.editTranslation', $language->code, false) }}'">
                                     <i class="fa fa-language"></i> {{ __('db.edit_tanslations') }}
                                     </button>
                                 </li>
                                 <li>
                                     <button type="button" data-id="{{$language->id}}" data-code="{{$language->code}}" data-name="{{$language->name}}" data-is_default="{{$language->is_default}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal" ><i class="dripicons-document-edit"></i>  {{__('db.edit')}}</button>
                                 </li>
-                                {{ Form::open(['route' => ['languages.destroy', $language->id], 'method' => 'POST'] ) }}
+                                {{ Form::open(['url' => route('languages.destroy', $language->id, false), 'method' => 'POST'] ) }}
                                 <li>
                                     <button type="submit" class="btn btn-link" onclick="return confirm('Are you sure want to delete?')"><i class="dripicons-trash"></i> {{__('db.delete')}}</button>
                                 </li>
@@ -109,7 +109,7 @@
 <div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
   <div role="document" class="modal-dialog">
     <div class="modal-content">
-        {{ Form::open(['route' => 'languages.update', 'method' => 'POST'] ) }}
+        {{ Form::open(['url' => route('languages.update', [], false), 'method' => 'POST'] ) }}
           <div class="modal-header">
             <h5 id="exampleModalLabel" class="modal-title">{{__('db.Update Language')}}</h5>
             <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>

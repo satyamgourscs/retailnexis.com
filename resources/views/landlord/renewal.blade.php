@@ -59,7 +59,7 @@
                     @if(!$payment_gateway_count)
                         <h1 class="heading h2 text-center">Your Subscription has expired! Please contact with superadmin</h1>
                     @else
-                        <form action="{{route('renewSubscription')}}" method="POST" class="renew-subscription-form">
+                        <form action="{{ route('renewSubscription', [], false) }}" method="POST" class="renew-subscription-form">
                             @csrf
                             <h1 class="heading h2 text-center">Your Subscription has expired!</h1>
                             <div class="row">

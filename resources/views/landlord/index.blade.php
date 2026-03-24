@@ -474,7 +474,7 @@
             <div class="row">
                 <div class="col-lg-8">
                     <div class="contact-form-wrapper">
-                        <form action="{{route('contactForm')}}" method="POST" class="form contact-form">
+                        <form action="{{ route('contactForm', [], false) }}" method="POST" class="form contact-form">
                             @csrf
                             <div class="row">
                                 <div class="col-md-6">

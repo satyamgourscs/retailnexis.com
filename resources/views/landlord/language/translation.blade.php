@@ -19,11 +19,11 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2>{{ __('db.translations') }}: {{ $langCode }}</h2>
                 <input type="text" id="searchTranslation" class="form-control w-50" placeholder="{{ __('db.search_ranslation') }}...">
-                <a href="{{ route('languages.index') }}" class="btn btn-primary">{{ __('db.manage_languages') }}</a>
+                <a href="{{ route('languages.index', [], false) }}" class="btn btn-primary">{{ __('db.manage_languages') }}</a>
             </div>
 
             {!! Form::open([
-                'route' => ['languages.updateTranslation', $langCode],
+                'url' => route('languages.updateTranslation', $langCode, false),
                 'method' => 'post',
             ]) !!}
             <table class="table table-bordered">

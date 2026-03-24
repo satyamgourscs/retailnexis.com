@@ -19,7 +19,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['route' => 'faqSection.store', 'files' => true, 'method' => 'post']) !!}
+            {!! Form::open(['url' => route('faqSection.store', [], false), 'files' => true, 'method' => 'post']) !!}
                 <!-- HEADINGS PER LANGUAGE -->
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
