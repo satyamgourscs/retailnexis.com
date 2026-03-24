@@ -99,7 +99,8 @@ class TenancyServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        if (empty(env('LANDLORD_DB'))) {
+        // config:cache makes env() null outside config files — use config('app.landlord_db').
+        if (empty(config('app.landlord_db'))) {
             return;
         }
         $this->bootEvents();

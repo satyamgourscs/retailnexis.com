@@ -66,12 +66,12 @@ Route::controller(Auth\SuperAdminLoginController::class)->group(function () {
 
 //landing page routes
 Route::controller(landlord\LandingPageController::class)->group(function () {
-    if(empty(env('LANDLORD_DB'))) {
-        Route::get('/',function() {
-            return redirect()->route('saas-install-step-1');
+    // Use config (not env): after `config:cache`, env('LANDLORD_DB') is always null in routes → endless installer redirect.
+    if (empty(config('app.landlord_db'))) {
+        Route::get('/', function () {
+            return redirect('/saas/install/step-1');
         });
-    }
-    else {
+    } else {
         Route::get('/', 'index');
     }
     //Route::get('sign-up', 'signUp')->name('signup');

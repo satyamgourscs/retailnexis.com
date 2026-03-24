@@ -57,6 +57,12 @@ return [
     'asset_url' => env('ASSET_URL', null),
 
     /*
+    | Central (landlord) database name for SaaS. Always read via config(), never env() in routes
+    | when using "php artisan config:cache" — env() returns null outside config files after caching.
+    */
+    'landlord_db' => env('LANDLORD_DB'),
+
+    /*
     |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------

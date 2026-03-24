@@ -59,7 +59,7 @@ class AppServiceProvider extends ServiceProvider
             }
         }
 
-        $isLandlordConfigured = !empty(env('LANDLORD_DB'));
+        $isLandlordConfigured = ! empty(config('app.landlord_db'));
         $canUseDatabase = function (): bool {
             try {
                 return (bool) DB::connection()->getPdo();
