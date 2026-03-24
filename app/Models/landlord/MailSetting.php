@@ -9,5 +9,7 @@ class MailSetting extends Model
 {
     use HasFactory;
 
+    protected $connection = 'saleprosaas_landlord';
+
     protected $fillable = ["driver", "host", "port", "from_address", "from_name", "username", "password", "encryption"];
 }
