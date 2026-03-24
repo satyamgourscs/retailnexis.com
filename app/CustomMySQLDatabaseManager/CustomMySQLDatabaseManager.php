@@ -54,6 +54,8 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             curl_exec($curl);
             curl_close($curl);
 
+            return true;
+
         } elseif (env('SERVER_TYPE') == 'plesk') {
             $host = config('app.central_domain');
             $username = env('PLESK_USER_NAME');
@@ -86,10 +88,18 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             curl_close($ch);
             $response = json_decode($response);
             $tenant->setInternal('db_id', $response->id);
-        } elseif (env('SERVER_TYPE') == 'localhost') {
-            $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `$charset` COLLATE `$collation`");
+
+            return true;
         }
-        return true;
+
+        // localhost, hostinger (hPanel), VPS: same MySQL user must be able to use the new DB after CREATE.
+        // Hostinger shared: if CREATE DATABASE is denied, create DB in hPanel and assign user manually (see .env.example).
+        if (in_array(env('SERVER_TYPE'), ['localhost', 'hostinger', 'vps'], true)) {
+            return $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
+        }
+
+        // Default: Stancl behaviour — requires MySQL user with CREATE DATABASE privilege.
+        return $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
     }
 
     public function deleteDatabase(TenantWithDatabase $tenant): bool
@@ -135,7 +145,10 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             curl_exec($ch);
             curl_close($ch);
             return true;
-        } elseif (env('SERVER_TYPE') == 'localhost')
+        } elseif (in_array(env('SERVER_TYPE'), ['localhost', 'hostinger', 'vps'], true)) {
             return $this->database()->statement("DROP DATABASE `{$tenant->database()->getName()}`");
+        }
+
+        return $this->database()->statement("DROP DATABASE `{$tenant->database()->getName()}`");
     }
 }
