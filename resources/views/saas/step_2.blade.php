@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SalePro SaaS Installer | Step-2</title>
+    <title>NEXA TECH Installer | Step-2</title>
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('saas-install-assets/images/favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('saas-install-assets/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -12,8 +12,7 @@
     <div class="col-md-6 offset-md-3">
         <div class='wrapper'>
             <header>
-	            <img src="{{ asset('saas-install-assets/images/logo.png') }}" alt="Logo" style="max-width: 120px;"/>
-                <h1 class="text-center">SalePro SaaS Auto Installer</h1>
+                <h1 class="text-center">NEXA TECH Auto Installer</h1>
             </header>
             <hr>
             <div class="content">
@@ -26,7 +25,7 @@
                     $passed .= '1';
 
                 } else {
-                    $ltext .= '<i class="fa fa-close"></i>SalepPro needs at least PHP version  7.4, Your PHP Version is: ' . PHP_VERSION . '<br/>';
+                    $ltext .= '<i class="fa fa-close"></i>NEXA TECH needs at least PHP version  7.4, Your PHP Version is: ' . PHP_VERSION . '<br/>';
                     $passed .= '0';
                 }
 
@@ -90,12 +89,12 @@
 
                 <?php if ($passed == '11111111'): ?>
                     <br/><?php echo $ltext; ?><br/>
-                    <h5>Great! System Test Completed. You can run SalepProSaaS on your server. Click Continue For Next Step.</h5>
+                    <h5>Great! System Test Completed. You can run NEXA TECH on your server. Click Continue For Next Step.</h5>
                     <a href="{{ route('saas-install-step-3', [], false) }}" class="btn btn-primary">Continue</a>
 
                 <?php else: ?>
 
-                <br/><?php echo $ltext; ?><br/>Sorry. The requirements of SalePro SaaS are not available on your server. Share this code with your hosting provider or system administrator: <?php echo $passed; ?><br><br>
+                <br/><?php echo $ltext; ?><br/>Sorry. The requirements of NEXA TECH are not available on your server. Share this code with your hosting provider or system administrator: <?php echo $passed; ?><br><br>
                 <a href="#" class="btn btn-primary disabled">Correct The Problem To Continue</a>
 
                 <?php endif ?>

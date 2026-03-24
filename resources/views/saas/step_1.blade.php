@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SalePro SaaS Installer | Step-1</title>
+    <title>NEXA TECH Installer | Step-1</title>
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('saas-install-assets/images/favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('saas-install-assets/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -12,8 +12,7 @@
 	<div class="col-md-6 offset-md-3">
 		<div class="wrapper">
 	        <header>
-	            <img src="{{ asset('saas-install-assets/images/logo.png') }}" alt="Logo" style="max-width: 120px;"/>
-	            <h1 class="text-center">SalePro SaaS  Auto Installer</h1>
+	            <h1 class="text-center">NEXA TECH Auto Installer</h1>
 	        </header>
             <hr>
             <div class="content text-center">
