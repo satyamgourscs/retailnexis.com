@@ -37,10 +37,10 @@
                 </div>
                 <div class="col-md-6 offset-md-3  error-text text-center">
                     <i class="las la-binoculars"style="color:var(--theme-color);font-size: 90px;margin-bottom:30px"></i>
-                    <h2 class="h1">{{__('db.Oh snap! We are lost')}}</h2>
-                    <p class="lead">{{__('db.It seems we can not find what you are looking for Perhaps searching can help or go back to')}}
+                    <h2 class="h1">Oh snap! We are lost</h2>
+                    <p class="lead">It seems we can not find what you are looking for. Perhaps searching can help or go back to
                     <br><br>
-                    <a class="button lg" style="background-color: #f5f6f7; border:1px solid #ddd; box-shadow:0 5px 10px rgba(44,44,44,0.1)" href="{{url('/')}}">{{__('db.Home')}}</a> </p>
+                    <a class="button lg" style="background-color: #f5f6f7; border:1px solid #ddd; box-shadow:0 5px 10px rgba(44,44,44,0.1)" href="{{ url('/') }}">Home</a> </p>
                 </div>
             </div>
         </div>

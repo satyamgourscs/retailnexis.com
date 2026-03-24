@@ -37,8 +37,8 @@
                 </div>
                 <div class="col-md-6 offset-md-3  error-text text-center">
                     <i class="las la-binoculars"style="color:var(--theme-color);font-size: 90px;margin-bottom:30px"></i>
-                    <h2 class="h1">{{__("db.We'll be back soon!")}}</h2>
-                    <p class="lead">{{__("db.Sorry for the inconvenience. We're performing some working to improve your experience and will be back online shortly!")}}
+                    <h2 class="h1">We'll be back soon!</h2>
+                    <p class="lead">Sorry for the inconvenience. We're performing some maintenance to improve your experience and will be back online shortly!
                 </div>
             </div>
         </div>
