@@ -30,12 +30,24 @@ Run landlord migrations:
 php artisan migrate --path=database/migrations/landlord
 ```
 
-## 3. Seed pool rows (example)
+## 3. Register pool rows (preferred on Hostinger)
 
-Edit `database/seeders/TenantDatabasePoolSeeder.php` — replace the `$pool` array with your real database names — then:
+The command is **only** in `routes/console.php` (no `app/Console/Commands/SeedTenantDatabasePoolCommand.php`). Upload that file plus `app/Services/TenantDatabasePoolTableSeeder.php` and `config/tenant_database_pool.php`.
 
 ```bash
-php artisan db:seed --class=TenantDatabasePoolSeeder
+php artisan tenant:seed-database-pool
+```
+
+Set exact MySQL names in `.env` (comma-separated):
+
+```env
+TENANT_DATABASE_POOL_NAMES=u612565959_pool_01,u612565959_pool_02,u612565959_pool_03
+```
+
+Or one-off without `.env`:
+
+```bash
+php artisan tenant:seed-database-pool --names=u612565959_pool_01,u612565959_pool_02
 ```
 
 Or insert manually in phpMyAdmin / Adminer on the **landlord** database:
