@@ -1999,7 +1999,6 @@
         }
     });
 
-    ////Start the code is for SaleproSaas///
     @if(config('database.connections.saleprosaas_landlord'))
         numberOfInvoice = <?php echo json_encode($numberOfInvoice)?>;
         $.ajax({
@@ -2013,13 +2012,10 @@
             }
         });
     @endif
-    ////End the code is for SaleproSaas///
 
-    ///NOT NEEDED - Check///
     $("ul#sale").siblings('a').attr('aria-expanded','true');
     $("ul#sale").addClass("show");
     $("ul#sale #sale-pos-menu").addClass("active");
-    ///NOT NEEDED - Check///
 
     ///start code for mobile////
     var isMobile = false;

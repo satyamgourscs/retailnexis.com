@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'RetailNexis'),
+    'name' => env('APP_NAME', 'Nexa Technologies'),
 
     /*
     |--------------------------------------------------------------------------

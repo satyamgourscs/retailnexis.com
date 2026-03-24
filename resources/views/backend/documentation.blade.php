@@ -181,8 +181,8 @@
                 <h3>Addons</h3>
                 <hr class="notop">
             </div>
-            <h2><strong>SalePro WooCommerce</strong></h2>
-            <p>Imagine you have an existing WooCommerce website. Now you want to use salepro and also want to synchronize your WooCommerce website with SalePro. If you want to do so then this is the ultimate solution you are looking for. SalePro WooCommerce addon comes with complete synchronization with your WooCommerce website. You can synchronize your orders from WooCommerce to SalePro. Also you can can synchronize products, categories from SalePro to WooCommerce. And you have to map your Salepro taxes with WooCommerce taxes.</p>
+            <h2><strong>Nexa Technologies WooCommerce</strong></h2>
+            <p>Imagine you have an existing WooCommerce website. Now you want to use Nexa Technologies and also want to synchronize your WooCommerce website with Nexa Technologies. If you want to do so then this is the ultimate solution you are looking for. Nexa Technologies WooCommerce addon comes with complete synchronization with your WooCommerce website. You can synchronize your orders from WooCommerce to Nexa Technologies. Also you can can synchronize products, categories from Nexa Technologies to WooCommerce. And you have to map your Nexa Technologies taxes with WooCommerce taxes.</p>
             <p>To purchase this addon go to the addon list from left sidebar and click on the Buy Now button.</p>
             <p>
                 <img alt="" src="read_me/assets/images/woocommerce1.png">
@@ -192,7 +192,7 @@
                 <img alt="" src="read_me/assets/images/woocommerce2.png">
                 <img alt="" src="read_me/assets/images/woocommerce3.png">
             </p>
-            <p>If you go to the WooCommerce section you will get all the necessary options to sync your Wocommerce categories, products, taxes and orders. You can also sync products from SalePro to WooCommerce from the product create or edit page.</p>
+            <p>If you go to the WooCommerce section you will get all the necessary options to sync your Wocommerce categories, products, taxes and orders. You can also sync products from Nexa Technologies to WooCommerce from the product create or edit page.</p>
             <p>
                 <img alt="" src="read_me/assets/images/woocommerce4.png">
             </p>
@@ -200,8 +200,8 @@
             <p>
                 <img alt="" src="read_me/assets/images/woocommerce5.png">
             </p>
-            <h2><strong>SalePro eCommerce</strong></h2>
-            <p>For SalePro eCommerce installation and documentation , please visit <a href="{{url('/ecommerce-documentation')}}">SalePro eCommerce Docs</a></p>
+            <h2><strong>Nexa Technologies eCommerce</strong></h2>
+            <p>For Nexa Technologies eCommerce installation and documentation , please visit <a href="{{url('/ecommerce-documentation')}}">Nexa Technologies eCommerce Docs</a></p>
         </section>
         <section id="common-error">
             <div class="page-header">

@@ -21,11 +21,11 @@ class GeneralSettingsTableSeeder extends Seeder
                 0 =>
                 array(
                     'id' => 1,
-                    'site_title' => 'SalePro POS SaaS',
-                    'meta_title' => 'SalePro SAAS inventory, POS, accounting & HRM',
-                    'meta_description' => 'SalePro SAAS lets your customers subscribe to SalePro inventory, POS, accounting & HRM solution',
-                    'og_title' => 'SalePro SAAS inventory, POS, accounting & HRM',
-                    'og_description' => 'SalePro SAAS lets your customers subscribe to SalePro inventory, POS, accounting & HRM solution',
+                    'site_title' => 'Nexa Technologies POS SaaS',
+                    'meta_title' => 'Nexa Technologies — inventory, POS, accounting & HRM',
+                    'meta_description' => 'Nexa Technologies lets your customers subscribe to inventory, POS, accounting & HRM solutions',
+                    'og_title' => 'Nexa Technologies — inventory, POS, accounting & HRM',
+                    'og_description' => 'Nexa Technologies lets your customers subscribe to inventory, POS, accounting & HRM solutions',
                     'og_image' => '20230307010632.jpg',
                     'site_logo' => '20231113033910.png',
                     'is_rtl' => 0,
@@ -33,9 +33,9 @@ class GeneralSettingsTableSeeder extends Seeder
                     'currency' => 'USD',
                     'frontend_layout' => 'regular',
                     'currency_position' => NULL,
-                    'developed_by' => 'LionCoders inc',
+                    'developed_by' => 'Nexa Technologies',
                     'phone' => '+8801924-756759',
-                    'email' => 'support@lion-coders.com',
+                    'email' => 'support@example.com',
                     'dedicated_ip' => '192.168.x.x',
                     'free_trial_limit' => 7.0,
                     'chat_script' => '<!-- Chat Snippet Start -->

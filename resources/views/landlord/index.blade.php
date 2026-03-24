@@ -9,12 +9,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{url('landlord/images/logo', $general_setting->site_logo)}}" />
     <!-- Document Title -->
-    <title>{{$general_setting->meta_title ?? 'NEXA TECH'}}</title>
+    <title>{{$general_setting->meta_title ?? 'Nexa Technologies'}}</title>
     <!-- Links -->
-    <meta name="description" content="{{$general_setting->meta_description ?? 'NEXA TECH — SaaS POS & inventory management platform'}}" />
+    <meta name="description" content="{{$general_setting->meta_description ?? 'Nexa Technologies — SaaS POS & inventory management platform'}}" />
     <meta property="og:url" content="{{url()->full()}}" />
-    <meta property="og:title" content="{{$general_setting->og_title ?? 'NEXA TECH'}}" />
-    <meta property="og:description" content="{{$general_setting->og_description ?? 'NEXA TECH — SaaS POS & inventory management platform'}}" />
+    <meta property="og:title" content="{{$general_setting->og_title ?? 'Nexa Technologies'}}" />
+    <meta property="og:description" content="{{$general_setting->og_description ?? 'Nexa Technologies — SaaS POS & inventory management platform'}}" />
     <meta property="og:image" content="{{url('/landlord/images/og-image')}}/{{$general_setting->og_image ?? 'saleprosaas.jpg'}}" />
 
     <!-- Bootstrap CSS -->
@@ -173,7 +173,7 @@
                             <div class="module-desc">{!! $module_description->sub_heading !!}</div>
                         @else
                             <h3 class="mb-15">One App, all the features</h3>
-                            <p>SalePro is packed with all the features you will need to seamlessly run your business</p>
+                            <p>Nexa Technologies is packed with all the features you will need to seamlessly run your business</p>
                         @endif
                     </div>
                 </div>
@@ -734,7 +734,7 @@
                                 <p class="lead mb-3">{{$tenant_signup_description->sub_heading}}</p>
                             @else
                                 <h2 class="heading">Sign Up</h2>
-                                <p class="lead mb-3">SalePro is packed with all the features you'll need to seamlessly run your business</p>
+                                <p class="lead mb-3">Nexa Technologies is packed with all the features you'll need to seamlessly run your business</p>
                             @endif
                         </div>
                         <form action="/tenant-checkout" method="POST"  class="form row customer-signup-form">

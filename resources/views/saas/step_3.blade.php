@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>NEXA TECH Installer | Step-3</title>
+    <title>Nexa Technologies Installer | Step-3</title>
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('saas-install-assets/images/favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('saas-install-assets/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -12,7 +12,7 @@
 	<div class="col-md-6 offset-md-3">
 		<div class='wrapper'>
 		    <header>
-	            <h1 class="text-center">NEXA TECH Auto Installer</h1>
+	            <h1 class="text-center">Nexa Technologies Auto Installer</h1>
                 @include('includes.session_message')
 	        </header>
 	        <hr>
@@ -54,12 +54,12 @@
                             <input type='text' placeholder="Ex: 5F5S5OF81XXXXXXXXXX" class="form-control" name="cpanel_api_key">
 
                             <label>cPanel User Name</label>
-                            <input type='text' placeholder="Ex: saleprosaas" class="form-control" name="cpanel_username">
+                            <input type='text' placeholder="Ex: nexa_cpanel" class="form-control" name="cpanel_username">
                         </div>
 
                         <div id="plesk_fields" style="display:none;">
                             <label>Plesk User Name</label>
-                            <input type='text' placeholder="Ex: saleprosaas" class="form-control" name="plesk_username">
+                            <input type='text' placeholder="Ex: nexa_cpanel" class="form-control" name="plesk_username">
 
                             <label>Plesk Password</label>
                             <input type='text' placeholder="Ex: 5F5S5OF81XXXXXXXXXX" class="form-control" name="plesk_password">
@@ -76,13 +76,13 @@
 		                <input type='number' required placeholder="Ex: 3306" class="form-control" name="db_port">
 
                         <label>Database Username</label>
-		                <input type='text' required placeholder="Ex: salepro2023" class="form-control" name="db_username">
+		                <input type='text' required placeholder="Ex: nexa_user" class="form-control" name="db_username">
 
                         <label>Database Password (leave blank if none)</label>
 		                <input type='password' placeholder="Ex: PXsfdf1542" class="form-control" name="db_password">
 
                         <label>Database Name</label>
-		                <input type='text' placeholder="Ex: saleprosaas_db" required class="form-control" name="db_name">
+		                <input type='text' placeholder="Ex: nexa_landlord_db" required class="form-control" name="db_name">
 
                         <button type='submit' class='btn btn-primary btn-block'>Submit</button>
 		            </fieldset>

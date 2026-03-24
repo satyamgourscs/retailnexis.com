@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>SalePro Installer | Step-4</title>
+        <title>Nexa Technologies Installer | Step-4</title>
         <link rel="shortcut icon" type="image/x-icon" href="{{ asset('install-assets/images/favicon.ico') }}">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="{{ asset('install-assets/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -13,12 +13,12 @@
         <div class='wrapper'>
             <header>
                 <img src="{{ asset('install-assets/images/logo.png')}}" alt="Logo" style="max-width: 120px;"/>
-                <h1 class="text-center">SalePro Auto Installer</h1>
+                <h1 class="text-center">Nexa Technologies Auto Installer</h1>
             </header>
             <hr>
             <div class="content pad-top-bot-50">
                 <h3 class="text-center"><strong class="theme-color">Congratulations!</strong></h3><br>
-                <h5 class="text-center">You have successfully installed SalepPro.</h5><br>
+                <h5 class="text-center">You have successfully installed Nexa Technologies.</h5><br>
                 <hr>
                 <br>
                 <p>Access admin login page - <strong><a href="{{ url('/login') }}" target="__blank">Click here</a></strong></p>

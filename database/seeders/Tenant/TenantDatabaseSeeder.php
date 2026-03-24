@@ -32,7 +32,7 @@ class TenantDatabaseSeeder extends Seeder
             DB::table('general_settings')->insert([
                 [
                     'id' => 1,
-                    'site_title' => !empty(self::$tenantData) ? self::$tenantData['site_title'] : 'SalePro POS SaaS',
+                    'site_title' => !empty(self::$tenantData) ? self::$tenantData['site_title'] : 'Nexa Technologies POS SaaS',
                     'site_logo' => !empty(self::$tenantData) ? self::$tenantData['site_logo'] : '20250102042651.png',
                     'is_rtl' => 0,
                     'currency' => '1',

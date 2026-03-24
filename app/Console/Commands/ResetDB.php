@@ -51,7 +51,12 @@ class ResetDB extends Command
         // Re-enable foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
 
-        //importing data from DB
-        DB::unprepared(file_get_contents(base_path('salepropos.sql')));
+        $sqlPath = base_path('database.sql');
+        if (! is_readable($sqlPath)) {
+            $this->error('database.sql not found at project root.');
+
+            return 1;
+        }
+        DB::unprepared(file_get_contents($sqlPath));
     }
 }

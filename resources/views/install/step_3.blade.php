@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>SalePro Installer | Step-3</title>
+    <title>Nexa Technologies Installer | Step-3</title>
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('install-assets/images/favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('install-assets/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -13,7 +13,7 @@
 		<div class='wrapper'>
 		    <header>
 	            <img src="{{ asset('install-assets/images/logo.png') }}" alt="Logo" style="max-width: 120px;"/>
-	            <h1 class="text-center">SalePro Auto Installer</h1>
+	            <h1 class="text-center">Nexa Technologies Auto Installer</h1>
 
                 @include('includes.session_message')
 	        </header>
@@ -35,11 +35,11 @@
 		                <label>Database Host</label>
 		                <input type='text' class="form-control" name="db_host" placeholder="Ex: localhost" required>
 		                <label>Database Username</label>
-		                <input type='text' class="form-control" name="db_username" placeholder="Ex: salepro2023" required>
+		                <input type='text' class="form-control" name="db_username" placeholder="Ex: nexa_user" required>
 		                <label>Database Password</label>
 		                <input type='password' class="form-control" name="db_password" placeholder="Ex: PXsfdf1542" required>
 		                <label>Database Name</label>
-		                <input type='text' class="form-control" name="db_name" placeholder="Ex: salepro_db" required>
+		                <input type='text' class="form-control" name="db_name" placeholder="Ex: nexa_db" required>
 		                <button type='submit' class='btn btn-primary btn-block'>Submit</button>
 		            </fieldset>
 		        </form>

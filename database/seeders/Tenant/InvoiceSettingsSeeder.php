@@ -15,7 +15,7 @@ class InvoiceSettingsSeeder extends Seeder
             'number_of_digit'     => 4,
             'numbering_type'      => 'datewise',
             'start_number'        => 1000,
-            'header_text'         => 'SalePro',
+            'header_text'         => 'Nexa Technologies',
             'footer_text'         => 'Thank you for shopping with us',
             'footer_title'        => 'Thank you for shopping with us',
             'size'                => 'a4',

@@ -21,7 +21,7 @@ class HeroesTableSeeder extends Seeder
                 0 =>
                 array(
                     'id' => 1,
-                    'heading' => 'SalePro is an all-in-one inventory management & POS software.',
+                    'heading' => 'Nexa Technologies is an all-in-one inventory management & POS software.',
                     'sub_heading' => 'Take care of all your products, sales, purchases, stores related tasks from an easy-to-use platform, from anywhere you want, anytime you want',
                     'image' => 'hero-image.jpg',
                     'button_text' => 'Try for free',
@@ -32,7 +32,7 @@ class HeroesTableSeeder extends Seeder
                 1 =>
                 array(
                     'id' => 5,
-                    'heading' => 'SalePro es un software POS y de gestión de inventario todo en uno.',
+                    'heading' => 'Nexa Technologies es un software POS y de gestión de inventario todo en uno.',
                     'sub_heading' => 'Ocúpese de todos sus productos, ventas, compras y tareas relacionadas con tiendas desde una plataforma fácil de usar, desde cualquier lugar que desee, en cualquier momento que desee.',
                     'image' => '20231113012229.jpg',
                     'button_text' => 'Prueba gratis',

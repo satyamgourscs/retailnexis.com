@@ -5,16 +5,16 @@
     <!-- Metas -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="LionCoders" />
+    <meta name="author" content="Nexa Technologies" />
     <meta name="csrf-token" content="CmSeExxpkZmScDB9ArBZKMGKAyzPqnxEriplXWrS">
     <link rel="icon" type="image/png" href="{{url('public/landlord/images/logo', $general_setting->site_logo)}}" />
     <!-- Document Title -->
-    <title>{{$general_setting->meta_title ?? 'NEXA TECH'}}</title>
+    <title>{{$general_setting->meta_title ?? 'Nexa Technologies'}}</title>
     <!-- Links -->
-    <meta name="description" content="{{$general_setting->meta_description ?? 'NEXA TECH'}}" />
+    <meta name="description" content="{{$general_setting->meta_description ?? 'Nexa Technologies'}}" />
     <meta property="og:url" content="{{url()->full()}}" />
-    <meta property="og:title" content="{{$general_setting->og_title ?? 'NEXA TECH'}}" />
-    <meta property="og:description" content="{{$general_setting->og_description ?? 'NEXA TECH'}}" />
+    <meta property="og:title" content="{{$general_setting->og_title ?? 'Nexa Technologies'}}" />
+    <meta property="og:description" content="{{$general_setting->og_description ?? 'Nexa Technologies'}}" />
     <meta property="og:image" content="{{url('/public/landlord/images/og-image')}}/{{$general_setting->og_image ?? 'saleprosaas.jpg'}}" />
 
     <!-- Bootstrap CSS -->

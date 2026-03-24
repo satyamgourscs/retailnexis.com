@@ -94,27 +94,6 @@
         </div>
       </div>
 
-      <!-- This section for demo only-->
-      @if(!env('USER_VERIFIED') && !config('database.connections.saleprosaas_landlord'))
-      <div class="switch-theme" id="switch-theme" style="background-color:rgba(255,255,255,0.9);border:1px solid #999;padding:15px;position:fixed;bottom:0px;left:0px;right:0px;z-index:99">
-        <div class="row">
-          <div class="col-md-4 text-center">
-            <div class="" style="font-size:11px;color:#666;margin-bottom:15px">Login as</div>
-            <button type="submit" class="btn btn-sm btn-success admin-btn">Admin</button>
-            <button type="submit" class="btn btn-sm btn-info staff-btn">Staff</button>
-            <button type="submit" class="btn btn-sm btn-dark customer-btn">Customer</button>
-          </div>
-          <div class="col-md-8 text-center">
-            <hr class="d-lg-none d-md-none d-sm-block">
-            <div class="text-center" style="font-size:11px;color:#666;margin-bottom:15px">Premium Add-ons</div>
-            <a href="https://salepropos.com/ecommerce/" class="btn btn-primary btn-sm">eCommerce</a>
-            <a href="?demo_db_name=sale_woocom" class="btn btn-primary btn-sm demo-btn">WooCommerce</a>
-                        <br><br>
-          </div>
-        </div>
-      </div>
-      @endif
-      <!-- This section for demo only-->
     </div>
   </body>
 </html>

@@ -134,7 +134,7 @@ class PesapalPayment implements PaybleContract
         $first_name = $data->name;
         //$middle_name = "Coders";
         $last_name = $data->name;
-        $email_address = $data->email ? $data->email : "hello@lion-coders.com";
+        $email_address = $data->email ? $data->email : (config('mail.from.address') ?: 'noreply@example.com');
         if( $APP_ENVIROMENT == 'sandbox'){
         $submitOrderUrl = "https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest";
         }elseif($APP_ENVIROMENT == 'live'){

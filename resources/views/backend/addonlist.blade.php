@@ -43,8 +43,8 @@
             <tbody>
                 @if (!config('database.connections.saleprosaas_landlord'))
                 <tr>
-                    <td>SaleProSaaS</td>
-                    <td>It's a standalone application to start subscription business with SalePro. It is a multi tenant system and each client will have their separate database. This application comes with free landing page, unlimited custom pages, blog, payment gateway and lots more.</td>
+                    <td>Nexa Technologies SaaS</td>
+                    <td>It's a standalone application to start subscription business with Nexa Technologies. It is a multi tenant system and each client will have their separate database. This application comes with free landing page, unlimited custom pages, blog, payment gateway and lots more.</td>
                     <td>
                         <div class="btn-group">
                             <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#installSaasModal">
@@ -55,8 +55,8 @@
                 </tr>
                 @endif
                 <tr>
-                    <td>SalePro{{$isLandlord ? 'SaaS' : ''}} eCommerce</td>
-                    <td>Start an eCommerce store and manage all aspects of your eCommerce site from within SalePro{{$isLandlord ? 'SaaS' : ''}}. From inventories, customers, deliveries to CMS website, SEO and everything in between!</td>
+                    <td>Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} eCommerce</td>
+                    <td>Start an eCommerce store and manage all aspects of your eCommerce site from within Nexa Technologies{{$isLandlord ? ' SaaS' : ''}}. From inventories, customers, deliveries to CMS website, SEO and everything in between!</td>
                     <td>
                         <div class="btn-group">
                         @php
@@ -78,8 +78,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>SalePro{{$isLandlord ? 'SaaS' : ''}} Mobile App</td>
-                    <td>SalePro{{$isLandlord ? 'SaaS' : ''}} Mobile App - All-in-one mobile POS, inventory, HRM & accounting management app.</td>
+                    <td>Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} Mobile App</td>
+                    <td>Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} Mobile App - All-in-one mobile POS, inventory, HRM & accounting management app.</td>
                     <td>
                         <div class="btn-group">
                             @php
@@ -101,8 +101,8 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>SalePro{{$isLandlord ? 'SaaS' : ''}} WooCommerce</td>
-                    <td>An addon to integrate SalePro{{$isLandlord ? 'SaaS' : ''}} with your existing WooCommerce website.</td>
+                    <td>Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} WooCommerce</td>
+                    <td>An addon to integrate Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} with your existing WooCommerce website.</td>
                     <td>
                         <div class="btn-group">
                             @php
@@ -134,7 +134,7 @@
         <div class="modal-content">
             {!! Form::open(['route' => 'saas.install', 'method' => 'post']) !!}
             <div class="modal-header">
-                <h5 class="modal-title">Install SaleProSaaS</h5>
+                <h5 class="modal-title">Install Nexa Technologies SaaS</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
