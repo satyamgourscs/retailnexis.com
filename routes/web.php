@@ -7,14 +7,18 @@ use Illuminate\Support\Facades\Artisan;
 
 
 Route::controller(landlord\SaasInstallController::class)->group(function () {
-    Route::prefix('saas')->group(function () {
-        Route::get('install/step-1', 'saasInstallStep1')->name('saas-install-step-1');
-        Route::get('install/step-2', 'saasInstallStep2')->name('saas-install-step-2');
-        Route::get('install/step-3', 'saasInstallStep3')->name('saas-install-step-3');
-        Route::post('install/process', 'saasInstallProcess')->name('saas-install-process');
-        Route::get('install/step-4', 'saasInstallStep4')->name('saas-install-step-4');
-    });
+    Route::get('install/step-1', 'saasInstallStep1')->name('saas-install-step-1');
+    Route::get('install/step-2', 'saasInstallStep2')->name('saas-install-step-2');
+    Route::get('install/step-3', 'saasInstallStep3')->name('saas-install-step-3');
+    Route::post('install/process', 'saasInstallProcess')->name('saas-install-process');
+    Route::get('install/step-4', 'saasInstallStep4')->name('saas-install-step-4');
 });
+
+// Old installer URLs (…/saas/install/…) — keep working after URL change.
+Route::redirect('saas/install/step-1', '/install/step-1', 301);
+Route::redirect('saas/install/step-2', '/install/step-2', 301);
+Route::redirect('saas/install/step-3', '/install/step-3', 301);
+Route::redirect('saas/install/step-4', '/install/step-4', 301);
 
 
 
@@ -71,7 +75,7 @@ Route::controller(landlord\LandingPageController::class)->group(function () {
     if (empty(config('app.landlord_db'))) {
         Route::get('/', function () {
             // Path-only: Laravel's redirect() absolutizes via APP_URL and can send users to 127.0.0.1.
-            return new RedirectResponse('/saas/install/step-1');
+            return new RedirectResponse('/install/step-1');
         });
     } else {
         Route::get('/', 'index');

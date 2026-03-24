@@ -82,8 +82,8 @@ class SaasInstallController extends Controller
                 self::optimizeClear();
 
                 // Never use $request->central_domain (not present on step-3 form). Build URL from this
-                // request so subfolder installs (e.g. /saas/public/) and production domains both work.
-                $target = rtrim($request->getBaseUrl(), '/').'/saas/install/step-4';
+                // request so subfolder installs (e.g. /public/) and production domains both work.
+                $target = rtrim($request->getBaseUrl(), '/').'/install/step-4';
 
                 return new RedirectResponse($target);
 

@@ -28,7 +28,7 @@ class AuthServiceProvider extends ServiceProvider
         // $installDir = base_path('install');
 
         // if (is_dir($installDir)) {
-        //     redirect()->to('saas/install/step-1');
+        //     redirect()->to('/install/step-1');
         //     exit(); // Ensure no further code is executed after the redirect
         // }
     }
