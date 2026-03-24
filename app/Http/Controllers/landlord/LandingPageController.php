@@ -90,6 +90,11 @@ class LandingPageController extends Controller
 
     public function index()
     {
+        // Central SaaS routes must hit the landlord DB (Hostinger .env sometimes leaves DB_CONNECTION=mysql).
+        if (! empty(config('app.landlord_db'))) {
+            DB::setDefaultConnection('saleprosaas_landlord');
+        }
+
         $currentLocale = App::getLocale();
         $present_lang = DB::table('languages')->where('code', $currentLocale)->first();
         $lang_id = $present_lang->id ?? 1;
@@ -161,13 +166,17 @@ class LandingPageController extends Controller
 
         $all_features = $this->features();
 
-        if($general_setting->frontend_layout == 'regular') {
-            return view('landlord.index', compact('general_setting', 'hero', 'all_features', 'packages', 'faq_description', 'faqs', 'modules', 'module_description', 'features', 'testimonials', 'socials','blogs', 'pages', 'tenant_signup_description', 'present_lang', 'coupon_list'));
+        if (! $general_setting) {
+            abort(503, 'Landlord database has no general_settings row. Re-run the installer or restore the landlord database.');
+        }
 
+        $layout = $general_setting->frontend_layout ?? 'regular';
+
+        if ($layout === 'custom') {
+            return view('landlord.custom_index', compact('general_setting', 'hero', 'all_features', 'packages', 'modules', 'module_description', 'testimonials', 'tenant_signup_description'));
         }
-        elseif($general_setting->frontend_layout == 'custom') {
-            return view('landlord.custom_index', compact('general_setting','hero', 'all_features', 'packages', 'modules', 'module_description', 'testimonials', 'tenant_signup_description'));
-        }
+
+        return view('landlord.index', compact('general_setting', 'hero', 'all_features', 'packages', 'faq_description', 'faqs', 'modules', 'module_description', 'features', 'testimonials', 'socials', 'blogs', 'pages', 'tenant_signup_description', 'present_lang', 'coupon_list'));
     }
 
 
