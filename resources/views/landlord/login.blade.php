@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{ $general_setting->meta_title }} - Login</title>
+    <title>{{ $general_setting->site_title ?? $general_setting->meta_title }} - Login</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
@@ -97,8 +97,12 @@
                         <button type="submit" class="btn btn-primary btn-block">{{ __('db.LogIn') }}</button>
                     </form>
                     <!-- <br> -->
-                    <p>{{ __('db.Developed By') }} <span
-                            class="external">{{ $general_setting->developed_by }}</span></p>
+                    <p>&copy; {{ $general_setting->site_title }} | {{ __('db.Developed By') }}
+                        <span class="external">{{ $general_setting->developed_by }}</span>
+                        @if(env('VERSION'))
+                            | V {{ env('VERSION') }}
+                        @endif
+                    </p>
                 </div>
             </div>
         </div>

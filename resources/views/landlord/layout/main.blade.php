@@ -299,7 +299,7 @@
               @if(function_exists('tenancy') && tenancy()->initialized)
                 <p>&copy; {{$general_setting->site_title}} | {{date("Y")}}. All rights reserved | V {{env('VERSION')}}</p>
               @else
-                <p>&copy; {{$general_setting->site_title}} | {{__('db.Developed By')}} <span class="external">{{$general_setting->developed_by}}</span> | V {{env('VERSION')}}</p>
+                <p>&copy; {{ $general_setting->site_title }} | {{ __('db.Developed By') }} <span class="external">{{ $general_setting->developed_by }}</span>@if(env('VERSION')) | V {{ env('VERSION') }}@endif</p>
               @endif
             </div>
           </div>
