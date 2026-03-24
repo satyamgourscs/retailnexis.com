@@ -65,8 +65,9 @@ return [
     /*
     | Central (landlord) database name for SaaS. Always read via config(), never env() in routes
     | when using "php artisan config:cache" — env() returns null outside config files after caching.
+    | If LANDLORD_DB is missing but DB_CONNECTION is saleprosaas_landlord, DB_DATABASE is used.
     */
-    'landlord_db' => env('LANDLORD_DB'),
+    'landlord_db' => env('LANDLORD_DB') ?: (env('DB_CONNECTION') === 'saleprosaas_landlord' ? env('DB_DATABASE') : null),
 
     /*
     |--------------------------------------------------------------------------
