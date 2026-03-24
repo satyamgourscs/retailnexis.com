@@ -16,13 +16,29 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-// Absolute path to Laravel root (contains app/, bootstrap/, vendor/, storage/, .env)
-$laravelRoot = dirname(__DIR__) . '/laravel_app';
+// Resolve Laravel root: supports both
+// - /home/USER/public_html + /home/USER/laravel_app
+// - /home/USER/domains/DOMAIN/public_html + /home/USER/laravel_app (Hostinger)
+$folder = getenv('LARAVEL_FOLDER') ?: 'laravel_app';
+$candidates = [
+    dirname(__DIR__) . '/' . $folder,
+    dirname(__DIR__, 3) . '/' . $folder,
+    dirname(__DIR__, 2) . '/' . $folder,
+];
 
-if (! is_dir($laravelRoot)) {
+$laravelRoot = null;
+foreach ($candidates as $path) {
+    if (is_dir($path) && is_file($path . '/vendor/autoload.php')) {
+        $laravelRoot = $path;
+        break;
+    }
+}
+
+if ($laravelRoot === null) {
     http_response_code(500);
     header('Content-Type: text/plain; charset=utf-8');
-    echo "Laravel root not found. Set \$laravelRoot in public_html/index.php (expected: {$laravelRoot})\n";
+    echo "Laravel root not found. Tried:\n - " . implode("\n - ", $candidates) . "\n";
+    echo "Set LARAVEL_FOLDER if the project folder is not \"laravel_app\", or edit \$candidates in index.php.\n";
     exit(1);
 }
 

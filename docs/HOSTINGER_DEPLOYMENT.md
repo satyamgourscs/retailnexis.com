@@ -182,6 +182,14 @@ If `URL::asset()` or redirects use `http://` behind SSL, set in `AppServiceProvi
 
 ---
 
+## `index.php`: “Laravel root not found” (domains/.../public_html)
+
+If the site lives under `~/domains/yourdomain.com/public_html` but Laravel is `~/laravel_app`, the old template looked for `domains/yourdomain.com/laravel_app`. Use **`public/index.shared-hosting.php`** from the repo (it auto-detects `~/laravel_app`). Copy it to `public_html/index.php` after `git pull`.
+
+Optional: set Apache/env `LARAVEL_FOLDER=myapp` if the project folder name is not `laravel_app`.
+
+---
+
 ## Hostinger: `symlink()` disabled (storage:link fails)
 
 If logs show `Call to undefined function ... symlink()` or `storage:link` fails, **do not** rely on `php artisan storage:link`. Use the shell instead:
