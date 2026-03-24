@@ -97,7 +97,9 @@ class SaasInstallController extends Controller
     protected function normalizeDbInput(SaasInstallationRequest $request): array
     {
         $host = trim((string) $request->db_host);
-        if ($host === '' || strtolower($host) === 'localhost') {
+        if ($host === '') {
+            $host = $request->server_type === 'hostinger' ? 'localhost' : '127.0.0.1';
+        } elseif (strtolower($host) === 'localhost' && $request->server_type !== 'hostinger') {
             $host = '127.0.0.1';
         }
 

@@ -2,6 +2,12 @@
 
 use Illuminate\Support\Str;
 
+// Hostinger: privileges are often granted for @'localhost' only. DB_HOST=127.0.0.1 authenticates as @'127.0.0.1' → SQLSTATE 1044.
+$mysqlHost = env('DB_HOST', '127.0.0.1');
+if (is_string($mysqlHost) && env('SERVER_TYPE') === 'hostinger' && $mysqlHost === '127.0.0.1') {
+    $mysqlHost = 'localhost';
+}
+
 return [
 
     /*
@@ -46,7 +52,7 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => $mysqlHost,
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
@@ -75,7 +81,7 @@ return [
         'saleprosaas_landlord' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => $mysqlHost,
             'port' => env('DB_PORT', '3306'),
             'database' => env('LANDLORD_DB') ?: env('DB_DATABASE', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
@@ -96,7 +102,7 @@ return [
         'saleprosaas_tenant' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'host' => $mysqlHost,
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'forge'),
             'username' => env('DB_USERNAME', 'forge'),
