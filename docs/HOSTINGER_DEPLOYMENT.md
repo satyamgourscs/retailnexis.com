@@ -182,11 +182,46 @@ If `URL::asset()` or redirects use `http://` behind SSL, set in `AppServiceProvi
 
 ---
 
+## Hostinger: `symlink()` disabled (storage:link fails)
+
+If logs show `Call to undefined function ... symlink()` or `storage:link` fails, **do not** rely on `php artisan storage:link`. Use the shell instead:
+
+```bash
+bash scripts/link-storage-shared-hosting.sh \
+  "$HOME/domains/YOURDOMAIN.com/public_html" \
+  "$HOME/laravel_app"
+```
+
+Or manually (example: `public_html` under `~/domains/retailnexis.com/`):
+
+```bash
+cd ~/domains/retailnexis.com/public_html
+rm -rf storage
+ln -sfn "$HOME/laravel_app/storage/app/public" storage
+ls -la storage
+```
+
+(Use your real domain folder name; `$HOME/laravel_app` must point at the Laravel project.)
+
+---
+
+## Database connection fails (migrate / PDO)
+
+1. Confirm `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` in `.env` match **hPanel → Databases** (user must be **assigned** to that database).
+2. Try `DB_HOST=localhost` if `127.0.0.1` fails (or vice versa).
+3. Test from SSH: `mysql -u u612565959_ss -p -h 127.0.0.1 u612565959_delta`
+
+**Never paste `.env` lines into the bash terminal** — paste only in `nano .env` or File Manager; otherwise you get `syntax error` / `command not found`.
+
+---
+
 ## Common errors
 
 | Symptom | Fix |
 |--------|-----|
 | 500 + blank page | `APP_DEBUG=true` briefly; check `storage/logs/laravel.log` |
+| `symlink()` / storage:link | Use `scripts/link-storage-shared-hosting.sh` or `ln -s` (see above) |
+| PDO / SQLSTATE | Fix `.env` DB_*; verify user has access to DB in hPanel |
 | “No application encryption key” | `php artisan key:generate` in `laravel_app` |
 | Permission denied on storage | chmod/chown `storage`, `bootstrap/cache` |
 | 404 on all routes except `/` | `.htaccess` missing or `mod_rewrite` off; confirm `RewriteBase /` if in subdirectory |
