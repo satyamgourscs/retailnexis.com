@@ -9,8 +9,8 @@
     <meta name="csrf-token" content="CmSeExxpkZmScDB9ArBZKMGKAyzPqnxEriplXWrS">
 
     <!-- Document Title -->
-    <title>{{$general_setting->meta_title ?? 'SalePro SAAS'}}</title>
-    <meta name="description" content="{{$general_setting->meta_description ?? 'SalePro SAAS is a multi-tenant SAAS POS & inventory management system allows you to sell subscriptions under your own brand. We handle support & customization, while you make money!'}}" />
+    <title>{{$general_setting->meta_title ?? 'NEXA TECH'}}</title>
+    <meta name="description" content="{{$general_setting->meta_description ?? 'NEXA TECH — multi-tenant SaaS POS & inventory management. Sell subscriptions under your own brand.'}}" />
     <!-- Links -->
     <link rel="icon" type="image/png" href="{{url('landlord/images/logo', $general_setting->site_logo)}}" />
 

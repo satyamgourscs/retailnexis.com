@@ -9,12 +9,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{url('landlord/images/logo', $general_setting->site_logo)}}" />
     <!-- Document Title -->
-    <title>{{$general_setting->meta_title ?? 'SalePro SAAS'}}</title>
+    <title>{{$general_setting->meta_title ?? 'NEXA TECH'}}</title>
     <!-- Links -->
-    <meta name="description" content="{{$general_setting->meta_description ?? 'Buy SalePro inventory management & POS SAAS php script'}}" />
+    <meta name="description" content="{{$general_setting->meta_description ?? 'NEXA TECH — SaaS POS & inventory management platform'}}" />
     <meta property="og:url" content="{{url()->full()}}" />
-    <meta property="og:title" content="{{$general_setting->og_title ?? 'SalePro SAAS'}}" />
-    <meta property="og:description" content="{{$general_setting->og_description ?? 'Buy SalePro inventory management & POS SAAS php script'}}" />
+    <meta property="og:title" content="{{$general_setting->og_title ?? 'NEXA TECH'}}" />
+    <meta property="og:description" content="{{$general_setting->og_description ?? 'NEXA TECH — SaaS POS & inventory management platform'}}" />
     <meta property="og:image" content="{{url('/landlord/images/og-image')}}/{{$general_setting->og_image ?? 'saleprosaas.jpg'}}" />
 
     <!-- Bootstrap CSS -->
@@ -52,12 +52,6 @@
     @endif
     <!--Header-->
     <!--Header Area starts-->
-    @if(!env('USER_VERIFIED'))
-    <div class="notice">
-        <a target="_blank" href="https://lion-coders.com/software/salepro-saas">Buy Salepro SAAS with full source code</a>
-    </div>
-    @endif
-
     @if(env('USER_VERIFIED')==1)
     <div style="display:none;position:fixed;right:0;top:200px;z-index:99">
         <span id="light-theme" class="btn btn-light d-block"><i class="fa fa-sun-o"></i></span>
@@ -610,14 +604,6 @@
     <!-- Footer (Nova footer-style-4) -->
     <footer class="footer footer-style-4 footer-dark footer-wrapper saas-premium-footer">
         <div class="container">
-            @if(!env('USER_VERIFIED'))
-            <div class="widget-wrapper">
-                <div class="cta text-center py-4">
-                    <h3 class="text-white mb-4">Start your software subscription business</h3>
-                    <a class="button radius-30" href="https://lion-coders.com/software/salepro-saas-pos-inventory-saas-php-script">Get SalePro SAAS</a>
-                </div>
-            </div>
-            @endif
             <div class="saas-premium-footer__main widget-wrapper pt-5 pb-2">
                 <div class="row g-4 g-lg-5">
                     <div class="col-12 col-md-6 col-xl-3">

@@ -9,12 +9,12 @@
     <meta name="csrf-token" content="CmSeExxpkZmScDB9ArBZKMGKAyzPqnxEriplXWrS">
     <link rel="icon" type="image/png" href="{{url('public/landlord/images/logo', $general_setting->site_logo)}}" />
     <!-- Document Title -->
-    <title>{{$general_setting->meta_title ?? 'SalePro SAAS'}}</title>
+    <title>{{$general_setting->meta_title ?? 'NEXA TECH'}}</title>
     <!-- Links -->
-    <meta name="description" content="{{$general_setting->meta_description ?? 'SalePro SAAS'}}" />
+    <meta name="description" content="{{$general_setting->meta_description ?? 'NEXA TECH'}}" />
     <meta property="og:url" content="{{url()->full()}}" />
-    <meta property="og:title" content="{{$general_setting->og_title ?? 'SalePro SAAS'}}" />
-    <meta property="og:description" content="{{$general_setting->og_description ?? 'SalePro SAAS'}}" />
+    <meta property="og:title" content="{{$general_setting->og_title ?? 'NEXA TECH'}}" />
+    <meta property="og:description" content="{{$general_setting->og_description ?? 'NEXA TECH'}}" />
     <meta property="og:image" content="{{url('/public/landlord/images/og-image')}}/{{$general_setting->og_image ?? 'saleprosaas.jpg'}}" />
     
     <!-- Bootstrap CSS -->
@@ -131,13 +131,6 @@
     <!-- Footer section Starts-->
     <div class="footer-wrapper">
         <div class="container">
-            @if(!env('USER_VERIFIED'))
-            <div class="mt-5 mb-5 cta">
-                <h3 class="h1 mb-5">Start your software subscription business</h3>
-                <a class="button lg style2" href="https://lion-coders.com/software/salepro-saas-pos-inventory-saas-php-script">Get SalePro SAAS</a>
-            </div>
-            <hr>
-            @endif
             <div class="d-flex justify-content-between mt-5">
                 <div class="footer-links">
                     @foreach($pages as $page)

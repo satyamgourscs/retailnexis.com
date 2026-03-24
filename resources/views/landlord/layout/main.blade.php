@@ -174,9 +174,6 @@
             <li><a href="{{ route('superadminGeneralSetting', [], false) }}"><i class="dripicons-gear"></i> {{__('db.settings')}}</a></li>
             <li><a href="{{ route('superadminMailSetting', [], false) }}"><i class="dripicons-mail"></i> {{__('db.Mail Setting')}}</a></li>
             <li><a href="{{url('superadmin/addon-list')}}"><i class="dripicons-flag"></i> {{__('db.Addons')}}</a></li>
-            @if(Auth::user()->role_id != 5)
-            <li><a target="_blank" href="https://lion-coders.com/docs/saleprosaas/"> <i class="dripicons-information"></i><span>{{__('db.Documentation')}}</span></a></li>
-            @endif
         </ul>
       </nav>
 

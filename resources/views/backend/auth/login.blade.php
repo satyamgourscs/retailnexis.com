@@ -109,7 +109,6 @@
             <div class="text-center" style="font-size:11px;color:#666;margin-bottom:15px">Premium Add-ons</div>
             <a href="https://salepropos.com/ecommerce/" class="btn btn-primary btn-sm">eCommerce</a>
             <a href="?demo_db_name=sale_woocom" class="btn btn-primary btn-sm demo-btn">WooCommerce</a>
-            <a href="https://lion-coders.com/software/salepro-saas-pos-inventory-saas-php-script"  target="_blank" class="btn btn-primary btn-sm">SAAS</a>
                         <br><br>
           </div>
         </div>

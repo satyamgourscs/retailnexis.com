@@ -173,7 +173,7 @@
             <p>You can also watch this video on <a href="https://www.youtube.com/watch?v=Fvi09MgBxUU">youtube</a></p>
 
             <h2><strong>Help with installation</strong></h2>
-            <p>We can help you install on any cpanel based hosting for as little as $15. You can send the money via paypal to tarik_17@yahoo.co.uk. Contact us at <a href="https://lion-coders.com/support">Support</a> with your hosting details and payment proof and we'll take care of the rest.</p>
+            <p>We can help you install on any cpanel based hosting for as little as $15. You can send the money via paypal to tarik_17@yahoo.co.uk. Contact us at Support with your hosting details and payment proof and we'll take care of the rest.</p>
             <p><strong>Please note</strong>- If you are installing on localhost, we'll charge $50 for anydesk/teamviewer support(installation).</p>
         </section>
         <section id="addon">
@@ -267,7 +267,7 @@
                 <li>Delete your previous database it.</li>
                 <li>Delete the project folder and reinstall it</li>
             </ul>
-            <p><strong>Still facing problem? Don't worry! We can update your software for USD 15. Please contact us at <a href="https://lion-coders.com/support">Support</a>.</strong></p>
+            <p><strong>Still facing problem? Don't worry! We can update your software for USD 15. Please contact us at Support.</strong></p>
         </section>
         <section id="pos-printer">
             <div class="page-header">
@@ -499,7 +499,7 @@
             <p><img alt="" src="read_me/assets/images/automated_purchase1.png"></p>
             <p>Then set up the cron job as described below. Here cron job is set for every 5 minitues. So the system will check in every five minitues and if any product exceeds the alert quantity an auotomated purchase will be made.</p>
             <p><img alt="" src="read_me/assets/images/automated_purchase2.png"></p>
-            <p><strong>Note:</strong> If you face any issues while setting up cron jobs, please contact at <a href="https://lion-coders.com/support">Support</a>.</p>
+            <p><strong>Note:</strong> If you face any issues while setting up cron jobs, please contact at Support.</p>
         </section>
         <section id="sale">
             <div class="page-header">
@@ -713,7 +713,7 @@
             <p><img alt="" src="read_me/assets/images/automated_purchase1.png"></p>
             <p>Then set up the cron job as described below. Here cron job is set up for once per day. So the system will check at 12:00 am if any product can not fulfill the daily sale objective for previous day. Products those can not fulfill the daily sale objective will be listed to the daily sale objective report.</p>
             <p><img alt="" src="read_me/assets/images/dso_alert1.png"></p>
-            <p><strong>Note:</strong> If you face any issues while setting up cron jobs, please contact at <a href="https://lion-coders.com/support">Support</a>.</p>
+            <p><strong>Note:</strong> If you face any issues while setting up cron jobs, please contact at Support.</p>
         </section>
         <section id="setting">
             <div class="page-header">
@@ -816,7 +816,7 @@
                 <h3>SUPPORT</h3>
                 <hr class="notop">
             </div>
-            <p>We are happy to provide support for any issues within our software. We also provide customization service for as little as $15/hour. So if you have any features in mind or suugestions, please feel free to contact us at <a href="https://lion-coders.com/support"><strong>Support</strong></a>. Please note that we don't provide support though any other means (example- whatsapp, comments etc.). So, please refrain from commenting your queries on codecanyon or kocking us elsewhere.</p>
+            <p>We are happy to provide support for any issues within our software. We also provide customization service for as little as $15/hour. So if you have any features in mind or suugestions, please feel free to contact us at <strong>Support</strong>. Please note that we don't provide support though any other means (example- whatsapp, comments etc.). So, please refrain from commenting your queries on codecanyon or kocking us elsewhere.</p>
             <p>Also, in case of any errors/bugs/issues on your installation, please contact us with your hosting details (url, username, password), software admin access (url, username, password) and purchase code. If your support period has expired, please renew support on codecanyon before contacting us for support.</p>
             <p>Thank you and  best wishes from {{$general_setting->developed_by}}</p>
         </section>

@@ -47,7 +47,6 @@
                     <td>It's a standalone application to start subscription business with SalePro. It is a multi tenant system and each client will have their separate database. This application comes with free landing page, unlimited custom pages, blog, payment gateway and lots more.</td>
                     <td>
                         <div class="btn-group">
-                            <a target="_blank" href="https://lion-coders.com/software/salepro-saas-pos-inventory-saas-php-script" class="btn btn-primary btn-sm" title="SalePro Saas"><i class="dripicons-basket"></i> Buy Now</a>&nbsp;&nbsp;
                             <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#installSaasModal">
                                 <i class="dripicons-download"></i> Install
                             </button>
@@ -64,16 +63,9 @@
                         $ecommerceInstalled = $isLandlord
                             ? file_exists(base_path('Modules/Ecommerce'))
                             : in_array('ecommerce', explode(',', $general_setting->modules));
-
-                        $buyNowUrl = $isLandlord
-                            ? 'https://lion-coders.com/software/ecommerce-addon-for-salepro-pos-saas'
-                            : 'https://lion-coders.com/software/ecommerce-addon-for-salepro-pos-inventory-management-app';
                         @endphp
 
                         @if (!$ecommerceInstalled)
-                            <a target="_blank" href="{{ $buyNowUrl }}" class="btn btn-primary btn-sm" title="SalePro eCommerce">
-                                <i class="dripicons-basket"></i> Buy Now
-                            </a>&nbsp;&nbsp;
                             <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#installeCommerceModal">
                                 <i class="dripicons-download"></i> Install
                             </button>
@@ -94,16 +86,9 @@
                             $apiInstalled = $isLandlord
                                 ? file_exists(base_path('app\Http\Controllers\Api'))
                                 : in_array('api', explode(',', $general_setting->modules));
-
-                            $buyNowUrl = $isLandlord
-                                ? 'https://lion-coders.com/software/salepro-saas-mobile-app'
-                                : 'https://lion-coders.com/software/salepro-mobile-app-complete-pos-inventory-management-system-hrm-accountingsolution';
                             @endphp
 
                             @if (!$apiInstalled)
-                                <a target="_blank" href="{{ $buyNowUrl }}" class="btn btn-primary btn-sm" title="Mobile App - All-in-one mobile POS">
-                                    <i class="dripicons-basket"></i> Buy Now
-                                </a>&nbsp;&nbsp;
                                 <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#installApiModal">
                                     <i class="dripicons-download"></i> Install
                                 </button>
@@ -124,16 +109,9 @@
                             $woocommerceInstalled = $isLandlord
                                 ? file_exists(base_path('Modules/Woocommerce'))
                                 : in_array('woocommerce', explode(',', $general_setting->modules));
-
-                            $buyNowUrl = $isLandlord
-                                ? 'https://lion-coders.com/software/woocommerce-addon-for-salepro-saas'
-                                : 'https://lion-coders.com/software/salepro-woocommerce-addon';
                             @endphp
 
                             @if (!$woocommerceInstalled)
-                                <a target="_blank" href="{{ $buyNowUrl }}" class="btn btn-primary btn-sm" title="Point of sale WooCommerce add-on">
-                                    <i class="dripicons-basket"></i> Buy Now
-                                </a>&nbsp;&nbsp;
                                 <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#installWooCommerceModal">
                                     <i class="dripicons-download"></i> Install
                                 </button>
