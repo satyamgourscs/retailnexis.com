@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\InstallationRequest;
 use App\Traits\ENVFilePutContent;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +33,7 @@ class InstallController extends Controller
 
        $dataServer = self::purchaseVerify($purchaseCode);
 
-        if (!$dataServer->dbdata) {
+        if (! is_object($dataServer) || empty($dataServer->dbdata)) {
             return redirect()->back()->withErrors(['errors' => ['Wrong Purchase Code !']]);
         }
 
@@ -49,7 +50,9 @@ class InstallController extends Controller
                 self::switchToNewDatabaseConnection($request);
                 self::importCentralDatabase($dataServer->dbdata);
                 self::optimizeClear();
-                return redirect(url('/install/step-4'));
+                $target = rtrim($request->getBaseUrl(), '/').'/install/step-4';
+
+                return new RedirectResponse($target);
 
             } catch (Exception $e) {
 
@@ -69,7 +72,7 @@ class InstallController extends Controller
         $result = curl_exec($ch);
         $response = json_decode($result, false);
 
-        return $response;
+        return is_object($response) ? $response : (object) ['dbdata' => null];
 
     }
 

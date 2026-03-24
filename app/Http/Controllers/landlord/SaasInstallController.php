@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\SaasInstallationRequest;
 use App\Traits\ENVFilePutContent;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -54,7 +55,7 @@ class SaasInstallController extends Controller
 
       $dataServer = self::purchaseVerify($purchaseCode);
 
-        if (!$dataServer->dbdata) {
+        if (! is_object($dataServer) || empty($dataServer->dbdata)) {
             return redirect()->back()->withErrors(['errors' => ['Wrong Purchase Code !']]);
         }
 
@@ -77,7 +78,11 @@ class SaasInstallController extends Controller
                 self::importCentralDatabase($dataServer->dbdata);
                 self::optimizeClear();
 
-                return redirect($request->central_domain.'/saas/install/step-4');
+                // Never use $request->central_domain (not present on step-3 form). Build URL from this
+                // request so subfolder installs (e.g. /saas/public/) and production domains both work.
+                $target = rtrim($request->getBaseUrl(), '/').'/saas/install/step-4';
+
+                return new RedirectResponse($target);
 
             } catch (Exception $e) {
 
@@ -124,7 +129,7 @@ class SaasInstallController extends Controller
         $result = curl_exec($ch);
         $response = json_decode($result, false);
 
-        return $response;
+        return is_object($response) ? $response : (object) ['dbdata' => null];
 
     }
 
