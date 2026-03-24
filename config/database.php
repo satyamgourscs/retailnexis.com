@@ -67,6 +67,8 @@ return [
                  ],
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // Required for installer SQL dumps: without this, PDO may execute only the first statement.
+                PDO::MYSQL_ATTR_MULTI_STATEMENTS => true,
             ]) : [],
         ],
 
@@ -87,6 +89,7 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_MULTI_STATEMENTS => true,
             ]) : [],
         ],
 
@@ -107,6 +110,7 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::MYSQL_ATTR_MULTI_STATEMENTS => true,
             ]) : [],
         ],
 

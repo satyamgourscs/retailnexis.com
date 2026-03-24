@@ -206,8 +206,9 @@ class SaasInstallController extends Controller
 
         $connectionName = 'saleprosaas_landlord';
 
-        // Fully or partially installed DB: skip re-import (avoids 1050 Table already exists).
-        if (self::landlordDatabaseHasAnyTables($connectionName)) {
+        // Only skip when the landlord schema looks complete (core SaaS tables present).
+        // Skipping on "any table" breaks partial/failed imports: leftover tables blocked the full dump.
+        if (self::landlordInstallLooksComplete($connectionName)) {
             return;
         }
 
@@ -231,14 +232,34 @@ class SaasInstallController extends Controller
     }
 
     /**
-     * True if the landlord database already has at least one table (SHOW TABLES).
+     * True when core landlord tables from the install dump exist (successful prior install).
+     * Do not use "any table" — a partial/failed import can leave a few tables and must re-run import.
      */
-    protected static function landlordDatabaseHasAnyTables(string $connectionName): bool
+    protected static function landlordInstallLooksComplete(string $connectionName): bool
     {
+        $required = ['tenants', 'domains', 'general_settings'];
+
         try {
             $rows = DB::connection($connectionName)->select('SHOW TABLES');
+            if (! is_array($rows) || $rows === []) {
+                return false;
+            }
 
-            return is_array($rows) && count($rows) > 0;
+            $names = [];
+            foreach ($rows as $row) {
+                $vals = array_values((array) $row);
+                if ($vals !== []) {
+                    $names[strtolower((string) $vals[0])] = true;
+                }
+            }
+
+            foreach ($required as $table) {
+                if (! isset($names[$table])) {
+                    return false;
+                }
+            }
+
+            return true;
         } catch (\Throwable $e) {
             return false;
         }
