@@ -13,6 +13,10 @@ class AddDbIdToTenantsTable extends Migration
      */
     public function up()
     {
+        if (! Schema::hasTable('tenants') || Schema::hasColumn('tenants', 'db_id')) {
+            return;
+        }
+
         Schema::table('tenants', function (Blueprint $table) {
             $table->integer('db_id')->nullable();
         });
@@ -25,8 +29,12 @@ class AddDbIdToTenantsTable extends Migration
      */
     public function down()
     {
+        if (! Schema::hasTable('tenants') || ! Schema::hasColumn('tenants', 'db_id')) {
+            return;
+        }
+
         Schema::table('tenants', function (Blueprint $table) {
-            //
+            $table->dropColumn('db_id');
         });
     }
 }
