@@ -1,0 +1,39 @@
+# Rename to deploy-hostinger.yml and add GitHub Secrets:
+#   HOSTINGER_SSH_HOST   (e.g. ssh.hostinger.com or server IP)
+#   HOSTINGER_SSH_USER
+#   HOSTINGER_SSH_KEY    (private key, full PEM)
+#   HOSTINGER_DEPLOY_PATH (optional, default: ~/laravel_app)
+#
+# This runs the deploy script on the server over SSH. Database creation in hPanel
+# must still be done once manually (or via Hostinger API if available).
+
+name: Deploy to Hostinger (SSH)
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Git branch'
+        required: true
+        default: 'main'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          script: |
+            set -e
+            cd ~/laravel_app
+            git fetch --depth 1 origin ${{ github.event.inputs.branch }}
+            git checkout -B ${{ github.event.inputs.branch }} FETCH_HEAD
+            export DEPLOY_DOMAIN="${{ secrets.DEPLOY_DOMAIN }}"
+            export SKIP_ROUTE_CACHE=1
+            bash scripts/deploy-hostinger.sh
