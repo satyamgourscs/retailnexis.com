@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\App;
 use Stancl\Tenancy\Events\TenancyBootstrapped;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,7 +27,25 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->ensureWritableDirectoriesExist();
+    }
+
+    /**
+     * Hostinger/cPanel: first deploy may lack cache/session dirs; avoid opaque 500s from mkdir failures.
+     */
+    protected function ensureWritableDirectoriesExist(): void
+    {
+        foreach ([
+            base_path('bootstrap/cache'),
+            storage_path('framework/cache/data'),
+            storage_path('framework/sessions'),
+            storage_path('framework/views'),
+            storage_path('logs'),
+        ] as $path) {
+            if (! is_dir($path)) {
+                @mkdir($path, 0755, true);
+            }
+        }
     }
 
 
@@ -83,8 +102,9 @@ class AppServiceProvider extends ServiceProvider
                     }
                 }
             } catch (\Exception $e) {
-                // Optional: log the error
-                // Log::error($e->getMessage());
+                Log::warning('AppServiceProvider translation bootstrap skipped', [
+                    'message' => $e->getMessage(),
+                ]);
             }
         };
 

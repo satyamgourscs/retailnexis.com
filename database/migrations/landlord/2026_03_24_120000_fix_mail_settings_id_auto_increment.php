@@ -22,9 +22,24 @@ return new class extends Migration
             return;
         }
 
-        DB::connection($connection)->statement(
-            'ALTER TABLE `mail_settings` MODIFY `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT'
-        );
+        $last = null;
+        foreach (
+            [
+                'ALTER TABLE `mail_settings` MODIFY `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT',
+                'ALTER TABLE `mail_settings` MODIFY `id` INT UNSIGNED NOT NULL AUTO_INCREMENT',
+            ] as $sql
+        ) {
+            try {
+                DB::connection($connection)->statement($sql);
+                $last = null;
+                break;
+            } catch (\Throwable $e) {
+                $last = $e;
+            }
+        }
+        if ($last !== null) {
+            throw $last;
+        }
     }
 
     public function down(): void

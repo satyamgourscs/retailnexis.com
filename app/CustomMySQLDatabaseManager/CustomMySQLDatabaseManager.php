@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\CustomMySQLDatabaseManager;
 
+use App\Services\TenantDatabasePoolAllocator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -28,6 +29,14 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
     protected function serverType(): string
     {
         return (string) config('app.server_type', '');
+    }
+
+    /**
+     * Pre-created DB pool (Hostinger): no CREATE DATABASE / GRANT at runtime.
+     */
+    protected function poolModeEnabled(): bool
+    {
+        return (bool) config('tenancy.database.pool_enabled', false);
     }
 
     /**
@@ -98,6 +107,25 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
         $database = $tenant->database()->getName();
         $charset = $this->database()->getConfig('charset');
         $collation = $this->database()->getConfig('collation');
+
+        if ($this->poolModeEnabled()) {
+            if ($database === null || $database === '') {
+                Log::error('CustomMySQLDatabaseManager: pool mode but tenant has no database name');
+
+                return false;
+            }
+            if (! $this->databaseExists($database)) {
+                Log::error('CustomMySQLDatabaseManager: pool database missing in MySQL', [
+                    'database' => $database,
+                ]);
+                throw new RuntimeException(
+                    "Pool database [{$database}] does not exist. Create it in hPanel, assign DB_USERNAME, add the name to tenant_databases."
+                );
+            }
+            $this->assertTenantDatabaseUsable($database);
+
+            return true;
+        }
 
         if ($this->serverType() === 'cpanel') {
             $headers = array(
@@ -176,6 +204,11 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
             if (! $this->databaseExists($database)) {
                 $ok = $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
                 if (! $ok) {
+                    Log::error('CustomMySQLDatabaseManager: CREATE DATABASE failed', [
+                        'database' => $database,
+                        'server_type' => $this->serverType(),
+                    ]);
+
                     return false;
                 }
             }
@@ -189,6 +222,11 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
         if (! $this->databaseExists($database)) {
             $ok = $this->database()->statement("CREATE DATABASE `{$database}` CHARACTER SET `{$charset}` COLLATE `{$collation}`");
             if (! $ok) {
+                Log::error('CustomMySQLDatabaseManager: CREATE DATABASE failed', [
+                    'database' => $database,
+                    'server_type' => $this->serverType(),
+                ]);
+
                 return false;
             }
         }
@@ -203,6 +241,12 @@ class CustomMySQLDatabaseManager extends MySQLDatabaseManager
         $database = $tenant->database()->getName();
         $charset = $this->database()->getConfig('charset');
         $collation = $this->database()->getConfig('collation');
+
+        if ($this->poolModeEnabled()) {
+            app(TenantDatabasePoolAllocator::class)->releaseForTenant($tenant);
+
+            return true;
+        }
 
         if ($this->serverType() === 'cpanel') {
             $headers = array(

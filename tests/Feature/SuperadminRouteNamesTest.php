@@ -15,6 +15,7 @@ class SuperadminRouteNamesTest extends TestCase
     public static function superadminRouteNames(): iterable
     {
         $names = [
+            'superadmin.home',
             'superadmin.dashboard',
             'saas-new-release',
             'superadminGeneralSetting',

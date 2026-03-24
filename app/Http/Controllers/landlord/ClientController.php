@@ -22,6 +22,7 @@ use Modules\Ecommerce\Database\Seeders\EcommerceDatabaseSeeder;
 use Modules\Restaurant\Database\Seeders\RestaurantDatabaseSeeder;
 use Illuminate\Validation\Rule;
 use App\Jobs\ProvisionTenantJob;
+use App\Exceptions\TenantDatabasePoolExhaustedException;
 
 class ClientController extends Controller
 {
@@ -126,9 +127,10 @@ class ClientController extends Controller
         try {
             //creating tenant
             // Ensure central records are created in a DB transaction.
+            $centralConnection = (string) config('tenancy.database.central_connection', 'saleprosaas_landlord');
             for ($attempt = 0; $attempt < 3; $attempt++) {
                 try {
-                    DB::transaction(function () use (&$tenant, &$tenantId, &$fullDomain) {
+                    DB::connection($centralConnection)->transaction(function () use (&$tenant, &$tenantId, &$fullDomain) {
                         $tenant = Tenant::create(['id' => $tenantId]);
                         $tenant->domains()->create(['domain' => $fullDomain]);
                     });
@@ -372,6 +374,8 @@ class ClientController extends Controller
             }
 
             return redirect()->back()->with('message', $message);
+        } catch (TenantDatabasePoolExhaustedException $e) {
+            return redirect()->back()->withInput()->with('not_permitted', $e->getMessage());
         } catch (\Throwable $e) {
             // On failure, remove half-created tenant/domain records to avoid broken clients.
             if ($tenant instanceof Tenant) {

@@ -36,6 +36,10 @@ class RouteServiceProvider extends ServiceProvider
 
         /*parent::boot();*/
 
+        // Merge APP_PUBLIC_URL + current request host into tenancy.central_domains (see centralDomains()).
+        // Without this, production hosts can be missing after config:cache → wrong tenancy / unexpected 404s.
+        $this->centralDomains();
+
         $this->mapApiRoutes();
         $this->mapWebRoutes();
     }

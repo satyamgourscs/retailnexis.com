@@ -16,6 +16,7 @@ use Mail;
 use Illuminate\Support\Facades\Artisan;
 use Database\Seeders\Tenant\TenantDatabaseSeeder;
 use Modules\Ecommerce\Database\Seeders\EcommerceDatabaseSeeder;
+use App\Exceptions\TenantDatabasePoolExhaustedException;
 
 trait TenantInfo
 {
@@ -163,7 +164,11 @@ trait TenantInfo
         else
             $paid_by = '';
         //creating tenant
-        $tenant = Tenant::create(['id' => $request->tenant]);
+        try {
+            $tenant = Tenant::create(['id' => $request->tenant]);
+        } catch (TenantDatabasePoolExhaustedException $e) {
+            abort(503, $e->getMessage());
+        }
         $tenant->domains()->create(['domain' => $request->tenant . '.' . config('app.central_domain')]);
 
         if ($paid_by) {

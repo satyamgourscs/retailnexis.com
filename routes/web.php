@@ -71,15 +71,7 @@ Route::controller(Auth\SuperAdminLoginController::class)->group(function () {
 
 //landing page routes
 Route::controller(landlord\LandingPageController::class)->group(function () {
-    // Use config (not env): after `config:cache`, env('LANDLORD_DB') is always null in routes → endless installer redirect.
-    if (empty(config('app.landlord_db'))) {
-        Route::get('/', function () {
-            // Path-only: Laravel's redirect() absolutizes via APP_URL and can send users to 127.0.0.1.
-            return new RedirectResponse('/install/step-1');
-        });
-    } else {
-        Route::get('/', 'index');
-    }
+    // GET / is registered once at the bottom of this file (after tenant routes) so it wins over routes/tenant.php.
     //Route::get('sign-up', 'signUp')->name('signup');
     Route::post('send-otp', 'sendOTP')->name('send.otp');
     Route::post('verify-otp', 'verifyOTP')->name('verify.otp');
@@ -105,6 +97,9 @@ Route::controller(landlord\PageController::class)->group(function () {
 
 
 Route::group(['prefix' => 'superadmin', 'middleware' => ['superadminauth']], function() {
+    Route::get('/', function () {
+        return redirect()->route('superadmin.dashboard');
+    })->name('superadmin.home');
     Route::controller(landlord\DashboardController::class)->group(function () {
         Route::get('dashboard', 'index')->name('superadmin.dashboard');
         Route::get('new-release', 'newVersionReleasePage')->name('saas-new-release');
@@ -238,3 +233,43 @@ Route::group(['prefix' => 'superadmin', 'middleware' => ['superadminauth']], fun
         Route::delete('tickets/{id}','destroy')->name('superadmin.tickets.destroy');
     });
 });
+
+// Central landing: must be Route::domain(...) so it does not share the same route key as routes/tenant.php GET /
+// (no domain). Otherwise whichever provider boots last overwrites GET / — stale config:cache can put Tenancy after
+// RouteServiceProvider and restore tenant HomeController@index → PreventAccessFromCentralDomains aborts with 404.
+$centralDomains = array_values(array_unique(array_filter(config('tenancy.central_domains', []))));
+$canonicalCentral = strtolower((string) config('app.central_domain'));
+if ($canonicalCentral !== '') {
+    usort($centralDomains, function ($a, $b) use ($canonicalCentral) {
+        $a = strtolower((string) $a);
+        $b = strtolower((string) $b);
+        if ($a === $canonicalCentral) {
+            return -1;
+        }
+        if ($b === $canonicalCentral) {
+            return 1;
+        }
+
+        return strcmp($a, $b);
+    });
+}
+$namedCentralHome = false;
+foreach ($centralDomains as $domain) {
+    $domain = strtolower((string) $domain);
+    if ($domain === '') {
+        continue;
+    }
+    Route::domain($domain)->group(function () use (&$namedCentralHome) {
+        if (empty(config('app.landlord_db'))) {
+            Route::get('/', function () {
+                return new RedirectResponse('/install/step-1');
+            });
+            return;
+        }
+        $route = Route::get('/', [\App\Http\Controllers\landlord\LandingPageController::class, 'index']);
+        if (! $namedCentralHome) {
+            $route->name('central.home');
+            $namedCentralHome = true;
+        }
+    });
+}

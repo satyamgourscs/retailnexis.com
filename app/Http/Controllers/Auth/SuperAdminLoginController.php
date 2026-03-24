@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 use Illuminate\Http\Request;
-use App\User;
+use App\Models\landlord\GeneralSetting;
+use App\Support\LandlordConnection;
+use Illuminate\Support\Facades\Log;
 
 class SuperAdminLoginController extends Controller
 {
@@ -15,6 +17,8 @@ class SuperAdminLoginController extends Controller
 
     public function login()
     {
+        LandlordConnection::ensureSaleprosaasLandlordIsDefault();
+
         if(isset($_COOKIE['language']))
             \App::setLocale($_COOKIE['language']);
         else
@@ -24,12 +28,21 @@ class SuperAdminLoginController extends Controller
             $theme = $_COOKIE['theme'];
         else
             $theme = 'light';
-        $general_setting = \App\Models\landlord\GeneralSetting::latest()->first();
+        try {
+            $general_setting = GeneralSetting::latest()->first();
+        } catch (\Throwable $e) {
+            Log::error('Superadmin login page: landlord database unavailable', [
+                'message' => $e->getMessage(),
+            ]);
+            $general_setting = null;
+        }
         return view('landlord.login', compact('theme', 'general_setting'));
     }
 
     public function store(Request $request)
     {
+        LandlordConnection::ensureSaleprosaasLandlordIsDefault();
+
         // Form field is `name` (label "UserName") but many users enter email.
         // Auth must query the correct column: `name` OR `email`, not both at once.
         $login = trim((string) $request->input('name', ''));

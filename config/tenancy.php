@@ -105,6 +105,19 @@ return [
         'template_tenant_connection' => 'saleprosaas_tenant',
 
         /**
+         * Hostinger / shared hosts: pre-create empty DBs in hPanel, list them in tenant_databases,
+         * set TENANT_DATABASE_POOL_ENABLED=true. No CREATE DATABASE / GRANT at runtime.
+         */
+        // Hostinger shared hosting: default ON when SERVER_TYPE=hostinger (override with TENANT_DATABASE_POOL_ENABLED=false).
+        'pool_enabled' => filter_var(
+            env(
+                'TENANT_DATABASE_POOL_ENABLED',
+                strtolower((string) env('SERVER_TYPE', '')) === 'hostinger' ? 'true' : 'false'
+            ),
+            FILTER_VALIDATE_BOOLEAN
+        ),
+
+        /**
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */

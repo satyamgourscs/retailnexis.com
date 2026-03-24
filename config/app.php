@@ -207,8 +207,10 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class,
+        // Tenancy must register before RouteServiceProvider: tenant routes/routes/tenant.php also define GET /.
+        // Laravel overwrites duplicate URIs; central SaaS landing (routes/web.php) must load last so / is the landlord homepage.
         App\Providers\TenancyServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,
         // barryvdh/laravel-debugbar is require-dev — do not register here or production (composer --no-dev) breaks.
         // When installed locally, Laravel package discovery registers it automatically.
 
