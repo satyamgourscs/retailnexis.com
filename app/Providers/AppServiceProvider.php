@@ -35,6 +35,9 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
         $this->app->bind(\App\ViewModels\ISmsModel::class, \App\ViewModels\SmsModel::class);
 
+        // Hostinger: MySQL grants are usually for @'localhost'. Must run for queue/CLI too (not only web).
+        $this->normalizeMysqlHostForHostingerSharedHosting();
+
         if (app()->runningInConsole()) {
             return;
         }
@@ -128,6 +131,23 @@ class AppServiceProvider extends ServiceProvider
 
         } else {
             $translationLogic();
+        }
+    }
+
+    /**
+     * Map 127.0.0.1 → localhost so MySQL matches @'localhost' privileges (fixes SQLSTATE 1044 on tenant DB).
+     */
+    protected function normalizeMysqlHostForHostingerSharedHosting(): void
+    {
+        if (config('app.server_type') !== 'hostinger') {
+            return;
+        }
+
+        foreach (['mysql', 'saleprosaas_landlord', 'saleprosaas_tenant'] as $name) {
+            $host = config("database.connections.{$name}.host");
+            if ($host === '127.0.0.1') {
+                config(["database.connections.{$name}.host" => 'localhost']);
+            }
         }
     }
 }
