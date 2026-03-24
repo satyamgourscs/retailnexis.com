@@ -25,7 +25,7 @@
                 <p>Access superadmin login page - <strong><a href="{{ url('/superadmin-login') }}" target="__blank">Click here</a></strong></p>
             </div>
             <hr>
-            <footer>Copyright &copy; LionCoders. All Rights Reserved.</footer>
+            <footer>Copyright &copy; {{ config('app.name') }}. All rights reserved.</footer>
         </div>
     </div>
     <script type="text/javascript" src="{{ asset('saas-install-assets/js/jquery.min.js')}}"></script>

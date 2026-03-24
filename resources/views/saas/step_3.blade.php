@@ -90,7 +90,7 @@
 		        </form>
 		    </div>
 		    <hr>
-		    <footer>Copyright &copy; LionCoders. All Rights Reserved.</footer>
+		    <footer>Copyright &copy; {{ config('app.name') }}. All rights reserved.</footer>
 		</div>
 	</div>
 

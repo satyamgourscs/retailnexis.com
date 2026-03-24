@@ -95,14 +95,14 @@
 
                 <?php else: ?>
 
-                <br/><?php echo $ltext; ?><br/>Sorry. The requirements of SalepProSaaS is not available on your server. Please contact with us- hello@lion-coders.com with this code- <?php echo $passed; ?> Or contact with your server administrator.<br><br>
+                <br/><?php echo $ltext; ?><br/>Sorry. The requirements of SalePro SaaS are not available on your server. Share this code with your hosting provider or system administrator: <?php echo $passed; ?><br><br>
                 <a href="#" class="btn btn-primary disabled">Correct The Problem To Continue</a>
 
                 <?php endif ?>
 
             </div>
             <hr>
-            <footer>Copyright &copy; LionCoders. All Rights Reserved.</footer>
+            <footer>Copyright &copy; {{ config('app.name') }}. All rights reserved.</footer>
         </div>
     </div>
 </body>

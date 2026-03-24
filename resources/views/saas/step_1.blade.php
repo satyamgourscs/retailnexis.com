@@ -19,11 +19,10 @@
             <div class="content text-center">
                 <a id="letsstart" href="{{ route('saas-install-step-2') }}" class="btn btn-primary">Let's Start</a>
                 <hr class="mt-lg-5">
-                <h6>If you need any help with installation, <br>
-                    Please contact through support <a target="_blank" href="https://lion-coders.com/support">Contact Support</a></h6>
+                <h6>If you need any help with installation, contact your hosting provider or system administrator.</h6>
             </div>
             <hr>
-            <footer>Copyright &copy; LionCoders. All Rights Reserved.</footer>
+            <footer>Copyright &copy; {{ config('app.name') }}. All rights reserved.</footer>
 		</div>
 	</div>
 
