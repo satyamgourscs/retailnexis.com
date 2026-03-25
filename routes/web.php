@@ -235,9 +235,38 @@ Route::group(['prefix' => 'superadmin', 'middleware' => ['superadminauth']], fun
 });
 
 // Central landing: must be Route::domain(...) so it does not share the same route key as routes/tenant.php GET /
-// (no domain). Otherwise whichever provider boots last overwrites GET / — stale config:cache can put Tenancy after
-// RouteServiceProvider and restore tenant HomeController@index → PreventAccessFromCentralDomains aborts with 404.
-$centralDomains = array_values(array_unique(array_filter(config('tenancy.central_domains', []))));
+// (no domain). Otherwise GET / hits tenant HomeController (auth) → guests redirect to /login.
+//
+// Merge app URL + central_domain into the host list: config:cache + empty CENTRAL_DOMAIN in tenancy.php can leave
+// only localhost in tenancy.central_domains, so production apex (retailnexis.com) would never get a landing route.
+$extraHosts = array_filter([
+    strtolower(rtrim((string) config('app.central_domain'), '.')),
+], static fn (string $h): bool => $h !== '');
+$appUrlHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+if (is_string($appUrlHost) && $appUrlHost !== '') {
+    $extraHosts[] = strtolower(rtrim($appUrlHost, '.'));
+}
+$publicUrlHost = parse_url((string) config('app.public_url', ''), PHP_URL_HOST);
+if (is_string($publicUrlHost) && $publicUrlHost !== '') {
+    $extraHosts[] = strtolower(rtrim($publicUrlHost, '.'));
+}
+$centralDomains = array_values(array_unique(array_filter(
+    array_merge((array) config('tenancy.central_domains', []), $extraHosts),
+    static fn ($h): bool => (string) $h !== ''
+)));
+$expanded = [];
+foreach ($centralDomains as $host) {
+    $host = strtolower((string) $host);
+    if ($host === '') {
+        continue;
+    }
+    $expanded[] = $host;
+    $isLocal = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
+    if (! $isLocal && ! str_starts_with($host, 'www.')) {
+        $expanded[] = 'www.'.$host;
+    }
+}
+$centralDomains = array_values(array_unique($expanded));
 $canonicalCentral = strtolower((string) config('app.central_domain'));
 if ($canonicalCentral !== '') {
     usort($centralDomains, function ($a, $b) use ($canonicalCentral) {
