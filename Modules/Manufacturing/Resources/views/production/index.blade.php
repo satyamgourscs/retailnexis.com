@@ -50,7 +50,7 @@
             </div>
             {{-- {!! Form::close() !!} --}}
         </div>
-        <a href="{{route('productions.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> {{__('db.Add Production')}}</a>&nbsp;
+        <a href="{{route('manufacturing.productions.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> {{__('db.Add Production')}}</a>&nbsp;
     </div>
     <div class="table-responsive">
         <table id="production-table" class="table production-list" style="width: 100%">
@@ -233,7 +233,7 @@
             "processing": true,
             "serverSide": true,
             "ajax":{
-                url:"productions/production-data",
+                url:"{{ url('manufacturing/productions/production-data') }}",
                 data: {
                     starting_date: starting_date,
                     ending_date: ending_date,
@@ -383,7 +383,7 @@
                 htmltext += '<strong>{{__("db.Attach Document")}}: </strong><a href="documents/production/'+production[25]+'">Download</a><br>';
 
             $(".product-production-list tbody").remove();
-        $.get('productions/product_production/' + production[3], function(response) {
+        $.get("{{ url('manufacturing/productions') }}" + '/product_production/' + production[3], function(response) {
 
         var newBody = $("<tbody>");
 

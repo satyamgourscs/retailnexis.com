@@ -9,7 +9,7 @@
 <section>
     <div class="container-fluid">
         @if(in_array("products-add", $all_permission))
-            <a href="{{route('recipes.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('db.add_recipes')}}</a>
+            <a href="{{route('manufacturing.recipes.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('db.add_recipes')}}</a>
 
         @endif
         @if( in_array("products-edit", $all_permission) && in_array('ecommerce',explode(',',$general_setting->modules)) )

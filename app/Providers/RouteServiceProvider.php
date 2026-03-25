@@ -32,16 +32,12 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
-
-        /*parent::boot();*/
-
         // Merge APP_PUBLIC_URL + current request host into tenancy.central_domains (see centralDomains()).
         // Without this, production hosts can be missing after config:cache → wrong tenancy / unexpected 404s.
         $this->centralDomains();
-
-        $this->mapApiRoutes();
-        $this->mapWebRoutes();
+        // mapApiRoutes/mapWebRoutes run only via map() — the framework loads routes in register()'s booted
+        // callback (see Illuminate\Foundation\Support\Providers\RouteServiceProvider). Calling them here too
+        // duplicates every route and breaks `php artisan route:cache`.
     }
 
     /**
@@ -69,7 +65,6 @@ class RouteServiceProvider extends ServiceProvider
     {
         // Register once: per-domain registration duplicates route names and breaks `php artisan route:cache`.
         Route::middleware('web')
-            ->namespace('App\Http\Controllers')
             ->namespace($this->namespace)
             ->group(base_path('routes/web.php'));
     }

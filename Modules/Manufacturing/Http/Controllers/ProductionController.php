@@ -171,7 +171,7 @@ class ProductionController extends Controller
                                     <button type="button" class="btn btn-link view"><i class="fa fa-eye"></i> '.__('db.View').'</button>
                                 </li>';
 
-                $nestedData['options'] .= \Form::open(["route" => ["productions.destroy", $production->id], "method" => "DELETE"] ).'
+                $nestedData['options'] .= \Form::open(["route" => ["manufacturing.productions.destroy", $production->id], "method" => "DELETE"] ).'
                         <li>
                             <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> '.__("db.delete").'</button>
                         </li>'.\Form::close().'

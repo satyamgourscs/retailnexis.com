@@ -83,7 +83,7 @@
                         <div class="card-body">
                             <p class="italic">
                                 <small>{{ __('db.The field labels marked with * are required input fields') }}.</small></p>
-                            <form id="product-form" method="post" action="{{ route('recipes.store') }}"
+                            <form id="product-form" method="post" action="{{ route('manufacturing.recipes.store') }}"
                                 enctype="multipart/form-data">
                                 @csrf
                                 <div class="row">
@@ -1156,7 +1156,7 @@
 
             // Ajax Request
             $.ajax({
-                url: '{{ route('get-Ingredients') }}',
+                url: '{{ route('manufacturing.get-Ingredients') }}',
                 type: 'POST',
                 data: {
                     product_id: productId
