@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Nexa Technologies Installer | Step-1</title>
+    <title>Retail Nexis Installer | Step-1</title>
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('install-assets/images/favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('install-assets/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -13,16 +13,17 @@
 		<div class="wrapper">
 	        <header>
 	            <img src="{{ asset('install-assets/images/logo.png') }}" alt="Logo" style="max-width: 120px;"/>
-	            <h1 class="text-center">Nexa Technologies Auto Installer</h1>
+	            <h1 class="text-center">Retail Nexis Auto Installer</h1>
 	        </header>
             <hr>
             <div class="content text-center">
                 <a href="{{ route('install-step-2') }}" class="btn btn-primary">Let's Start</a>
                 <hr class="mt-lg-5">
-                <h6>If you need any help with installation, contact your hosting provider or system administrator.</h6>
+                <h6>If you need any help with installation, <br>
+                    Please contact through support <a target="_blank" href="https://tryonedigital.com/support">Contact Support</a></h6>
             </div>
             <hr>
-            <footer>Copyright &copy; {{ config('app.name') }}. All rights reserved.</footer>
+            <footer>Copyright &copy; TryOneDigital. All Rights Reserved.</footer>
 		</div>
 	</div>
 </body>

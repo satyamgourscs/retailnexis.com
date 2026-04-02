@@ -457,12 +457,6 @@
                 @if (isset($show->show_qr_code) && $show->show_qr_code == 1)
                     <?php echo '<img style="width:5%" src="data:image/png;base64,' . DNS2D::getBarcodePNG($qrText, 'QRCODE') . '" alt="barcode"   />'; ?>
                 @endif
-                @include('backend.setting.invoice_setting.partials.upi_qr_invoice', [
-                    'upiQrMaxWidth' => '128px',
-                    'upiQrModuleW' => 3,
-                    'upiQrModuleH' => 3,
-                    'upiQrType' => 'QRCODE,M',
-                ])
                 <br>
                 @if (isset($show->show_footer_text) && $show->show_footer_text == 1)
                     <strong>{{ $invoice_settings->footer_text ?? __('db.Thank you for shopping with us Please come again') }}</strong>

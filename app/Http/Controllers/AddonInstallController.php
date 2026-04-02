@@ -31,7 +31,7 @@ class AddonInstallController extends Controller
     {
         $data = [
              'purchase_code' => '7245b836-d811-4a05-942d-570988d5cc67',
-            'product' => (config('database.connections.saleprosaas_landlord')) ? 'saas_ecom' : 'ecom'
+            'product' => (config('database.connections.retailnexis_landlord')) ? 'saas_ecom' : 'ecom'
         ];
         $path = '/Modules/';
         $module = 'ecommerce';
@@ -42,7 +42,7 @@ class AddonInstallController extends Controller
     {
         $data = [
             'purchase_code' => '42b22a65-e8f6-4302-a4bc-125c2894e5b0',
-            'product' => (config('database.connections.saleprosaas_landlord')) ? 'saas_wcom' : 'wcom'
+            'product' => (config('database.connections.retailnexis_landlord')) ? 'saas_wcom' : 'wcom'
         ];
         $path = '/Modules/';
         $module = 'woocommerce';
@@ -53,7 +53,7 @@ class AddonInstallController extends Controller
     {
         $data = [
             'purchase_code' => $request->purchase_code,
-            'product' => (config('database.connections.saleprosaas_landlord')) ? 'saas_api' : 'api'
+            'product' => (config('database.connections.retailnexis_landlord')) ? 'saas_api' : 'api'
         ];
         $path = '/app/Http/Controllers/';
         $module = 'api';
@@ -63,14 +63,14 @@ class AddonInstallController extends Controller
     public function addonIstallUnzipMigrateRemoveTempFolder($data, $path, $module)
     {
         $db_str = '';
-        if(!config('database.connections.saleprosaas_landlord')) {
+        if(!config('database.connections.retailnexis_landlord')) {
             $db_str = 'db.';
         }
-        if(!config('app.user_verified')) {
+        if(!config('app.demo_unlocked')) {
             return redirect()->back()->with('not_permitted', __($db_str.'This feature is disable for demo!'));
         }
 
-        $url = 'https://lion-coders.com/api/addon-install/';
+        $url = 'https://tryonedigital.com/api/addon-install/';
         $ch = curl_init(); // Initialize cURL
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -103,7 +103,7 @@ class AddonInstallController extends Controller
                     return redirect('/');
                 }
 
-                if(!config('database.connections.saleprosaas_landlord')) {
+                if(!config('database.connections.retailnexis_landlord')) {
                     if ($module == 'ecommerce' || $module == 'woocommerce') {
                         Artisan::call('module:migrate', ['--force' => true]);
                     }
@@ -134,7 +134,7 @@ class AddonInstallController extends Controller
                 $data = [
                     'path' => $response,
                 ];
-                $url = 'https://lion-coders.com/api/addon-db/';
+                $url = 'https://tryonedigital.com/api/addon-db/';
                 $ch = curl_init(); // Initialize cURL
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);

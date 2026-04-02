@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\App;
 use Stancl\Tenancy\Events\TenancyBootstrapped;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,25 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->ensureWritableDirectoriesExist();
-    }
-
-    /**
-     * Hostinger/cPanel: first deploy may lack cache/session dirs; avoid opaque 500s from mkdir failures.
-     */
-    protected function ensureWritableDirectoriesExist(): void
-    {
-        foreach ([
-            base_path('bootstrap/cache'),
-            storage_path('framework/cache/data'),
-            storage_path('framework/sessions'),
-            storage_path('framework/views'),
-            storage_path('logs'),
-        ] as $path) {
-            if (! is_dir($path)) {
-                @mkdir($path, 0755, true);
-            }
-        }
+        //
     }
 
 
@@ -54,21 +35,9 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
         $this->app->bind(\App\ViewModels\ISmsModel::class, \App\ViewModels\SmsModel::class);
 
-        // Hostinger: MySQL grants are usually for @'localhost'. Must run for queue/CLI too (not only web).
-        $this->normalizeMysqlHostForHostingerSharedHosting();
-
         if (app()->runningInConsole()) {
             return;
         }
-
-        $isLandlordConfigured = ! empty(config('app.landlord_db'));
-        $canUseDatabase = function (): bool {
-            try {
-                return (bool) DB::connection()->getPdo();
-            } catch (\Throwable $e) {
-                return false;
-            }
-        };
 
         $translationLogic = function () {
             try {
@@ -85,7 +54,11 @@ class AppServiceProvider extends ServiceProvider
                     App::setLocale($_COOKIE['language']);
                 } elseif (Schema::hasTable('languages')) {
                     $language = DB::table('languages')->where('is_default', true)->first();
-                    App::setLocale($language->language ?? 'en');
+                    $locale = 'en';
+                    if ($language) {
+                        $locale = $language->code ?? $language->language ?? 'en';
+                    }
+                    App::setLocale($locale);
                 } else {
                     App::setLocale('en');
                 }
@@ -102,23 +75,22 @@ class AppServiceProvider extends ServiceProvider
                     }
                 }
             } catch (\Exception $e) {
-                Log::warning('AppServiceProvider translation bootstrap skipped', [
-                    'message' => $e->getMessage(),
-                ]);
+                // Optional: log the error
+                // Log::error($e->getMessage());
             }
         };
 
-        if ($isLandlordConfigured && config('database.connections.saleprosaas_landlord') && $canUseDatabase()) {
+        if (config('database.connections.retailnexis_landlord')) {
             ///new code for superadmin//
             if (!app()->bound('tenancy')) {
+                $landlordConn = (string) config('tenancy.database.central_connection', 'retailnexis_landlord');
                 $locale = null;
                 try {
-                    if (Schema::hasTable('languages')) {
-                    // Fallback to default language
-                    $default_language = DB::table('languages')->where('is_default', true)->first();
-                    $locale = $default_language->code ?? 'en';
+                    if (Schema::connection($landlordConn)->hasTable('languages')) {
+                        $default_language = DB::connection($landlordConn)->table('languages')->where('is_default', true)->first();
+                        $locale = $default_language->code ?? 'en';
                     } else {
-                    $locale = 'en';
+                        $locale = 'en';
                     }
                 } catch (\Throwable $e) {
                     $locale = 'en';
@@ -151,23 +123,6 @@ class AppServiceProvider extends ServiceProvider
 
         } else {
             $translationLogic();
-        }
-    }
-
-    /**
-     * Map 127.0.0.1 → localhost so MySQL matches @'localhost' privileges (fixes SQLSTATE 1044 on tenant DB).
-     */
-    protected function normalizeMysqlHostForHostingerSharedHosting(): void
-    {
-        if (config('app.server_type') !== 'hostinger') {
-            return;
-        }
-
-        foreach (['mysql', 'saleprosaas_landlord', 'saleprosaas_tenant'] as $name) {
-            $host = config("database.connections.{$name}.host");
-            if ($host === '127.0.0.1') {
-                config(["database.connections.{$name}.host" => 'localhost']);
-            }
         }
     }
 }

@@ -57,7 +57,7 @@
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
                                 <li><button type="button" data-id="{{$coupon->id}}" data-name="{{$coupon->name}}" data-code="{{$coupon->code}}" data-type="{{$coupon->type}}" data-amount="{{$coupon->amount}}" data-minimum_amount="{{$coupon->minimum_amount}}" data-quantity="{{$coupon->quantity}}" data-expired_date="{{$coupon->expired_date}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> {{__('db.edit')}}</button></li>
-                                {{ Form::open(['url' => route('coupon.destroy', $coupon->id, false), 'method' => 'DELETE'] ) }}
+                                {{ Form::open(['route' => ['coupon.destroy', $coupon->id], 'method' => 'DELETE'] ) }}
                                 <li>
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{__('db.delete')}}</button>
                                 </li>
@@ -91,7 +91,7 @@
             </div>
             <div class="modal-body">
               <p class="italic"><small>{{__('db.The field labels marked with * are required input fields')}}.</small></p>
-                {!! Form::open(['url' => route('coupon.store', [], false), 'method' => 'post']) !!}
+                {!! Form::open(['route' => 'coupon.store', 'method' => 'post']) !!}
                   <div class="row">
                     <div class="col-md-6 form-group">
                         <label>{{__('db.Coupon Name')}} *</label>
@@ -147,7 +147,7 @@
           </div>
           <div class="modal-body">
             <p class="italic"><small>{{__('db.The field labels marked with * are required input fields')}}.</small></p>
-              {!! Form::open(['url' => route('coupon.update', ['coupon' => 1], false), 'method' => 'put']) !!}
+              {!! Form::open(['route' => ['coupon.update', 1], 'method' => 'put']) !!}
               <div class="row">
                 <div class="col-md-6 form-group">
                     <label>{{__('db.Coupon Name')}} *</label>
@@ -202,10 +202,12 @@
 @push('scripts')
 <script type="text/javascript">
 
-    $("#coupon-menu").addClass("active");
+    $("ul#sale").siblings('a').attr('aria-expanded','true');
+    $("ul#sale").addClass("show");
+    $("ul#sale #coupon-menu").addClass("active");
 
     var coupon_id = [];
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
 
     $.ajaxSetup({
         headers: {

@@ -7,7 +7,7 @@
 @endif
 <section>
     <div class="container-fluid">
-        <a href="{{ route('packages.create', [], false) }}" class="btn btn-info"><i class="dripicons-plus"></i> {{__('db.Add Package')}}</a>&nbsp;
+        <a href="{{route('packages.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> {{__('db.Add Package')}}</a>&nbsp;
     </div>
     <div class="table-responsive">
         <table id="package-table" class="table">
@@ -94,9 +94,9 @@
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
                                 <li>
-                                    <a href="{{ route('packages.edit', ['package' => $package->id], false) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> {{__('db.edit')}}</a>
+                                    <a href="{{ route('packages.edit', $package->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> {{__('db.edit')}}</a>
                                 </li>
-                                {{ Form::open(['url' => '/superadmin/packages/'.$package->id, 'method' => 'DELETE'] ) }}
+                                {{ Form::open(['route' => ['packages.destroy', $package->id], 'method' => 'DELETE'] ) }}
                                 <li>
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{__('db.delete')}}</button>
                                 </li>

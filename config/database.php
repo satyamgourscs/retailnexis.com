@@ -2,12 +2,6 @@
 
 use Illuminate\Support\Str;
 
-// Hostinger: privileges are often granted for @'localhost' only. DB_HOST=127.0.0.1 authenticates as @'127.0.0.1' → SQLSTATE 1044.
-$mysqlHost = env('DB_HOST', '127.0.0.1');
-if (is_string($mysqlHost) && env('SERVER_TYPE') === 'hostinger' && $mysqlHost === '127.0.0.1') {
-    $mysqlHost = 'localhost';
-}
-
 return [
 
     /*
@@ -52,10 +46,10 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => $mysqlHost,
+            'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', ''),
-            'username' => env('DB_USERNAME', ''),
+            'database' => env('DB_DATABASE', 'forge'),
+            'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
@@ -73,18 +67,16 @@ return [
                  ],
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-                // Required for installer SQL dumps: without this, PDO may execute only the first statement.
-                PDO::MYSQL_ATTR_MULTI_STATEMENTS => true,
             ]) : [],
         ],
 
-        'saleprosaas_landlord' => [
+        'retailnexis_landlord' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => $mysqlHost,
+            'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('LANDLORD_DB') ?: env('DB_DATABASE', ''),
-            'username' => env('DB_USERNAME', ''),
+            'database' => env('LANDLORD_DB', 'forge'),
+            'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
@@ -95,17 +87,16 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-                PDO::MYSQL_ATTR_MULTI_STATEMENTS => true,
             ]) : [],
         ],
 
-        'saleprosaas_tenant' => [
+        'retailnexis_tenant' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => $mysqlHost,
+            'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', ''),
-            'username' => env('DB_USERNAME', ''),
+            'database' => env('DB_DATABASE', 'forge'),
+            'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
@@ -116,7 +107,6 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-                PDO::MYSQL_ATTR_MULTI_STATEMENTS => true,
             ]) : [],
         ],
 

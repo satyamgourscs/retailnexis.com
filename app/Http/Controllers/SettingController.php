@@ -41,7 +41,7 @@ class SettingController extends Controller
 
     public function emptyDatabase()
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
         //clearing all the cached queries
         $this->cacheForget('biller_list');
@@ -63,7 +63,7 @@ class SettingController extends Controller
         $this->cacheForget('role_has_permissions_list');
 
         $tables = DB::select('SHOW TABLES');
-        if(!config('database.connections.saleprosaas_landlord'))
+        if(!config('database.connections.retailnexis_landlord'))
             $database_name = env('DB_DATABASE');
         else
             $database_name = env('DB_PREFIX').$this->getTenantId();
@@ -84,10 +84,10 @@ class SettingController extends Controller
         $zones_array = array();
         $timestamp = time();
 
-        if(!config('database.connections.saleprosaas_landlord'))
+        if(!config('database.connections.retailnexis_landlord'))
             $installUrl = config('app.url');
         else
-            $installUrl = "https://" .$this->getTenantId().'.'.config('app.central_domain');
+            $installUrl = "https://" .$this->getTenantId().'.'.env('CENTRAL_DOMAIN');
 
         foreach(timezone_identifiers_list() as $key => $zone) {
             date_default_timezone_set($zone);
@@ -99,7 +99,7 @@ class SettingController extends Controller
 
     public function generalSettingStore(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $this->validate($request, [
@@ -185,14 +185,14 @@ class SettingController extends Controller
 
     public function backup()
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         // Database configuration
         $host = env('DB_HOST');
         $username = env('DB_USERNAME');
         $password = env('DB_PASSWORD');
-        if(!config('database.connections.saleprosaas_landlord'))
+        if(!config('database.connections.retailnexis_landlord'))
             $database_name = env('DB_DATABASE');
         else
             $database_name = env('DB_PREFIX').$this->getTenantId();
@@ -297,7 +297,7 @@ class SettingController extends Controller
 
     public function mailSettingStore(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $data = $request->all();
@@ -408,7 +408,7 @@ class SettingController extends Controller
 
     public function smsSettingStore(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $data = $request->all();
@@ -553,7 +553,7 @@ class SettingController extends Controller
                 ->with('not_permitted', __('db.Sorry! You are not allowed to access this module'));
         }
 
-        if (!config('app.user_verified')) {
+        if (!config('app.demo_unlocked')) {
             Session::flash('message', 'This feature is disabled for demo!');
             Session::flash('type', 'error');
             return redirect()->back();
@@ -650,7 +650,7 @@ class SettingController extends Controller
 
     public function posSettingStore(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $data = $request->all();

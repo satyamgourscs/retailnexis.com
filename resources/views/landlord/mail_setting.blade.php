@@ -16,8 +16,7 @@
                     </div>
                     <div class="card-body">
                         <p class="italic"><small>{{__('db.The field labels marked with * are required input fields')}}.</small></p>
-                        <form method="POST" action="{{ route('superadminMailSettingStore', [], false) }}">
-                            @csrf
+                        {!! Form::open(['route' => 'superadminMailSettingStore', 'method' => 'post']) !!}
                         <div class="row">
                             <div class="col-md-4 form-group">
                                 <label>{{__('db.Mail Driver')}} *</label>
@@ -55,7 +54,7 @@
                                 <input type="submit" value="{{__('db.submit')}}" class="btn btn-primary">
                             </div>
                         </div>
-                        </form>
+                        {!! Form::close() !!}
                     </div>
                 </div>
             </div>
@@ -66,6 +65,8 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("#mail-setting-menu").addClass("active");
+    $("ul#setting").siblings('a').attr('aria-expanded','true');
+    $("ul#setting").addClass("show");
+    $("ul#setting #mail-setting-menu").addClass("active");
 </script>
 @endpush

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Nexa Technologies'),
+    'name' => env('APP_NAME', 'Retail Nexis'),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,42 +52,22 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'https://retailnexis.com'),
-
-    /*
-    | Optional: force public site URL on shared hosting when Host / proxy headers are wrong.
-    | Example: https://retailnexis.com (no trailing slash). Leave empty to derive from the request.
-    */
-    'public_url' => env('APP_PUBLIC_URL'),
-
-    /*
-    | Apex domain for tenant subdomains (tenant.{central_domain}). Defaults from APP_URL host.
-    */
-    'central_domain' => env('CENTRAL_DOMAIN', 'retailnexis.com'),
+    'url' => env('APP_URL', 'http://localhost'),
 
     'asset_url' => env('ASSET_URL', null),
 
-    /*
-    | Central (landlord) database name for SaaS. Always read via config(), never env() in routes
-    | when using "php artisan config:cache" — env() returns null outside config files after caching.
-    | If LANDLORD_DB is missing but DB_CONNECTION is saleprosaas_landlord, DB_DATABASE is used.
-    */
-    'landlord_db' => env('LANDLORD_DB') ?: (env('DB_CONNECTION') === 'saleprosaas_landlord' ? env('DB_DATABASE') : null),
+    'central_domain' => env('CENTRAL_DOMAIN', 'localhost'),
+
+    'landlord_db' => env('LANDLORD_DB'),
+
+    'public_url' => env('PUBLIC_URL'),
 
     /*
-    | Legacy "demo mode" gate (was env USER_VERIFIED only). Defaults to true so production works
-    | without .env; set USER_VERIFIED=false to enable demo restrictions / LionCoders-style locks.
+    | Demo: legacy "demo" lock used config('app.demo_unlocked'). Replaced by config.
+    | Default true = all features unlocked; no .env entry required.
+    | Set DEMO_UNLOCKED=false only if you need to re-enable locks.
     */
-    'user_verified' => env('USER_VERIFIED') === null || env('USER_VERIFIED') === ''
-        ? true
-        : filter_var(env('USER_VERIFIED'), FILTER_VALIDATE_BOOLEAN),
-
-    /*
-    | Deployment target for tenant DB creation (CustomMySQLDatabaseManager / Stancl tenancy).
-    | Values: hostinger | cpanel | plesk | localhost | vps | (empty = generic MySQL CREATE DATABASE).
-    | Read via config('app.server_type') so php artisan config:cache works.
-    */
-    'server_type' => env('SERVER_TYPE', ''),
+    'demo_unlocked' => filter_var(env('DEMO_UNLOCKED', true), FILTER_VALIDATE_BOOLEAN),
 
     /*
     |--------------------------------------------------------------------------
@@ -207,12 +187,10 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-        // Tenancy must register before RouteServiceProvider: tenant routes/routes/tenant.php also define GET /.
-        // Laravel overwrites duplicate URIs; central SaaS landing (routes/web.php) must load last so / is the landlord homepage.
-        App\Providers\TenancyServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        // barryvdh/laravel-debugbar is require-dev — do not register here or production (composer --no-dev) breaks.
-        // When installed locally, Laravel package discovery registers it automatically.
+        App\Providers\TenancyServiceProvider::class,
+        Barryvdh\Debugbar\ServiceProvider::class,
+
 
     ],
 
@@ -264,6 +242,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Keygen' => Keygen\Keygen::class,
+        'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
     ],
 
 ];

@@ -40,7 +40,7 @@
                         @csrf
                         <input type="hidden" name="stripeToken">
                         <input type="hidden" name="requestData" value="{{ $requestData }}">
-                        <input type="hidden" name="central_domain" value="{{config('app.central_domain')}}">
+                        <input type="hidden" name="central_domain" value="{{env('CENTRAL_DOMAIN')}}">
                     
                         <div class="row form-row mt-4" id="stripe_details">
                             <div class="col-6 form-group">
@@ -114,7 +114,7 @@
             $('.error').addClass('hide').find('.alert').text('');
         
             var requestData = JSON.parse(@json($requestData));
-            var centralDomain = "{{ config('app.central_domain') }}";
+            var centralDomain = "{{ env('CENTRAL_DOMAIN') }}";
             var successUrl;
             if (requestData.tenant) {
                 successUrl = 'https://' + requestData.tenant + '.' + centralDomain;
@@ -150,13 +150,7 @@
                 data: $.param(formData),
                 success: function (response) {
                     if (response.success) {
-                        try {
-                            window.top.location.href = successUrl;
-                        } catch (e) {
-                            try {
-                                window.open(successUrl, '_blank', 'noopener');
-                            } catch (e2) {}
-                        }
+                        window.location.href = successUrl;
                     } else {
                         $('.error').removeClass('hide').find('.alert').text(response.message || 'Something went wrong!');
                         $('#payNowBtn').prop('disabled', false).text('Try Again');

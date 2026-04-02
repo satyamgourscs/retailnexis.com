@@ -9,7 +9,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['url' => route('blog.store', [], false), 'files' => true, 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'blog.store', 'files' => true, 'method' => 'post']) !!}
                 <button type="button" class="btn btn-success mb-3" data-toggle="collapse" href="#collapse" aria-expanded="false" aria-controls="collapse"/>{{__('db.Add Post')}}</button>
                 <div class="collapse" id="collapse">
                     <div class="card">
@@ -76,7 +76,7 @@
                     <td>{{ $blog->title }}</td>
                     <td>
                         <button type="button" data-id="{{$blog->id}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal" ><i class="dripicons-document-edit"></i></button>
-                        <form class="d-inline" method="post" action="{{ route('blog.delete', $blog->id, false) }}">
+                        <form class="d-inline" method="post" action="{{ route('blog.delete', $blog->id) }}">
                         @csrf
                             <button type="submit" class="btn btn-link" onclick="return confirm('{{__('db.Are you sure you want to delete?')}}')"><i class="dripicons-trash"></i></button>
                         </form>
@@ -92,7 +92,7 @@
     <div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
         <div role="document" class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action="{{ route('blog.update', [], false) }}" enctype="multipart/form-data">
+            <form method="post" action="{{route('blog.update')}}" enctype="multipart/form-data">
             @csrf
             <div class="modal-header">
             <h5 id="exampleModalLabel" class="modal-title">{{__('db.Update Blog')}}</h5>

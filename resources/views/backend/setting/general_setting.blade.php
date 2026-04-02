@@ -44,7 +44,7 @@
 
                                     </div>
                                 </div>
-                                @if(config('database.connections.saleprosaas_landlord'))
+                                @if(config('database.connections.retailnexis_landlord'))
                                     <div class="col-md-4 mt-4">
                                         <div class="form-group">
                                             @if($lims_general_setting_data->is_zatca)
@@ -321,7 +321,7 @@
                                 <div class="col-md-6">
                                     <div id="qrcode"></div>
                                 </div>
-                                @if(config('database.connections.saleprosaas_landlord'))
+                                @if(config('database.connections.retailnexis_landlord'))
                                     <br>
                                     <div class="col-md-2">
                                         <div class="form-group">
@@ -380,7 +380,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label>{{__('db.Subscription Ends at')}}</label>
-                                            <p>{{date($lims_general_setting_data->date_format, strtotime($lims_general_setting_data->expiry_date))}}</p>
+                                            <p>{{ $lims_general_setting_data->expiry_date ? \Carbon\Carbon::parse($lims_general_setting_data->expiry_date)->format($lims_general_setting_data->date_format) : 'N/A' }}</p>
                                         </div>
                                     </div>
                                 @endif
@@ -434,7 +434,7 @@
         $('#custom-style').attr('href', style_link);
     });
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         $.ajax({
             type: 'GET',
             async: false,

@@ -10,7 +10,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['url' => route('tenantSignupDescription.store', [], false), 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'tenantSignupDescription.store', 'method' => 'post']) !!}
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
                         <h4>{{__('db.Tenant Signup Description')}}</h4>

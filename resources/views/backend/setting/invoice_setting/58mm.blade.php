@@ -404,15 +404,6 @@
                             @if (isset($show->show_qr_code) && $show->show_qr_code == 1)
                                 <?php echo '<img style="margin:10px auto;width:30px" src="data:image/png;base64,' . DNS2D::getBarcodePNG($qrText, 'QRCODE') . '" alt="QRcode"   />'; ?>
                             @endif
-                            {{-- UPI QR: compact modules for ~58mm paper; updates when tenant changes invoice_settings.upi_id --}}
-                            @include('backend.setting.invoice_setting.partials.upi_qr_invoice', [
-                                'upiQrMaxWidth' => '76px',
-                                'upiQrModuleW' => 2,
-                                'upiQrModuleH' => 2,
-                                'upiQrType' => 'QRCODE,M',
-                                'upiQrThermal' => true,
-                                'upiQrTitle' => 'UPI',
-                            ])
                         </td>
                     </tr>
                 </tbody>

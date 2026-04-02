@@ -26,7 +26,9 @@ class BlogController extends Controller
     public function list(Request $request)
     {
         $currentLocale = App::getLocale();
-        $present_lang = DB::table('languages')->where('code', $currentLocale)->first();
+        $present_lang = DB::table('languages')->where('code', $currentLocale)->first()
+            ?? DB::table('languages')->where('is_default', true)->first()
+            ?? DB::table('languages')->orderBy('id')->first();
         $lang_id = $present_lang->id ?? 1;
 
         if(cache()->has('general_settings')) {
@@ -67,7 +69,9 @@ class BlogController extends Controller
     public function details($slug)
     {
         $currentLocale = App::getLocale();
-        $present_lang = DB::table('languages')->where('code', $currentLocale)->first();
+        $present_lang = DB::table('languages')->where('code', $currentLocale)->first()
+            ?? DB::table('languages')->where('is_default', true)->first()
+            ?? DB::table('languages')->orderBy('id')->first();
         $lang_id = $present_lang->id ?? 1;
 
         if(cache()->has('general_settings')){
@@ -101,7 +105,7 @@ class BlogController extends Controller
 
     public function store(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $this->validate($request, [
             'featured_image' => 'image|mimes:jpg,jpeg,png|max:100000',
@@ -143,7 +147,7 @@ class BlogController extends Controller
 
     public function update(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $input = $request->all();
         if($request->featured_image){
@@ -166,7 +170,7 @@ class BlogController extends Controller
 
     public function sort(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $blogs = Blog::all();
         foreach ($blogs as $blog) {
@@ -183,7 +187,7 @@ class BlogController extends Controller
 
     public function delete($id)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $blog = Blog::find($id);
         $blog->delete();

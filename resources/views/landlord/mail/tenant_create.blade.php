@@ -3,7 +3,7 @@
 <p>To help you get started smoothly, we have prepared a quick guide to walk you through the initial setup process and ensure you maximize the benefits of your subscription. Here are the key steps to begin your journey with {{$tenant_data['superadmin_company_name']}}:</p>
 <p><strong>Step 1: Login to the system</strong><br>
 You can logged in to the system via the following url:<br>
-{{$tenant_data['subdomain'].'.'.config('app.central_domain')}}<br>
+{{$tenant_data['subdomain'].'.'.env('CENTRAL_DOMAIN')}}<br>
 user: {{$tenant_data['name']}}<br>
 pass: {{$tenant_data['password']}}
 </p>

@@ -16,50 +16,10 @@ return [
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
-    // Normalize CENTRAL_DOMAIN so PreventAccessFromCentralDomains can match reliably.
-    // Handles cases like "https://tryonedigital.com" and "www.tryonedigital.com".
-    'central_domains' => (function () {
-        $centralDomain = trim((string) env('CENTRAL_DOMAIN', ''));
-        $appUrlHost = parse_url((string) env('APP_URL', ''), PHP_URL_HOST);
-
-        if ($centralDomain !== '') {
-            // Remove scheme, path and port if accidentally included in env.
-            $centralDomain = preg_replace('#^https?://#i', '', $centralDomain);
-            $centralDomain = preg_replace('#/.*$#', '', $centralDomain);
-            $centralDomain = explode(':', $centralDomain)[0];
-            $centralDomain = trim($centralDomain);
-            $centralDomain = strtolower(rtrim($centralDomain, '.'));
-        }
-
-        if (is_string($appUrlHost) && $appUrlHost !== '') {
-            $appUrlHost = strtolower(rtrim($appUrlHost, '.'));
-        }
-
-        // Put configured central domain first so named routes generate URLs on the same host.
-        $domains = [];
-        if ($centralDomain !== '') {
-            $domains[] = $centralDomain;
-            if ($centralDomain !== 'localhost' && $centralDomain !== '127.0.0.1') {
-                $domains[] = 'www.' . $centralDomain;
-            } else {
-                // Local convenience: keep www.localhost only after localhost.
-                $domains[] = 'www.localhost';
-            }
-        }
-
-        if (is_string($appUrlHost) && $appUrlHost !== '') {
-            $domains[] = $appUrlHost;
-            if ($appUrlHost !== 'localhost' && $appUrlHost !== '127.0.0.1') {
-                $domains[] = 'www.' . $appUrlHost;
-            }
-        }
-
-        // Local fallback domains (kept after central domain to avoid host switching).
-        $domains[] = 'localhost';
-        $domains[] = '127.0.0.1';
-
-        return array_values(array_unique(array_filter($domains)));
-    })(),
+    'central_domains' => [
+        'localhost',
+        '127.0.0.1',
+    ],
 
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.
@@ -67,55 +27,26 @@ return [
      *
      * To configure their behavior, see the config keys below.
      */
-    /**
-     * Tenancy bootstrappers.
-     *
-     * CacheTenancyBootstrapper uses `cache()->tags(...)` internally.
-     * Some cache stores (e.g. file/array) do NOT support tags and will throw:
-     * "This cache store does not support tagging."
-     */
-    'bootstrappers' => (function () {
-        $cacheDriver = (string) env('CACHE_DRIVER', config('cache.default', 'file'));
-        $cacheSupportsTags = in_array(strtolower($cacheDriver), ['redis', 'memcached', 'dynamodb', 'apc'], true);
-
-        $bootstrappers = [
-            Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
-            Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
-            Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
-            // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
-        ];
-
-        if ($cacheSupportsTags) {
-            $bootstrappers[] = Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class;
-        }
-
-        return $bootstrappers;
-    })(),
+    'bootstrappers' => [
+        Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
+        App\Bootstrappers\SafeCacheTenancyBootstrapper::class,
+        Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
+        Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
+        // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
+    ],
 
     /**
      * Database tenancy config. Used by DatabaseTenancyBootstrapper.
      */
     'database' => [
-        'central_connection' => env('DB_CONNECTION', 'saleprosaas_landlord'),
+        // Connection name for landlord DB (database name: LANDLORD_DB, e.g. saas_landlord)
+        'central_connection' => env('LANDLORD_DB_CONNECTION', env('DB_CONNECTION', 'retailnexis_landlord')),
 
         /**
          * Connection used as a "template" for the dynamically created tenant database connection.
          * Note: don't name your template connection tenant. That name is reserved by package.
          */
-        'template_tenant_connection' => 'saleprosaas_tenant',
-
-        /**
-         * Hostinger / shared hosts: pre-create empty DBs in hPanel, list them in tenant_databases,
-         * set TENANT_DATABASE_POOL_ENABLED=true. No CREATE DATABASE / GRANT at runtime.
-         */
-        // Hostinger shared hosting: default ON when SERVER_TYPE=hostinger (override with TENANT_DATABASE_POOL_ENABLED=false).
-        'pool_enabled' => filter_var(
-            env(
-                'TENANT_DATABASE_POOL_ENABLED',
-                strtolower((string) env('SERVER_TYPE', '')) === 'hostinger' ? 'true' : 'false'
-            ),
-            FILTER_VALIDATE_BOOLEAN
-        ),
+        'template_tenant_connection' => 'retailnexis_tenant',
 
         /**
          * Tenant database names are created like this:
@@ -199,14 +130,19 @@ return [
         'suffix_storage_path' => true,
 
         /**
-         * By default, asset() calls are made multi-tenant too. You can use global_asset() and mix()
-         * for global, non-tenant-specific assets. However, you might have some issues when using
-         * packages that use asset() calls inside the tenant app. To avoid such issues, you can
-         * disable asset() helper tenancy and explicitly use tenant_asset() calls in places
-         * where you want to use tenant-specific assets (product images, avatars, etc).
+         * When true with ASSET_URL=null, Stancl points asset() at /tenancy/assets (tenant storage),
+         * which breaks static files that live under public/ (vendor/bootstrap, css/, js/).
+         * Keep false so asset() resolves to public/ on the current tenant host.
+         * Use tenant_asset() or Storage for files under storage/app/public.
          */
-        'asset_helper_tenancy' => true,
+        'asset_helper_tenancy' => false,
     ],
+
+    /*
+     * Keep ASSET_URL unset in .env (app.asset_url = null) when using subdomain tenants so
+     * static files are served from public/ on each tenant host. Set ASSET_URL only for a CDN.
+     */
+    'asset_url' => env('ASSET_URL', null),
 
     /**
      * Redis tenancy config. Used by RedisTenancyBoostrapper.
@@ -235,9 +171,7 @@ return [
     'features' => [
         // Stancl\Tenancy\Features\UserImpersonation::class,
         // Stancl\Tenancy\Features\TelescopeTags::class,
-        // EMERGENCY: UniversalRoutes can apply tenancy middleware broadly and break
-        // central auth/CSRF. Keep it disabled until central domain is stable.
-        // Stancl\Tenancy\Features\UniversalRoutes::class,
+        Stancl\Tenancy\Features\UniversalRoutes::class,
         // Stancl\Tenancy\Features\TenantConfig::class, // https://tenancyforlaravel.com/docs/v3/features/tenant-config
         // Stancl\Tenancy\Features\CrossDomainRedirect::class, // https://tenancyforlaravel.com/docs/v3/features/cross-domain-redirect
     ],

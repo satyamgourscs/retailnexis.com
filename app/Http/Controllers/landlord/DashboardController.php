@@ -21,9 +21,7 @@ class DashboardController extends Controller
 
 	public function __construct()
     {
-		// This dashboard is protected by the route-level `superadminauth` middleware.
-        // Keeping the default `auth` middleware here may redirect central requests to
-        // `/login` (tenant-protected), causing confusing 404 loops.
+		$this->middleware(['auth']);
         $this->versionUpgradeInfo = $this->isUpdateAvailable();
 	}
 

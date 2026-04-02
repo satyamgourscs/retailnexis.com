@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
     <link rel="manifest" href="{{url('manifest.json')}}">
-    @if(!config('database.connections.saleprosaas_landlord'))
+    @if(!config('database.connections.retailnexis_landlord'))
     <link rel="icon" type="image/png" href="{{url('logo', $general_setting->site_logo)}}" />
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="<?php echo asset('vendor/bootstrap/css/bootstrap.min.css') ?>" type="text/css">
@@ -21,14 +21,14 @@
     <link rel="preload" href="https://fonts.googleapis.com/css?family=Nunito:400,500,700" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css?family=Nunito:400,500,700" rel="stylesheet"></noscript>
     @else
-    <link rel="icon" type="image/png" href="{{url('../../logo', $general_setting->site_logo)}}" />
+    <link rel="icon" type="image/png" href="{{ asset('logo/'.$general_setting->site_logo) }}" />
     <!-- Bootstrap CSS-->
-    <link rel="stylesheet" href="<?php echo asset('../../vendor/bootstrap/css/bootstrap.min.css') ?>" type="text/css">
+    <link rel="stylesheet" href="<?php echo asset('vendor/bootstrap/css/bootstrap.min.css') ?>" type="text/css">
     <!-- Font Awesome CSS-->
-    <link rel="preload" href="<?php echo asset('../../vendor/font-awesome/css/font-awesome.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/font-awesome/css/font-awesome.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet"></noscript>
     <!-- login stylesheet-->
-    <link rel="stylesheet" href="<?php echo asset('../../css/auth.css') ?>" id="theme-stylesheet" type="text/css">
+    <link rel="stylesheet" href="<?php echo asset('css/auth.css') ?>" id="theme-stylesheet" type="text/css">
     <!-- Google fonts - Roboto -->
     <link rel="preload" href="https://fonts.googleapis.com/css?family=Nunito:400,500,700" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://fonts.googleapis.com/css?family=Nunito:400,500,700" rel="stylesheet"></noscript>
@@ -94,16 +94,38 @@
         </div>
       </div>
 
+      <!-- This section for demo only-->
+      @if(!config('database.connections.retailnexis_landlord'))
+      <div class="switch-theme" id="switch-theme" style="background-color:rgba(255,255,255,0.9);border:1px solid #999;padding:15px;position:fixed;bottom:0px;left:0px;right:0px;z-index:99">
+        <div class="row">
+          <div class="col-md-4 text-center">
+            <div class="" style="font-size:11px;color:#666;margin-bottom:15px">Login as</div>
+            <button type="submit" class="btn btn-sm btn-success admin-btn">Admin</button>
+            <button type="submit" class="btn btn-sm btn-info staff-btn">Staff</button>
+            <button type="submit" class="btn btn-sm btn-dark customer-btn">Customer</button>
+          </div>
+          <div class="col-md-8 text-center">
+            <hr class="d-lg-none d-md-none d-sm-block">
+            <div class="text-center" style="font-size:11px;color:#666;margin-bottom:15px">Premium Add-ons</div>
+            <a href="https://tryonedigital.com/ecommerce/" class="btn btn-primary btn-sm">eCommerce</a>
+            <a href="?demo_db_name=sale_woocom" class="btn btn-primary btn-sm demo-btn">WooCommerce</a>
+            <a href="https://tryonedigital.com/software/retail-nexis"  target="_blank" class="btn btn-primary btn-sm">SAAS</a>
+                        <br><br>
+          </div>
+        </div>
+      </div>
+      @endif
+      <!-- This section for demo only-->
     </div>
   </body>
 </html>
-@if(!config('database.connections.saleprosaas_landlord'))
+@if(!config('database.connections.retailnexis_landlord'))
 <script type="text/javascript" src="<?php echo asset('vendor/jquery/jquery.min.js') ?>"></script>
 @else
-<script type="text/javascript" src="<?php echo asset('../../vendor/jquery/jquery.min.js') ?>"></script>
+<script type="text/javascript" src="<?php echo asset('vendor/jquery/jquery.min.js') ?>"></script>
 @endif
 <script>
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         if(localStorage.getItem("message")) {
             alert(localStorage.getItem("message"));
             localStorage.removeItem("message");

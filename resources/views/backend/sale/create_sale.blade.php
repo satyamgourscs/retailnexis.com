@@ -845,12 +845,9 @@
                                                 <tr>
                                                     <th class="col-sm-2">{{__('db.product')}}</th>
                                                     <th class="col-sm-2">{{__('db.Batch No')}}</th>
-                                                    <th class="col-sm-2">{{__('db.Quantity')}}</th>
-                                                    <th class="col-sm-2">{{__('db.Net Unit Price')}}</th>
-                                                    <th class="col-sm-2">{{__('db.Discount')}}</th>
-                                                    <th class="col-sm-2">{{__('db.Tax')}}</th>
-                                                    <th class="col-sm-2">{{__('db.Subtotal')}}</th>
-                                                    <th class="col-sm-1"></th>
+                                                    <th class="col-sm-2">{{__('db.Price')}}</th>
+                                                    <th class="col-sm-3">{{__('db.Quantity')}}</th>
+                                                    <th class="col-sm-3">{{__('db.Subtotal')}}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -914,8 +911,6 @@
                                                     $temp_unit_operation_value = $unit_operation_value =  implode(",",$unit_operation_value) . ',';
 
                                                     $product_batch_data = \App\Models\ProductBatch::select('batch_no', 'expired_date')->find($product_sale->product_batch_id);
-                                                    $__qtyLineCs = max(1, (float) $product_sale->qty);
-                                                    $__unitDiscCs = (float) $product_sale->discount / $__qtyLineCs;
                                                 ?>
                                                     <td class="col-sm-2 product-title"><strong>{{$product_data->name}}</strong> [{{$product_data->code}}] <button type="button" class="edit-product btn btn-link" data-toggle="modal" data-target="#editModal"> <i class="dripicons-document-edit"></i></button> </td>
                                                     @if($product_batch_data)
@@ -928,15 +923,12 @@
                                                       <input type="text" class="form-control batch-no" disabled/> <input type="hidden" class="product-batch-id" name="product_batch_id[]"/>
                                                     </td>
                                                     @endif
-                                                    <td class="col-sm-2"><div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-default minus"><span class="dripicons-minus"></span></button></span><input type="text" name="qty[]" class="form-control qty numkey input-number" value="{{$product_sale->qty}}" step="any" required><span class="input-group-btn"><button type="button" class="btn btn-default plus"><span class="dripicons-plus"></span></button></span></div></td>
-                                                    <td class="col-sm-2 net-unit-price-col text-right">{{ number_format((float) $product_sale->net_unit_price, $general_setting->decimal, '.', '')}}</td>
-                                                    <td class="col-sm-2 line-discount-cell"><input type="text" inputmode="decimal" class="form-control form-control-sm line-unit-discount numkey text-right" style="min-width:72px;max-width:96px" autocomplete="off" value="{{ number_format($__unitDiscCs, $general_setting->decimal, '.', '') }}" /></td>
-                                                    <td class="col-sm-2 tax text-right">{{ number_format((float) $product_sale->tax, $general_setting->decimal, '.', '') }}</td>
-                                                    <td class="col-sm-2 sub-total text-right">{{ number_format((float)$product_sale->total, $general_setting->decimal, '.', '')}}</td>
+                                                    <td class="col-sm-2 product-price">{{ number_format((float)($product_sale->total / $product_sale->qty), $general_setting->decimal, '.', '')}}</td>
+                                                    <td class="col-sm-3"><div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-default minus"><span class="dripicons-minus"></span></button></span><input type="text" name="qty[]" class="form-control qty numkey input-number" value="{{$product_sale->qty}}" step="any" required><span class="input-group-btn"><button type="button" class="btn btn-default plus"><span class="dripicons-plus"></span></button></span></div></td>
+                                                    <td class="col-sm-2 sub-total">{{ number_format((float)$product_sale->total, $general_setting->decimal, '.', '')}}</td>
                                                     <td class="col-sm-1"><button type="button" class="ibtnDel btn btn-danger btn-sm"><i class="dripicons-cross"></i></button></td>
                                                     <input type="hidden" class="product-code" name="product_code[]" value="{{$product_data->code}}"/>
                                                     <input type="hidden" class="product-id" name="product_id[]" value="{{$product_data->id}}"/>
-                                                    <input type="hidden" class="product_type" name="product_type[]" value="{{ $product_data->type }}"/>
                                                     <input type="hidden" class="product_price" name="product_price[]" value="{{$product_price}}"/>
                                                     <input type="hidden" class="net_unit_price" name="net_unit_price[]" value="{{$product_sale->net_unit_price}}" />
                                                     <input type="hidden" class="discount-value" name="discount[]" value="{{$product_sale->discount}}" />
@@ -1058,7 +1050,6 @@
                     <div class="payment-amount">
                         <h2>{{__('db.grand total')}} <span id="grand-total">{{number_format((float)$lims_sale_data->grand_total, $general_setting->decimal, '.', '')}}</span></h2>
                     </div>
-                    @include('backend.sale.partials.universal_payment_summary')
                     <div class="payment-options">
                         @php
                             $options = explode(',', $lims_pos_setting_data->payment_options);
@@ -1256,7 +1247,7 @@
                                         <div class="form-group col-md-12" id="cheque">
                                             <div class="form-group">
                                                 <label>{{__('db.Cheque Number')}} *</label>
-                                                <input type="text" name="cheque_no[]" class="form-control" id="pos-sale-cheque-no">
+                                                <input type="text" name="cheque_no" class="form-control">
                                             </div>
                                         </div>
                                         <div class="form-group col-md-12">
@@ -1650,70 +1641,6 @@
         var coupon_list = <?php echo json_encode($lims_coupon_list) ?>;
         var currency = <?php echo json_encode($currency) ?>;
         var without_stock = <?php echo json_encode($general_setting->without_stock) ?>;
-        var __saleCsDec = {{ (int) $general_setting->decimal }};
-        function __saleCsFt(n) { return (parseFloat(n) || 0).toFixed(__saleCsDec); }
-        function __saleCsGrandTotal() { return parseFloat($('input[name="grand_total"]').val()) || 0; }
-        window.__saleCreateSaleRecalc = function () {
-            if (!$('#sale_payment_total_due').length) return;
-            var gt = __saleCsGrandTotal();
-            $('#sale_payment_total_due').val(__saleCsFt(gt));
-            var sumPaid = 0;
-            $('#add-payment input[name="paid_amount[]"]').each(function () {
-                sumPaid += parseFloat($(this).val()) || 0;
-            });
-            if (!$('#sale_payment_fully_paid').is(':checked')) {
-                $('#sale_payment_amount_received').val(__saleCsFt(sumPaid));
-            }
-            $('#sale_payment_remaining_due').val(__saleCsFt(Math.max(0, gt - sumPaid)));
-            var ps;
-            if ($('#sale_payment_fully_paid').is(':checked') || sumPaid + 1e-9 >= gt) {
-                ps = '4';
-            } else if (sumPaid <= 1e-9) {
-                ps = '1';
-            } else {
-                ps = '3';
-            }
-            $('#payment_status').val(ps);
-            $('#sale_payment_status_display').val(ps);
-        };
-        $('#sale_payment_amount_received').on('input', function () {
-            var gt = __saleCsGrandTotal();
-            var v = Math.min(Math.max(0, parseFloat($(this).val()) || 0), gt);
-            $(this).val(__saleCsFt(v));
-            $('#add-payment input[name="paid_amount[]"]').val(__saleCsFt(v));
-            $('#add-payment input[name="paying_amount[]"]').val(__saleCsFt(v));
-            window.__saleCreateSaleRecalc();
-        });
-        $('#sale_payment_fully_paid').on('change', function () {
-            var checked = $(this).is(':checked');
-            $('#sale_payment_amount_received').prop('readonly', checked);
-            if (checked) {
-                var gt = __saleCsGrandTotal();
-                $('#add-payment input[name="paid_amount[]"]').val(__saleCsFt(gt));
-                $('#add-payment input[name="paying_amount[]"]').val(__saleCsFt(gt));
-                $('#sale_payment_amount_received').val(__saleCsFt(gt));
-                $('#sale_payment_remaining_due').val(__saleCsFt(0));
-            }
-            window.__saleCreateSaleRecalc();
-        });
-        $(document).on('input', '#add-payment input[name="paid_amount[]"], #add-payment input[name="paying_amount[]"]', function () {
-            if ($('#sale_payment_fully_paid').is(':checked')) return;
-            var gt = __saleCsGrandTotal();
-            var $paid = $('#add-payment input[name="paid_amount[]"]');
-            var $paying = $('#add-payment input[name="paying_amount[]"]');
-            var p = parseFloat($paid.val()) || 0;
-            if (p > gt) {
-                $paid.val(__saleCsFt(gt));
-                p = gt;
-            }
-            var r = parseFloat($paying.val()) || 0;
-            if (r < p) $paying.val(__saleCsFt(p));
-            window.__saleCreateSaleRecalc();
-        });
-        $('#add-payment').on('shown.bs.modal', function () {
-            window.__saleCreateSaleRecalc();
-        });
-        $(function () { window.__saleCreateSaleRecalc(); });
 
         $('#currency').change(function(){
             var rate = $(this).find(':selected').data('rate');
@@ -1889,12 +1816,6 @@
             $.each(product_code, function(index) {
                 lims_product_array.push(product_code[index]+'|'+product_name[index]+'|'+imei_number[index]+'|'+is_embeded[index]);
             });
-            var __rn = $('table.order-list tbody tr:last').index();
-            for (var __ri = 0; __ri <= __rn; __ri++) {
-                rowindex = __ri;
-                pos = product_code.indexOf($('table.order-list tbody tr:nth-child(' + (__ri + 1) + ')').find('.product-code').val());
-                calculateRowProductData($('table.order-list tbody tr:nth-child(' + (__ri + 1) + ')').find('.qty').val());
-            }
         });
 
         if(keyboard_active==1){
@@ -2131,8 +2052,13 @@
                 }));
             },
             response: function(event, ui) {
-                if(ui.content.length == 0 && $('#lims_productcodeSearch').val().length == 13) {
-                    productSearch($('#lims_productcodeSearch').val()+'|'+1);
+                if (ui.content.length == 1) {
+                    var data = ui.content[0].value;
+                    $(this).autocomplete( "close" );
+                    productSearch(data);
+                }
+                else if(ui.content.length == 0 && $('#lims_productcodeSearch').val().length == 13) {
+                productSearch($('#lims_productcodeSearch').val()+'|'+1);
                 }
             },
             select: function(event, ui) {
@@ -2204,29 +2130,6 @@
                 checkQuantity($(this).val(), true);
             else
                 checkDiscount($(this).val(), true);
-        });
-
-        $("#myTable").on('input blur', '.line-unit-discount', function() {
-            var $tr = $(this).closest('tr');
-            rowindex = $tr.index();
-            pos = product_code.indexOf($tr.find('.product-code').val());
-            var qty = parseFloat($tr.find('.qty').val()) || 0;
-            var raw = parseFloat($(this).val());
-            if ($(this).val() === '' || isNaN(raw) || raw < 0) {
-                raw = 0;
-            }
-            if (($tr.find('.product_type').val() || '') == 'standard') {
-                unitConversion();
-            } else {
-                row_product_price = parseFloat(product_price[rowindex]) || 0;
-            }
-            var maxU = parseFloat(row_product_price) || 0;
-            if (raw > maxU) {
-                raw = maxU;
-            }
-            $(this).val(raw.toFixed(__saleCsDec));
-            product_discount[rowindex] = raw;
-            calculateRowProductData(qty);
         });
 
         $("#myTable").on('click', '.qty', function() {
@@ -2356,7 +2259,6 @@
             audio.play();
             $('input[name="paid_amount[]"]').val($("#grand-total").text());
             $('input[name="paying_amount[]"]').val($("#grand-total").text());
-            if (typeof window.__saleCreateSaleRecalc === 'function') window.__saleCreateSaleRecalc();
             $('.qc').data('initial', 1);
         });
 
@@ -2381,7 +2283,6 @@
             $('.selectpicker').selectpicker('refresh');
             $('input[name="paid_amount[]"]').val($("#grand-total").text());
             $('input[name="paying_amount[]"]').val($("#grand-total").text());
-            if (typeof window.__saleCreateSaleRecalc === 'function') window.__saleCreateSaleRecalc();
             giftCard();
         });
 
@@ -2392,7 +2293,6 @@
             $('.selectpicker').selectpicker('refresh');
             $('input[name="paid_amount[]"]').val($("#grand-total").text());
             $('input[name="paying_amount[]"]').val($("#grand-total").text());
-            if (typeof window.__saleCreateSaleRecalc === 'function') window.__saleCreateSaleRecalc();
             creditCard();
         });
 
@@ -2403,7 +2303,6 @@
             $('.selectpicker').selectpicker('refresh');
             $('input[name="paid_amount[]"]').val($("#grand-total").text());
             $('input[name="paying_amount[]"]').val($("#grand-total").text());
-            if (typeof window.__saleCreateSaleRecalc === 'function') window.__saleCreateSaleRecalc();
             cheque();
         });
 
@@ -2414,7 +2313,6 @@
             $('.selectpicker').selectpicker('refresh');
             $('input[name="paid_amount[]"]').val($("#grand-total").text());
             $('input[name="paying_amount[]"]').val($("#grand-total").text());
-            if (typeof window.__saleCreateSaleRecalc === 'function') window.__saleCreateSaleRecalc();
             hide();
         });
 
@@ -2425,7 +2323,6 @@
             $('.selectpicker').selectpicker('refresh');
             $('input[name="paid_amount[]"]').val($("#grand-total").text());
             $('input[name="paying_amount[]"]').val($("#grand-total").text());
-            if (typeof window.__saleCreateSaleRecalc === 'function') window.__saleCreateSaleRecalc();
             hide();
         });
 
@@ -2436,7 +2333,6 @@
             $('.selectpicker').selectpicker('refresh');
             $('input[name="paid_amount[]"]').val($("#grand-total").text());
             $('input[name="paying_amount[]"]').val($("#grand-total").text());
-            if (typeof window.__saleCreateSaleRecalc === 'function') window.__saleCreateSaleRecalc();
             hide();
             deposits();
         });
@@ -2540,7 +2436,6 @@
             else
                 $('input[name="paying_amount[]"]').val('{{number_format(0, $general_setting->decimal, '.', '')}}');
             change( $('input[name="paying_amount[]"]').val(), $('input[name="paid_amount[]"]').val() );
-            if (typeof window.__saleCreateSaleRecalc === 'function') window.__saleCreateSaleRecalc();
         });
 
         function change(paying_amount, paid_amount) {
@@ -2620,15 +2515,12 @@
             else {
                 cols += '<td class="col-sm-2"><input type="text" class="form-control batch-no" disabled/> <input type="hidden" class="product-batch-id" name="product_batch_id[]"/> </td>';
             }
-            cols += '<td class="col-sm-2"><div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-default minus"><span class="dripicons-minus"></span></button></span><input type="text" name="qty[]" class="form-control qty numkey input-number" step="any" value="'+data[15]+'" required><span class="input-group-btn"><button type="button" class="btn btn-default plus"><span class="dripicons-plus"></span></button></span></div></td>';
-            cols += '<td class="col-sm-2 net-unit-price-col text-right"></td>';
-            cols += '<td class="col-sm-2 line-discount-cell"><input type="text" inputmode="decimal" class="form-control form-control-sm line-unit-discount numkey text-right" style="min-width:72px;max-width:96px" autocomplete="off" value="{{ number_format(0, $general_setting->decimal, '.', '') }}" /></td>';
-            cols += '<td class="col-sm-2 tax text-right"></td>';
-            cols += '<td class="col-sm-2 sub-total text-right"></td>';
+            cols += '<td class="col-sm-2 product-price"></td>';
+            cols += '<td class="col-sm-3"><div class="input-group"><span class="input-group-btn"><button type="button" class="btn btn-default minus"><span class="dripicons-minus"></span></button></span><input type="text" name="qty[]" class="form-control qty numkey input-number" step="any" value="'+data[15]+'" required><span class="input-group-btn"><button type="button" class="btn btn-default plus"><span class="dripicons-plus"></span></button></span></div></td>';
+            cols += '<td class="col-sm-2 sub-total"></td>';
             cols += '<td class="col-sm-1"><button type="button" class="ibtnDel btn btn-danger btn-sm"><i class="dripicons-cross"></i></button></td>';
             cols += '<input type="hidden" class="product-code" name="product_code[]" value="' + data[1] + '"/>';
             cols += '<input type="hidden" class="product-id" name="product_id[]" value="' + data[9] + '"/>';
-            cols += '<input type="hidden" class="product_type" name="product_type[]" value="' + data[20] + '"/>';
             cols += '<input type="hidden" class="product_price" />';
             cols += '<input type="hidden" class="sale-unit" name="sale_unit[]" value="' + temp_unit_name[0] + '"/>';
             cols += '<input type="hidden" class="net_unit_price" name="net_unit_price[]" />';
@@ -2877,8 +2769,7 @@
         }
 
         function calculateRowProductData(quantity) {
-            var rowProductType = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product_type').val();
-            if (rowProductType == 'standard')
+            if(product_type[pos] == 'standard')
                 unitConversion();
             else
                 row_product_price = product_price[rowindex];
@@ -2900,16 +2791,13 @@
                 var sub_total = sub_total_unit * quantity;
             }
 
-            var $srow = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')');
-            $srow.find('.discount-value').val((product_discount[rowindex] * quantity).toFixed({{$general_setting->decimal}}));
-            $srow.find('.tax-rate').val(tax_rate[rowindex].toFixed({{$general_setting->decimal}}));
-            $srow.find('.net_unit_price').val(net_unit_price.toFixed({{$general_setting->decimal}}));
-            $srow.find('.tax-value').val(tax.toFixed({{$general_setting->decimal}}));
-            $srow.find('.net-unit-price-col').text(net_unit_price.toFixed({{$general_setting->decimal}}));
-            $srow.find('.tax').text(tax.toFixed({{$general_setting->decimal}}));
-            $srow.find('.line-unit-discount').val(parseFloat(product_discount[rowindex]).toFixed({{$general_setting->decimal}}));
-            $srow.find('.sub-total').text(sub_total.toFixed({{$general_setting->decimal}}));
-            $srow.find('.subtotal-value').val(sub_total.toFixed({{$general_setting->decimal}}));
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.discount-value').val((product_discount[rowindex] * quantity).toFixed({{$general_setting->decimal}}));
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.tax-rate').val(tax_rate[rowindex].toFixed({{$general_setting->decimal}}));
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.net_unit_price').val(net_unit_price.toFixed({{$general_setting->decimal}}));
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.tax-value').val(tax.toFixed({{$general_setting->decimal}}));
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product-price').text(sub_total_unit.toFixed({{$general_setting->decimal}}));
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.sub-total').text(sub_total.toFixed({{$general_setting->decimal}}));
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.subtotal-value').val(sub_total.toFixed({{$general_setting->decimal}}));
 
             calculateTotal();
         }
@@ -2998,9 +2886,6 @@
             $('#shipping-cost').text(shipping_cost.toFixed({{$general_setting->decimal}}));
             $('#grand-total').text(grand_total.toFixed({{$general_setting->decimal}}));
             $('input[name="grand_total"]').val(grand_total.toFixed({{$general_setting->decimal}}));
-            if (typeof window.__saleCreateSaleRecalc === 'function') {
-                window.__saleCreateSaleRecalc();
-            }
         }
 
         function hide() {
@@ -3008,7 +2893,7 @@
             $(".card-errors").hide();
             $("#cheque").hide();
             $("#gift-card").hide();
-            $('input[name="cheque_no[]"]').attr('required', false);
+            $('input[name="cheque_no"]').attr('required', false);
         }
 
         function giftCard() {
@@ -3032,7 +2917,7 @@
             $(".card-element").hide();
             $(".card-errors").hide();
             $("#cheque").hide();
-            $('input[name="cheque_no[]"]').attr('required', false);
+            $('input[name="cheque_no"]').attr('required', false);
         }
 
         function cheque() {
@@ -3040,7 +2925,7 @@
             $(".card-element").hide();
             $(".card-errors").hide();
             $("#gift-card").hide();
-            $('input[name="cheque_no[]"]').attr('required', true);
+            $('input[name="cheque_no"]').attr('required', true);
         }
 
         function creditCard() {
@@ -3049,14 +2934,14 @@
             $(".card-errors").show();
             $("#cheque").hide();
             $("#gift-card").hide();
-            $('input[name="cheque_no[]"]').attr('required', false);
+            $('input[name="cheque_no"]').attr('required', false);
         }
 
         function deposits() {
             if($('input[name="paid_amount[]"]').val() > deposit[$('#customer_id').val()]){
                 alert('Amount exceeds customer deposit! Customer deposit : '+ deposit[$('#customer_id').val()]);
             }
-            $('input[name="cheque_no[]"]').attr('required', false);
+            $('input[name="cheque_no"]').attr('required', false);
         }
 
         function pointCalculation() {
@@ -3106,10 +2991,6 @@
             }
             else if( parseFloat( $('input[name="paying_amount[]"]').val() ) < parseFloat( $('input[name="paid_amount[]"]').val()) ){
                 alert('Paying amount cannot be bigger than recieved amount');
-                e.preventDefault();
-            }
-            else if (parseFloat($('input[name="paid_amount[]"]').val()) > parseFloat($('input[name="grand_total"]').val()) + 0.000001) {
-                alert('Total received cannot exceed grand total.');
                 e.preventDefault();
             }
             else{

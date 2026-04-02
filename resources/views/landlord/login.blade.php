@@ -10,7 +10,7 @@
     <meta name="robots" content="all,follow">
     <link rel="manifest" href="{{ url('manifest.json') }}">
     @if ($general_setting && $general_setting->site_logo)
-        <link rel="icon" type="image/png" href="{{ url('landlord/images/logo', $general_setting->site_logo) }}" />
+        <link rel="icon" type="image/png" href="{{ asset('landlord/images/logo/'.$general_setting->site_logo) }}" />
     @endif
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/font-awesome.min.css') }}" type="text/css">
@@ -39,7 +39,7 @@
                 <div class="form-inner">
                     <div class="logo">
                         @if ($general_setting && $general_setting->site_logo)
-                            <img src="{{ url('landlord/images/logo', $general_setting->site_logo) }}" width="110" alt="">
+                            <img src="{{ asset('landlord/images/logo/'.$general_setting->site_logo) }}" width="110" alt="">
                         @endif
                     </div>
                     @if (session()->has('delete_message'))
@@ -48,7 +48,7 @@
                                     aria-hidden="true">&times;</span></button>{{ session()->get('delete_message') }}
                         </div>
                     @endif
-                    <form method="POST" action="{{ url('superadmin-login/store') }}" id="login-form">
+                    <form method="POST" action="{{ route('superadmin.login') }}" id="login-form">
                         @csrf
                         <div class="form-group-material">
                             <input id="login-username" type="text" name="name" required class="input-material"

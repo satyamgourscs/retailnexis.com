@@ -51,10 +51,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 $middleware = ['api'];
-if(config('database.connections.saleprosaas_landlord')) {
-    // EMERGENCY: disable tenant identification middleware on API routes.
-    // Tenant initialization will only run for routes under `routes/tenant.php`
-    // to keep central/root domain stable during outage.
+if(config('database.connections.retailnexis_landlord')) {
+    $middleware[] = InitializeTenancyByDomain::class;
+    $middleware[] = PreventAccessFromCentralDomains::class;
 }
 
 Route::controller(DemoAutoUpdateController::class)->group(function () {
@@ -62,12 +61,6 @@ Route::controller(DemoAutoUpdateController::class)->group(function () {
     Route::get('fetch-data-upgrade', 'fetchDataForAutoUpgrade')->name('data-read');
     Route::get('fetch-data-bugs', 'fetchDataForBugs')->name('fetch-data-bugs');
 });
-
-// If the mobile API controllers aren't present in this codebase, skip registering the rest
-// of the API routes to avoid runtime/reflection failures (e.g. during `php artisan route:list`).
-if (!class_exists(\App\Http\Controllers\Api\LoginController::class)) {
-    return;
-}
 
 Route::group(['middleware' => $middleware], function () {
     Route::post('/check', [LoginController::class, 'checkLicense']);

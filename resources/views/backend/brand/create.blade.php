@@ -204,7 +204,7 @@
         $("ul#setting #brand-menu").addClass("active");
 
         var brand_id = [];
-        var user_verified = <?php echo json_encode(config('app.user_verified')); ?>;
+        var user_verified = <?php echo json_encode(config('app.demo_unlocked')); ?>;
 
         $.ajaxSetup({
             headers: {

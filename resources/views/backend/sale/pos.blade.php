@@ -769,13 +769,11 @@
                     </div>
                     <div class="table-responsive transaction-list">
                         <table id="myTable" class="table table-hover table-striped order-list table-fixed">
-                            <thead class="d-none d-md-table-header-group">
+                            <thead class="d-none d-md-block">
                                 <tr>
                                     <th class="col-sm-5 col-6">{{__('db.product')}}</th>
+                                    <th class="col-sm-2">{{__('db.Price')}}</th>
                                     <th class="col-sm-3">{{__('db.Quantity')}}</th>
-                                    <th class="col-sm-2 d-none d-md-table-cell">{{__('db.Net Unit Price')}}</th>
-                                    <th class="col-sm-2">{{__('db.Discount')}}</th>
-                                    <th class="col-sm-1 d-none d-md-table-cell">{{__('db.Tax')}}</th>
                                     <th class="col-sm-2">{{__('db.Subtotal')}}</th>
                                 </tr>
                             </thead>
@@ -867,7 +865,6 @@
                 <div class="payment-amount d-none d-md-block">
                     <h2>{{__('db.grand total')}} <span id="grand-total">{{number_format(0, $general_setting->decimal, '.', '')}}</span></h2>
                 </div>
-                @include('backend.sale.partials.universal_payment_summary')
                 <div class="payment-options">
                     <div class="column-5 more-payment-options">
                         <div class="btn-group dropup">
@@ -1817,8 +1814,6 @@
     <div id="reader" style="width:100%;"></div>
 </div>
 
-@include('backend.sale.partials.out_of_stock_modal')
-
 @endsection
 
 @push('scripts')
@@ -1857,7 +1852,7 @@
             $noResults.hide();
 
             $.ajax({
-                url: '{{url("/")}}/sales/search/' + warehouse_id + '/' + encodeURIComponent(search),
+                url: '{{url("/")}}/sales/search/' + warehouse_id + '/' + search,
                 type: 'GET',
                 success: function (data) {
                     $results.empty();
@@ -1919,6 +1914,15 @@
                             $results.append(productHtml);
                         });
 
+                        // Auto-click if only one result
+                        if (data.length === 1) {
+                            if(click === 0){
+                                $('#product-results-container .product-img').first().trigger('click');
+                            }
+                            clearResults();
+                            click = 1;
+                        }
+
                     } else {
                         clearResults();
                         $noResults.show();
@@ -1930,10 +1934,13 @@
             });
         }
 
+        var click = 0;
+
         // Trigger on input
         $input.on('input', function () {
             const value = $(this).val().trim();
-            if (value.length >= 1) {
+            if (value.length >= 3) {
+                click = 0;
                 clearTimeout(typingTimer);
                 typingTimer = setTimeout(() => searchProducts(value), doneTypingInterval);
             } else {
@@ -1944,7 +1951,8 @@
         // Trigger on paste
         $input.on('paste', function (e) {
             const pastedData = (e.originalEvent || e).clipboardData.getData('text');
-            if (pastedData.length >= 1) {
+            if (pastedData.length >= 3) {
+                click = 0;
                 searchProducts(pastedData.trim());
             }
         });
@@ -1999,7 +2007,8 @@
         }
     });
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    ////Start the code is for landlord SaaS///
+    @if(config('database.connections.retailnexis_landlord'))
         numberOfInvoice = <?php echo json_encode($numberOfInvoice)?>;
         $.ajax({
             type: 'GET',
@@ -2012,10 +2021,13 @@
             }
         });
     @endif
+    ////End the code is for landlord SaaS///
 
+    ///NOT NEEDED - Check///
     $("ul#sale").siblings('a').attr('aria-expanded','true');
     $("ul#sale").addClass("show");
     $("ul#sale #sale-pos-menu").addClass("active");
+    ///NOT NEEDED - Check///
 
     ///start code for mobile////
     var isMobile = false;
@@ -2036,32 +2048,6 @@
     var public_key = <?php echo json_encode($lims_pos_setting_data->stripe_public_key) ?>;
     @endif
     var without_stock = <?php echo json_encode($general_setting->without_stock) ?>;
-
-    function showOutOfStockModal(message, onHidden) {
-        var $modal = $('#outOfStockModal');
-        var fallback = ($modal.find('[data-oos-message]').data('default') || 'Out of Stock');
-        var text = (message && String(message).trim() !== '') ? message : fallback;
-        if ($modal.length) {
-            $modal.find('[data-oos-message]').text(text);
-            $modal.off('hidden.bs.modal.oos').on('hidden.bs.modal.oos', function () {
-                $('body').removeClass('modal-open');
-                $('.modal-backdrop').remove();
-                var $t = $('#product-search-input');
-                if ($t.length) {
-                    setTimeout(function () { $t.trigger('focus'); }, 50);
-                }
-                if (typeof onHidden === 'function') {
-                    onHidden();
-                }
-            });
-            $modal.modal({ backdrop: true, keyboard: true, show: true });
-        } else {
-            alert(text);
-            if (typeof onHidden === 'function') {
-                onHidden();
-            }
-        }
-    }
     var alert_product = <?php echo json_encode($alert_product) ?>;
     var currency = <?php echo json_encode($currency) ?>;
     var valid;
@@ -2116,102 +2102,6 @@
     var currencyChange = false;
     var all_permission = '<?php echo json_encode($all_permission) ?>';
     var next_page_url;
-
-    /** Universal payment summary (shared partial): totals + auto payment_status */
-    var __salePosPayDec = {{ (int) $general_setting->decimal }};
-    function __salePosPayFt(n) { return (parseFloat(n) || 0).toFixed(__salePosPayDec); }
-    function __salePosPayGrandTotal() { return parseFloat($('input[name="grand_total"]').val()) || 0; }
-    window.__saleUniversalPaymentRecalc = function () {
-        if (!$('#sale_payment_total_due').length) return;
-        var gt = __salePosPayGrandTotal();
-        $('#sale_payment_total_due').val(__salePosPayFt(gt));
-        var sumPaid = 0;
-        $('#add-payment input[name="paid_amount[]"]').each(function () {
-            sumPaid += parseFloat($(this).val()) || 0;
-        });
-        if (!$('#sale_payment_fully_paid').is(':checked')) {
-            $('#sale_payment_amount_received').val(__salePosPayFt(sumPaid));
-        }
-        $('#sale_payment_remaining_due').val(__salePosPayFt(Math.max(0, gt - sumPaid)));
-        var ps;
-        if ($('#sale_payment_fully_paid').is(':checked') || sumPaid + 1e-9 >= gt) {
-            ps = '4';
-        } else if (sumPaid <= 1e-9) {
-            ps = '1';
-        } else {
-            ps = '3';
-        }
-        $('#payment_status').val(ps);
-        $('#sale_payment_status_display').val(ps);
-    };
-    window.__salePosPaymentSyncing = false;
-    $('#sale_payment_amount_received').on('input', function () {
-        window.__salePosPaymentSyncing = true;
-        var gt = __salePosPayGrandTotal();
-        var v = Math.min(Math.max(0, parseFloat($(this).val()) || 0), gt);
-        $(this).val(__salePosPayFt(v));
-        var $paid = $('#add-payment input[name="paid_amount[]"]');
-        var $paying = $('#add-payment input[name="paying_amount[]"]');
-        if ($paid.length) {
-            $paid.first().val(__salePosPayFt(v));
-            $paid.slice(1).each(function () { $(this).val(__salePosPayFt(0)); });
-        }
-        if ($paying.length) {
-            $paying.first().val(__salePosPayFt(v));
-            $paying.slice(1).each(function () { $(this).val(__salePosPayFt(0)); });
-        }
-        window.__salePosPaymentSyncing = false;
-        window.__saleUniversalPaymentRecalc();
-    });
-    $('#sale_payment_fully_paid').on('change', function () {
-        var checked = $(this).is(':checked');
-        $('#sale_payment_amount_received').prop('readonly', checked);
-        if (checked) {
-            var gt = __salePosPayGrandTotal();
-            $('#add-payment input[name="paid_amount[]"]').each(function (i) {
-                $(this).val(i === 0 ? __salePosPayFt(gt) : __salePosPayFt(0));
-            });
-            $('#add-payment input[name="paying_amount[]"]').each(function (i) {
-                $(this).val(i === 0 ? __salePosPayFt(gt) : __salePosPayFt(0));
-            });
-            $('#sale_payment_amount_received').val(__salePosPayFt(gt));
-            $('#sale_payment_remaining_due').val(__salePosPayFt(0));
-        }
-        window.__saleUniversalPaymentRecalc();
-    });
-    $(document).on('input', '#add-payment input[name="paid_amount[]"]', function () {
-        if ($('#sale_payment_fully_paid').is(':checked')) return;
-        if (window.__salePosPaymentSyncing) return;
-        var gt = __salePosPayGrandTotal();
-        var $inputs = $('#add-payment input[name="paid_amount[]"]');
-        var sum = 0;
-        $inputs.each(function () { sum += parseFloat($(this).val()) || 0; });
-        if (sum > gt + 1e-9) {
-            var selfVal = parseFloat($(this).val()) || 0;
-            var others = sum - selfVal;
-            var maxSelf = Math.max(0, gt - others);
-            $(this).val(__salePosPayFt(maxSelf));
-        }
-        var idx = $inputs.index(this);
-        var $payRow = $('#add-payment input[name="paying_amount[]"]').eq(idx);
-        if ($payRow.length) {
-            var p = parseFloat($(this).val()) || 0;
-            var py = parseFloat($payRow.val()) || 0;
-            if (py < p) $payRow.val(__salePosPayFt(p));
-        }
-        window.__saleUniversalPaymentRecalc();
-    });
-    $(document).on('input', '#add-payment input[name="paying_amount[]"]', function () {
-        if ($('#sale_payment_fully_paid').is(':checked')) return;
-        var $paid = $('#add-payment input[name="paid_amount[]"]');
-        var idx = $('#add-payment input[name="paying_amount[]"]').index(this);
-        var p = parseFloat($paid.eq(idx).val()) || 0;
-        var py = parseFloat($(this).val()) || 0;
-        if (py < p) $(this).val(__salePosPayFt(p));
-        window.__saleUniversalPaymentRecalc();
-    });
-    $('#add-payment').on('shown.bs.modal', function () { window.__saleUniversalPaymentRecalc(); });
-    $(function () { window.__saleUniversalPaymentRecalc(); });
 
     $(window).on('load', async function () {
         //await getProduct(warehouse_id);
@@ -2514,26 +2404,17 @@
                 embedded: data.embedded,
                 batch: data.batch,
                 price: data.price,
-                customer_id: $('#customer_id').val(),
-                warehouse_id: $('#warehouse_id').val()
+                customer_id: $('#customer_id').val()
             };
             //data += '?'+$('#customer_id').val()+'?'+(parseFloat(pre_qty) + 1);
             $.ajax({
                 type: 'GET',
-                dataType: 'json',
+                async: false,
                 url: '{{url("sales/lims_product_search")}}',
                 data: {
                     data: product
                 },
-                success: function(resp) {
-                    if (!Array.isArray(resp)) {
-                        if (resp && resp.error === 'out_of_stock') {
-                            showOutOfStockModal(resp.message);
-                            $('#product-search-input').val('');
-                        }
-                        return;
-                    }
-                    var data = resp;
+                success: function(data) {
                     console.log(data)
                     if(data[23]) {
                         data[15] = 1;
@@ -2572,14 +2453,6 @@
                             imeiNumbers = data[18];
                         $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.imei-number').val(imeiNumbers);
                     }
-                },
-                error: function(xhr) {
-                    var j = xhr.responseJSON;
-                    if (xhr.status === 422 && j && j.error === 'out_of_stock') {
-                        showOutOfStockModal(j.message);
-                        $('#product-search-input').val('');
-                        return;
-                    }
                 }
             });
         }
@@ -2602,14 +2475,14 @@
         let stockDisplay = '';
 
         if (authUser > 2) {
-            cols += '<td class="col-sm-5 col-6 product-title"><strong>' + data[0] + '<br><span>' + data[1] + '</span>' + stockDisplay + ' <strong class="product-price-mobile d-none"></strong>';
+            cols += '<td class="col-sm-5 col-6 product-title"><strong>' + data[0] + '<br><span>' + data[1] + '</span>' + stockDisplay + ' <strong class="product-price d-none"></strong>';
         } else {
             if(data[20].trim() == 'standard' || data[20].trim() == 'combo'){
                 if (!data[18] || data[18] == 'null') {
                     stockDisplay = ` | {{ __('db.In Stock') }} : <span class="in-stock">` + data[19] + `</span>`;
                 }
             }
-            cols += '<td class="col-sm-5 col-6 product-title"><strong class="edit-product btn btn-link" data-toggle="modal" data-target="#editModal">' + data[0] + ' <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg></strong><br><span>' + data[1] + '</span>' + stockDisplay + ' <strong class="product-price-mobile d-none"></strong>';
+            cols += '<td class="col-sm-5 col-6 product-title"><strong class="edit-product btn btn-link" data-toggle="modal" data-target="#editModal">' + data[0] + ' <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" /></svg></strong><br><span>' + data[1] + '</span>' + stockDisplay + ' <strong class="product-price d-none"></strong>';
         }
 
         if(data[12]) {
@@ -2620,7 +2493,8 @@
         }
 
         cols += '</td>';
-        cols += '<td class="col-sm-3 col-6 order-qty-cell" style="min-width:140px"><div class="input-group"><span class="input-group-btn">';
+        cols += '<td class="col-sm-2 product-price d-none d-md-block"></td>';
+        cols += '<td class="col-sm-3" style="min-width:140px"><div class="input-group"><span class="input-group-btn">';
 
         // Always show delete button
         cols += '<button type="button" class="ibtnDel btn btn-danger btn-sm mr-2" style="padding:5px"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg></button></span>';
@@ -2640,10 +2514,7 @@
 
         cols += '</span></div></td>';
 
-        cols += '<td class="col-sm-2 net-unit-price-col d-none d-md-table-cell text-right"></td>';
-        cols += '<td class="col-sm-2 line-discount-cell"><input type="text" inputmode="decimal" class="form-control form-control-sm line-unit-discount numkey text-right" style="min-width:72px;max-width:96px" autocomplete="off" value="{{ number_format(0, $general_setting->decimal, '.', '') }}" /></td>';
-        cols += '<td class="col-sm-1 tax d-none d-md-table-cell text-right"></td>';
-        cols += '<td class="col-sm-2 sub-total text-right"></td>';
+        cols += '<td class="col-sm-2 sub-total"></td>';
         cols += '<input type="hidden" class="product-code" name="product_code[]" value="' + data[1] + '"/>';
         cols += '<input type="hidden" class="product-id" name="product_id[]" value="' + data[9] + '"/>';
         cols += '<input type="hidden" class="product_type" name="product_type[]" value="' + data[20] + '"/>';
@@ -2737,10 +2608,10 @@
                     newRow.find('.topping_product').val(matchedProduct.topping_id);
                     newRow.find('.topping-price').val(totalToppingPrice.toFixed({{$general_setting->decimal}}));
 
-                    const currentPrice = parseFloat(newRow.find('.net-unit-price-col').text()) || 0;
+                    const currentPrice = parseFloat(newRow.find('.product-price').text()) || 0;
                     const newPrice = currentPrice + totalToppingPrice;
                     newPrice -= product_discount[rowindex];
-                    newRow.find('.net-unit-price-col, .product-price-mobile').text(newPrice.toFixed({{$general_setting->decimal}}));
+                    newRow.find('.product-price').text(newPrice.toFixed({{$general_setting->decimal}}));
                     newRow.find('.sub-total').text(newPrice.toFixed({{$general_setting->decimal}}));
 
                     // Remove used item from array
@@ -2839,10 +2710,10 @@
                         newRow.find('.topping_product').val(selectedToppingsJson); // Store JSON in hidden field
 
                         // Update the total price
-                        const currentPrice = parseFloat(newRow.find('.net-unit-price-col').text()) || 0;
+                        const currentPrice = parseFloat(newRow.find('.product-price').text()) || 0;
                         let newPrice = currentPrice + totalAdditionalPrice;
                         newPrice -= product_discount[rowindex];
-                        newRow.find('.net-unit-price-col, .product-price-mobile').text(newPrice.toFixed({{$general_setting->decimal}}));
+                        newRow.find('.product-price').text(newPrice.toFixed({{$general_setting->decimal}}));
                         newRow.find('.sub-total').text(newPrice.toFixed({{$general_setting->decimal}}));
                         newRow.find('.topping-price').val(totalAdditionalPrice.toFixed({{$general_setting->decimal}}));
                     }
@@ -3588,29 +3459,6 @@
         }else{
             checkDiscount($(this).val(), 'input');
         }
-    });
-
-    $("#myTable").on('input blur', '.line-unit-discount', function() {
-        var $tr = $(this).closest('tr');
-        rowindex = $tr.index();
-        pos = product_code.indexOf($tr.find('.product-code').val());
-        var qty = parseFloat($tr.find('.qty').val()) || 0;
-        var raw = parseFloat($(this).val());
-        if ($(this).val() === '' || isNaN(raw) || raw < 0) {
-            raw = 0;
-        }
-        if (($tr.find('.product_type').val() || '') == 'standard') {
-            unitConversion();
-        } else {
-            row_product_price = parseFloat(product_price[rowindex]) || 0;
-        }
-        var maxU = parseFloat(row_product_price) || 0;
-        if (raw > maxU) {
-            raw = maxU;
-        }
-        $(this).val(raw.toFixed({{$general_setting->decimal}}));
-        product_discount[rowindex] = raw;
-        calculateRowProductData(qty);
     });
 
     $("#myTable").on('click', '.qty', function() {
@@ -4424,68 +4272,36 @@
     }
 
     function checkQuantity(sale_qty, flag) {
-        var $row = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')');
-        var maxAttr = $row.find('.qty').attr('max');
-        var maxStock = parseFloat(maxAttr);
-        if (maxAttr === undefined || maxAttr === '' || isNaN(maxStock)) {
-            maxStock = Infinity;
-        }
-        var product_type = ($row.find('.product_type').val() || '').trim();
+        var row_product_code = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product-code').val();
+        var qty = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').attr('max');
+        var product_type = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product_type').val();
         if(without_stock == 'no') {
-            if(product_type == 'standard' || product_type == 'combo') {
-                var operator = (unit_operator[rowindex] || '*').split(',');
-                var operation_value = (unit_operation_value[rowindex] || '1').split(',');
-                var saleQtyNum = parseFloat(sale_qty);
-                if (isNaN(saleQtyNum)) {
-                    saleQtyNum = 0;
-                }
-                var total_qty;
+            if(product_type.trim() == 'standard' || product_type.trim() == 'combo') {
+                var operator = unit_operator[rowindex].split(',');
+                var operation_value = unit_operation_value[rowindex].split(',');
                 if(operator[0] == '*')
-                    total_qty = saleQtyNum * parseFloat(operation_value[0] || 1);
+                    total_qty = sale_qty * operation_value[0];
                 else if(operator[0] == '/')
-                    total_qty = saleQtyNum / parseFloat(operation_value[0] || 1);
-                else
-                    total_qty = saleQtyNum;
-
-                if (maxStock !== Infinity && maxStock <= 0 && total_qty > 0) {
-                    showOutOfStockModal(null, function () {
-                        if (!flag) {
-                            edit();
-                        }
-                    });
+                    total_qty = sale_qty / operation_value[0];
+                if (total_qty > parseFloat(qty)) {
+                    alert('Quantity exceeds stock quantity!');
                     if (flag) {
-                        $row.find('.ibtnDel').trigger('click');
-                    } else {
-                        $row.find('.qty').val(0);
+                        sale_qty = (sale_qty - 1);
+                        checkQuantity(sale_qty, true);
                     }
-                    return;
-                }
-
-                if (maxStock !== Infinity && total_qty > maxStock) {
-                    showOutOfStockModal(null, function () {
-                        if (!flag) {
-                            edit();
-                        }
-                    });
-                    var maxSaleQty = operator[0] == '*'
-                        ? maxStock / parseFloat(operation_value[0] || 1)
-                        : maxStock * parseFloat(operation_value[0] || 1);
-                    if (!isFinite(maxSaleQty) || maxSaleQty < 0) {
-                        maxSaleQty = 0;
+                    else {
+                        edit();
+                        return;
                     }
-                    sale_qty = maxSaleQty;
-                    $row.find('.qty').val(sale_qty);
-                    calculateRowProductData(sale_qty);
-                    return;
                 }
-                $row.find('.qty').val(sale_qty);
+                $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val(sale_qty);
             }
         }
         else
-            $row.find('.qty').val(sale_qty);
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val(sale_qty);
         if(!flag) {
             $('#editModal').modal('hide');
-            $row.find('.qty').val(sale_qty);
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val(sale_qty);
         }
         calculateRowProductData(sale_qty);
     }
@@ -4516,8 +4332,7 @@
         //     // @endif
         // }
 
-        var rowProductType = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product_type').val();
-        if (rowProductType == 'standard')
+        if(product_type[pos] == 'standard')
             unitConversion();
         else
             row_product_price = product_price[rowindex];
@@ -4540,16 +4355,13 @@
 
         var topping_price = ($('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.topping-price').val() * quantity) || 0;
 
-        var $prow = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')');
-        $prow.find('.discount-value').val((product_discount[rowindex] * quantity).toFixed({{$general_setting->decimal}}));
-        $prow.find('.tax-rate').val(tax_rate[rowindex].toFixed({{$general_setting->decimal}}));
-        $prow.find('.net_unit_price').val(net_unit_price.toFixed({{$general_setting->decimal}}));
-        $prow.find('.tax-value').val(tax.toFixed({{$general_setting->decimal}}));
-        $prow.find('.net-unit-price-col, .product-price-mobile').text(net_unit_price.toFixed({{$general_setting->decimal}}));
-        $prow.find('.tax').text(tax.toFixed({{$general_setting->decimal}}));
-        $prow.find('.line-unit-discount').val(parseFloat(product_discount[rowindex]).toFixed({{$general_setting->decimal}}));
-        $prow.find('.sub-total').text((sub_total+topping_price).toFixed({{$general_setting->decimal}}));
-        $prow.find('.subtotal-value').val((sub_total+topping_price).toFixed({{$general_setting->decimal}}));
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.discount-value').val((product_discount[rowindex] * quantity).toFixed({{$general_setting->decimal}}));
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.tax-rate').val(tax_rate[rowindex].toFixed({{$general_setting->decimal}}));
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.net_unit_price').val(net_unit_price.toFixed({{$general_setting->decimal}}));
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.tax-value').val(tax.toFixed({{$general_setting->decimal}}));
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product-price').text(sub_total_unit.toFixed({{$general_setting->decimal}}));
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.sub-total').text((sub_total+topping_price).toFixed({{$general_setting->decimal}}));
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.subtotal-value').val((sub_total+topping_price).toFixed({{$general_setting->decimal}}));
 
         calculateTotal();
     }
@@ -4661,10 +4473,6 @@
         $('#grand-total-m').text(grand_total.toFixed({{$general_setting->decimal}}));
         $('input[name="grand_total"]').val(grand_total.toFixed({{$general_setting->decimal}}));
         currencyChange = false;
-
-        if (typeof window.__saleUniversalPaymentRecalc === 'function') {
-            window.__saleUniversalPaymentRecalc();
-        }
 
         saveDataToLocalStorageForCustomerDisplay('clear_no');
     }
@@ -5068,7 +4876,7 @@
                         .children("svg").remove().end()
                         .text().trim();
 
-            let price = $(this).find(".net-unit-price-col").text().trim() || $(this).find(".product-price-mobile").text().trim();
+            let price = $(this).find(".product-price.d-none.d-md-block").text().trim();
             let qty   = $(this).find("input.qty").val();
             let subtotal = $(this).find(".sub-total").text().trim();
 

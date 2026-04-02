@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Nexa Technologies Installer | Step-2</title>
+    <title>Retail Nexis SaaS Installer | Step-2</title>
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('saas-install-assets/images/favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('saas-install-assets/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -12,7 +12,8 @@
     <div class="col-md-6 offset-md-3">
         <div class='wrapper'>
             <header>
-                <h1 class="text-center">Nexa Technologies Auto Installer</h1>
+	            <img src="{{ asset('saas-install-assets/images/logo.png') }}" alt="Logo" style="max-width: 120px;"/>
+                <h1 class="text-center">Retail Nexis SaaS Auto Installer</h1>
             </header>
             <hr>
             <div class="content">
@@ -25,7 +26,7 @@
                     $passed .= '1';
 
                 } else {
-                    $ltext .= '<i class="fa fa-close"></i>Nexa Technologies needs at least PHP version  7.4, Your PHP Version is: ' . PHP_VERSION . '<br/>';
+                    $ltext .= '<i class="fa fa-close"></i>SalepPro needs at least PHP version  7.4, Your PHP Version is: ' . PHP_VERSION . '<br/>';
                     $passed .= '0';
                 }
 
@@ -89,19 +90,19 @@
 
                 <?php if ($passed == '11111111'): ?>
                     <br/><?php echo $ltext; ?><br/>
-                    <h5>Great! System Test Completed. You can run Nexa Technologies on your server. Click Continue For Next Step.</h5>
-                    <a href="{{ route('saas-install-step-3', [], false) }}" class="btn btn-primary">Continue</a>
+                    <h5>Great! System Test Completed. You can run SalepProSaaS on your server. Click Continue For Next Step.</h5>
+                    <a href="{{ route('saas-install-step-3') }}" class="btn btn-primary">Continue</a>
 
                 <?php else: ?>
 
-                <br/><?php echo $ltext; ?><br/>Sorry. The requirements of Nexa Technologies are not available on your server. Share this code with your hosting provider or system administrator: <?php echo $passed; ?><br><br>
+                <br/><?php echo $ltext; ?><br/>Sorry. The requirements of SalepProSaaS is not available on your server. Please contact with us- hello@tryonedigital.com with this code- <?php echo $passed; ?> Or contact with your server administrator.<br><br>
                 <a href="#" class="btn btn-primary disabled">Correct The Problem To Continue</a>
 
                 <?php endif ?>
 
             </div>
             <hr>
-            <footer>Copyright &copy; {{ config('app.name') }}. All rights reserved.</footer>
+            <footer>Copyright &copy; TryOneDigital. All Rights Reserved.</footer>
         </div>
     </div>
 </body>

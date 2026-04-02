@@ -16,7 +16,6 @@ use Mail;
 use Illuminate\Support\Facades\Artisan;
 use Database\Seeders\Tenant\TenantDatabaseSeeder;
 use Modules\Ecommerce\Database\Seeders\EcommerceDatabaseSeeder;
-use App\Exceptions\TenantDatabasePoolExhaustedException;
 
 trait TenantInfo
 {
@@ -138,38 +137,48 @@ trait TenantInfo
             $general_setting = DB::table('general_settings')->latest()->first();
         }
         $package = Package::select('is_free_trial', 'features')->find($request->package_id);
-        $features = json_decode($package->features);
+        $features = json_decode($package->features ?? '[]', true) ?: [];
+        if (! is_array($features)) {
+            $features = [];
+        }
         $modules = [];
-        if (in_array('manufacturing', $features)) {
+        if (in_array('manufacturing', $features, true)) {
             $modules[] = 'manufacturing';
         }
-        if (in_array('ecommerce', $features)) {
+        if (in_array('ecommerce', $features, true)) {
             $modules[] = 'ecommerce';
         }
-        if (in_array('woocommerce', $features))
+        if (in_array('woocommerce', $features, true)) {
             $modules[] = 'woocommerce';
-        if (count($modules))
-            $modules = implode(",", $modules);
-        else
-            $modules = Null;
+        }
+        if (count($modules)) {
+            $modules = implode(',', $modules);
+        } else {
+            $modules = null;
+        }
 
-        if ($package->is_free_trial)
-            $numberOfDaysToExpired = $general_setting->free_trial_limit;
-        elseif ($request->subscription_type == 'monthly')
+        if ($package->is_free_trial) {
+            $numberOfDaysToExpired = (int) ($general_setting->free_trial_limit ?? 0);
+        } elseif ($request->subscription_type == 'monthly') {
             $numberOfDaysToExpired = 30;
-        elseif ($request->subscription_type == 'yearly')
+        } elseif ($request->subscription_type == 'yearly') {
             $numberOfDaysToExpired = 365;
+        } else {
+            $numberOfDaysToExpired = 0;
+        }
+        $numberOfDaysToExpired = $numberOfDaysToExpired > 0 ? $numberOfDaysToExpired : 30;
+        $tenantExpiryDate = now()->addDays($numberOfDaysToExpired)->format('Y-m-d');
         if (isset($request->payment_method))
             $paid_by = $request->payment_method;
         else
             $paid_by = '';
         //creating tenant
-        try {
-            $tenant = Tenant::create(['id' => $request->tenant]);
-        } catch (TenantDatabasePoolExhaustedException $e) {
-            abort(503, $e->getMessage());
-        }
-        $tenant->domains()->create(['domain' => $request->tenant . '.' . config('app.central_domain')]);
+        $tenant = Tenant::create(['id' => $request->tenant]);
+        $centralDomain = env('CENTRAL_DOMAIN', 'localhost');
+        $fullDomain = $request->tenant.'.'.$centralDomain;
+        $tenant->domains()->firstOrCreate([
+            'domain' => $fullDomain,
+        ]);
 
         if ($paid_by) {
             TenantPayment::create(['tenant_id' => $tenant->id, 'amount' => $request->price, 'paid_by' => $paid_by]);
@@ -207,7 +216,7 @@ trait TenantInfo
             'subscription_type' => $request->subscription_type,
             'developed_by' => $general_setting->developed_by,
             'modules' => $modules,
-            'expiry_date' => date("Y-m-d", strtotime("+" . $numberOfDaysToExpired . " days")),
+            'expiry_date' => $tenantExpiryDate,
             //set user information
             'name' => $request->name,
             'email' => $request->email,
@@ -271,7 +280,7 @@ trait TenantInfo
         }
 
         //updating tenant others information on landlord DB
-        $tenant->update(['package_id' => $request->package_id, 'subscription_type' => $request->subscription_type, 'company_name' => $request->company_name, 'phone_number' => $request->phone_number, 'email' => $request->email, 'expiry_date' => date("Y-m-d", strtotime("+" . $numberOfDaysToExpired . " days"))]);
+        $tenant->update(['package_id' => $request->package_id, 'subscription_type' => $request->subscription_type, 'company_name' => $request->company_name, 'phone_number' => $request->phone_number, 'email' => $request->email, 'expiry_date' => $tenantExpiryDate]);
 
         // $message have no use, it is not shown in any place, as frontend signup redirect to tenants domain,
         // check PaymentController@tenantCheckout function
@@ -327,37 +336,16 @@ trait TenantInfo
 
     public function changePermission($tenant, $abandoned_permission_ids, $permission_ids, int $package_id, string $modules = null, $expiry_date = null, $subscription_type = null)
     {
-        $decodedAbandoned = json_decode($abandoned_permission_ids ?? '[]');
-        $abandoned_permission_ids = is_array($decodedAbandoned) ? $decodedAbandoned : [];
-        $decodedPerm = json_decode($permission_ids ?? '[]');
-        $permission_ids = is_array($decodedPerm) ? $decodedPerm : [];
-
+        $abandoned_permission_ids = json_decode($abandoned_permission_ids);
+        $permission_ids = json_decode($permission_ids);
         $tenant->run(function () use ($tenant, $abandoned_permission_ids, $permission_ids, $package_id, $modules, $expiry_date, $subscription_type) {
-
-            // Run migrate + seed BEFORE touching role_has_permissions so `permissions` rows exist (FK).
-            Artisan::call('tenants:migrate', [
-                '--tenants' => $tenant->id,
-                '--force' => true,
-            ]);
-
-            Artisan::call('tenants:seed', [
-                '--tenants' => $tenant->id,
-                '--force' => true,
-            ]);
 
             if (count($abandoned_permission_ids)) {
                 DB::table('role_has_permissions')->whereIn('permission_id', $abandoned_permission_ids)->delete();
             }
             if (count($permission_ids)) {
                 foreach ($permission_ids as $permission_id) {
-                    $permission_id = (int) $permission_id;
-                    if ($permission_id < 1) {
-                        continue;
-                    }
-                    if (! DB::table('permissions')->where('id', $permission_id)->exists()) {
-                        continue;
-                    }
-                    if (! DB::table('role_has_permissions')->where([['role_id', 1], ['permission_id', $permission_id]])->first()) {
+                    if (!(DB::table('role_has_permissions')->where([['role_id', 1], ['permission_id', $permission_id]])->first())) {
                         DB::table('role_has_permissions')->insert(['role_id' => 1, 'permission_id' => $permission_id]);
                     }
                 }
@@ -368,6 +356,16 @@ trait TenantInfo
             } else {
                 $general_setting->update(['package_id' => $package_id, 'modules' => $modules]);
             }
+
+            Artisan::call('tenants:migrate', [
+                '--tenants' => $tenant->id,
+                '--force' => true,
+            ]);
+
+            Artisan::call('tenants:seed', [
+                '--tenants' => $tenant->id,
+                '--force' => true,
+            ]);
 
             if (isset($modules) && str_contains($modules, 'ecommerce')) {
                 Artisan::call('tenants:seed', [
@@ -389,18 +387,16 @@ trait TenantInfo
     {
         $subdomain = $tenant->id;
         if (env('SERVER_TYPE') == 'cpanel') {
-            $url = "https://" . config('app.central_domain') . ":2083/json-api/cpanel?cpanel_jsonapi_func=addsubdomain&cpanel_jsonapi_module=SubDomain&cpanel_jsonapi_version=2&domain=" . $subdomain . "&rootdomain=" . config('app.central_domain');
+            $url = "https://" . env('CENTRAL_DOMAIN') . ":2083/json-api/cpanel?cpanel_jsonapi_func=addsubdomain&cpanel_jsonapi_module=SubDomain&cpanel_jsonapi_version=2&domain=" . $subdomain . "&rootdomain=" . env('CENTRAL_DOMAIN');
             if (env('ROOT_DOMAIN'))
                 $url .= "&dir=public_html";
             else
-                $url .= "&dir=" . config('app.central_domain');
+                $url .= "&dir=" . env('CENTRAL_DOMAIN');
             //return $url;
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
-            curl_setopt($curl, CURLOPT_TIMEOUT, 30);
             //setting the curl headers
             $headers = array(
                 "Authorization: cpanel " . env('CPANEL_USER_NAME') . ":" . env('CPANEL_API_KEY'),
@@ -412,26 +408,10 @@ trait TenantInfo
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
 
-            $resp = curl_exec($curl);
-            if ($resp === false) {
-                $err = curl_error($curl);
-                curl_close($curl);
-                throw new \RuntimeException('cPanel addsubdomain curl failed: ' . ($err ?: 'unknown error'));
-            }
+            curl_exec($curl);
             curl_close($curl);
-
-            $decoded = json_decode((string) $resp, true);
-            // cPanel JSON result format varies; we only hard-fail when an explicit "result" is present and not successful.
-            $resultData = $decoded['cpanelresult']['data'][0] ?? null;
-            if (is_array($resultData) && array_key_exists('result', $resultData)) {
-                $ok = (int) $resultData['result'] === 1;
-                if (! $ok) {
-                    $reason = $resultData['reason'] ?? 'Unknown cPanel response';
-                    throw new \RuntimeException('cPanel addsubdomain failed: ' . (string) $reason);
-                }
-            }
         } elseif (env('SERVER_TYPE') == 'plesk') {
-            $host = config('app.central_domain');
+            $host = env('CENTRAL_DOMAIN');
             $username = env('PLESK_USER_NAME');
             $password = env('PLESK_PASSWORD');
             $pleskApiUrl = 'https://' . $host . ':8443/api/v2/domains';
@@ -451,8 +431,6 @@ trait TenantInfo
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($domainData));
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Content-Type: application/json',
                 'Authorization: Basic ' . base64_encode("$username:$password"),
@@ -463,9 +441,6 @@ trait TenantInfo
             $response = curl_exec($ch);
             curl_close($ch);
             $response = json_decode($response);
-            if (! isset($response->id) || empty($response->id)) {
-                throw new \RuntimeException('Plesk add domain failed: missing response id');
-            }
             $tenant->setInternal('domain_id', $response->id);
         }
     }
@@ -474,7 +449,7 @@ trait TenantInfo
     {
         if (env('SERVER_TYPE') == 'cpanel') {
             $subdomain = $tenant->id;
-            $url = "https://" . config('app.central_domain') . ":2083/json-api/cpanel?cpanel_jsonapi_func=delsubdomain&cpanel_jsonapi_module=SubDomain&cpanel_jsonapi_version=2&domain=" . $subdomain . "." . config('app.central_domain');
+            $url = "https://" . env('CENTRAL_DOMAIN') . ":2083/json-api/cpanel?cpanel_jsonapi_func=delsubdomain&cpanel_jsonapi_module=SubDomain&cpanel_jsonapi_version=2&domain=" . $subdomain . "." . env('CENTRAL_DOMAIN');
             //return $url;
             $curl = curl_init($url);
             curl_setopt($curl, CURLOPT_URL, $url);
@@ -494,7 +469,7 @@ trait TenantInfo
             $resp = curl_exec($curl);
             curl_close($curl);
         } elseif (env('SERVER_TYPE') == 'plesk') {
-            $host = config('app.central_domain');
+            $host = env('CENTRAL_DOMAIN');
             $username = env('PLESK_USER_NAME');
             $password = env('PLESK_PASSWORD');
             $domain_id = $tenant->getInternal('domain_id');

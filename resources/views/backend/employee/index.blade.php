@@ -159,7 +159,7 @@
     $("ul#hrm").addClass("show");
     $("ul#hrm #employee-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         if(localStorage.getItem("message")) {
             alert(localStorage.getItem("message"));
             localStorage.removeItem("message");
@@ -179,7 +179,7 @@
     @endif
 
     var employee_id = [];
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
 
     $.ajaxSetup({
         headers: {

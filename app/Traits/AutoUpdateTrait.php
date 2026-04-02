@@ -14,9 +14,9 @@ trait AutoUpdateTrait{
     public function isUpdateAvailable()
     {
         $versionUpgradeData = [];
-        $url = config('database.connections.saleprosaas_landlord')
-                ? 'https://lion-coders.com/api/sale-pro-saas-purchase/verify/updatecheck'
-                : 'https://lion-coders.com/api/sale-pro-purchase/verify/updatecheck';
+        $url = config('database.connections.retailnexis_landlord')
+                ? 'https://tryonedigital.com/api/retail-nexis-saas-purchase/verify/updatecheck'
+                : 'https://tryonedigital.com/api/retail-nexis-purchase/verify/updatecheck';
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -57,9 +57,9 @@ trait AutoUpdateTrait{
     {
         $version_upgrade_file_url = null;
         $post_string = urlencode($purchaseCode);
-        $url = config('database.connections.saleprosaas_landlord')
-                ? 'https://lion-coders.com/api/sale-pro-saas-purchase/verify/updatefile/'.$post_string
-                : 'https://lion-coders.com/api/sale-pro-purchase/verify/updatefile/'.$post_string;
+        $url = config('database.connections.retailnexis_landlord')
+                ? 'https://tryonedigital.com/api/retail-nexis-saas-purchase/verify/updatefile/'.$post_string
+                : 'https://tryonedigital.com/api/retail-nexis-purchase/verify/updatefile/'.$post_string;
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);

@@ -5,6 +5,6 @@ return
         'product_mode' => env('PRODUCT_MODE'),
         'version' => env('VERSION'),
         'bug_no' => env('BUG_NO'),
-        'demo_url' => env('APP_URL', '').'/api',
+        'demo_url' => 'https://tryonedigital.com/demo/api',
     ];
 ?>

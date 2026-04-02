@@ -28,7 +28,7 @@ class PackageController extends Controller
 
     public function store(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $data = $request->all();
         $data['features'] = json_encode($data['features']);
@@ -61,7 +61,7 @@ class PackageController extends Controller
 
     public function edit($id)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $features = $this->features();
         $packageData = Package::find($id);
@@ -138,7 +138,7 @@ class PackageController extends Controller
 
     public function destroy($id)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         Package::find($id)->update(['is_active' => false]);
         $this->cacheForget('packages');

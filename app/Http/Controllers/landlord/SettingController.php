@@ -24,7 +24,7 @@ class SettingController extends Controller
 
     public function superadminGeneralSettingStore(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $this->validate($request, [
@@ -125,7 +125,7 @@ class SettingController extends Controller
         }
         /////////////////////////End payment gateway saved in external_services table////////////////////
 
-        return redirect()->route('superadminGeneralSetting')->with('message', __('db.Data updated successfully'));
+        return redirect()->back()->with('message', __('db.Data updated successfully'));
     }
 
     public function superadminMailSetting()
@@ -136,37 +136,24 @@ class SettingController extends Controller
 
     public function superadminMailSettingStore(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
+        $data = $request->all();
+        $mail_setting = MailSetting::latest()->first();
+        if(!$mail_setting)
+            $mail_setting = new MailSetting;
+        $mail_setting->driver = $data['driver'];
+        $mail_setting->host = $data['host'];
+        $mail_setting->port = $data['port'];
+        $mail_setting->from_address = $data['from_address'];
+        $mail_setting->from_name = $data['from_name'];
+        $mail_setting->username = $data['username'];
+        $mail_setting->password = trim($data['password']);
+        $mail_setting->encryption = $data['encryption'];
+        $mail_setting->save();
+
         try {
-            $data = $request->validate([
-                'driver' => ['required', 'string', 'max:255'],
-                'host' => ['required', 'string', 'max:255'],
-                'port' => ['required', 'integer', 'min:1', 'max:65535'],
-                'from_address' => ['required', 'string', 'max:255'],
-                'from_name' => ['required', 'string', 'max:255'],
-                'username' => ['required', 'string', 'max:255'],
-                'password' => ['required', 'string'],
-                'encryption' => ['required', 'string', 'max:50'],
-            ]);
-
-            $mail_setting = MailSetting::latest()->first();
-            if(!$mail_setting) {
-                $mail_setting = new MailSetting;
-            }
-
-            $mail_setting->driver = $data['driver'];
-            $mail_setting->host = $data['host'];
-            $mail_setting->port = $data['port'];
-            $mail_setting->from_address = $data['from_address'];
-            $mail_setting->from_name = $data['from_name'];
-            $mail_setting->username = $data['username'];
-            $mail_setting->password = trim($data['password']);
-            $mail_setting->encryption = $data['encryption'];
-
-            $mail_setting->save();
-
             $this->setMailInfo($mail_setting);
             // Send test mail to from_address
             Mail::raw(__('db.This is a test mail to confirm your SMTP settings are working.'), function ($message) use ($mail_setting) {
@@ -174,15 +161,14 @@ class SettingController extends Controller
                         ->subject(__('db.Test Mail'));
             });
 
-            return redirect()->route('superadminMailSetting')->with(
+            return redirect()->back()->with(
                 'message',
                 __('db.data_updated_mail_sent') . ' ' . $mail_setting->from_address
             );
         } catch (\Exception $e) {
-            // Fail gracefully (avoid 500 "server snapped" pages)
-            return redirect()->route('superadminMailSetting')->with(
+            return redirect()->back()->with(
                 'not_permitted',
-                __('db.data_updated_mail_fail') . ' ' . mb_substr($e->getMessage(), 0, 2000)
+                __('db.data_updated_mail_fail') . ' ' . $e->getMessage()
             );
         }
     }

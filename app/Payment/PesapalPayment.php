@@ -129,12 +129,12 @@ class PesapalPayment implements PaybleContract
         $merchantreference = rand(1, 1000000000000000000);
         $phone = $data->phone_number; //0768168060
         $amount = $data->price;
-        $callbackurl = "salepro.test/ipn";
+        $callbackurl = "retailnexis.test/ipn";
         $branch = $company;
         $first_name = $data->name;
         //$middle_name = "Coders";
         $last_name = $data->name;
-        $email_address = $data->email ? $data->email : (config('mail.from.address') ?: 'noreply@example.com');
+        $email_address = $data->email ? $data->email : "hello@tryonedigital.com";
         if( $APP_ENVIROMENT == 'sandbox'){
         $submitOrderUrl = "https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest";
         }elseif($APP_ENVIROMENT == 'live'){

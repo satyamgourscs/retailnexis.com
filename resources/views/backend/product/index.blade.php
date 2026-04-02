@@ -240,7 +240,7 @@
     $("ul#product").addClass("show");
     $("ul#product #product-list-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         if(localStorage.getItem("message")) {
             alert(localStorage.getItem("message"));
             localStorage.removeItem("message");
@@ -281,7 +281,7 @@
     var product_id = [];
     var all_permission = <?php echo json_encode($all_permission) ?>;
     var role_id = <?php echo json_encode($role_id) ?>;
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
     var logoUrl = <?php echo json_encode(url('logo', $general_setting->site_logo)) ?>;
     var warehouse_id = <?php echo json_encode($warehouse_id); ?>;
     var product_type = <?php echo json_encode($product_type); ?>;
@@ -716,15 +716,6 @@
                 },
             ],
         } );
-
-        @if(!empty($nav_product_search ?? ''))
-        (function () {
-            var navProductSearch = @json($nav_product_search);
-            if (navProductSearch && typeof navProductSearch === 'string' && navProductSearch.length) {
-                table.search(navProductSearch).draw();
-            }
-        })();
-        @endif
 
         let hasFilters = window.location.search.length > 0;
         if (hasFilters) {

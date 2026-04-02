@@ -27,7 +27,7 @@ class LanguageController extends Controller
 
     public function store(Request $request)
     {
-        if (!config('app.user_verified'))
+        if (!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
 
         $request->validate([
@@ -58,7 +58,7 @@ class LanguageController extends Controller
 
     public function update(Request $request)
     {
-        if (!config('app.user_verified'))
+        if (!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
 
         $request->validate([

@@ -41,7 +41,7 @@ class HomeController extends Controller
 
 	public function __construct()
     {
-        if(!config('database.connections.saleprosaas_landlord')) {
+        if(!config('database.connections.retailnexis_landlord')) {
             $this->versionUpgradeInfo = $this->isUpdateAvailable();
         }
 	}
@@ -58,7 +58,7 @@ class HomeController extends Controller
 
     public function addonList()
     {
-        if(!config('database.connections.saleprosaas_landlord')) {
+        if(!config('database.connections.retailnexis_landlord')) {
             $role = Role::find(Auth::user()->role_id);
             if(!$role->hasPermissionTo('addons')) {
                 return redirect('dashboard')->with('not_permitted', __('db.Sorry! You are not allowed to access this module'));
@@ -104,10 +104,7 @@ class HomeController extends Controller
         config()->set('database.connections.mysql.strict', false);
         DB::reconnect();
 
-        $generalSetting = cache()->get('general_setting');
-        $modules = is_object($generalSetting) ? (string) ($generalSetting->modules ?? '') : '';
-
-        if(in_array('restaurant', explode(',', $modules))){
+        if(in_array('restaurant',explode(',',cache()->get('general_setting')->modules))){
             if(Auth::user()->role_id > 2 && isset(Auth::user()->kitchen_id)){
 
                 $result = (new \Modules\Restaurant\Http\Controllers\KitchenController)->dashboard();
@@ -136,8 +133,7 @@ class HomeController extends Controller
         $end_date = date("Y").'-'.date("m").'-'.date('t', mktime(0, 0, 0, date("m"), 1, date("Y")));
         $yearly_sale_amount = [];
 
-        $staffAccess = is_object($generalSetting) ? (string) ($generalSetting->staff_access ?? '') : '';
-        if(Auth::user()->role_id > 2 && $staffAccess == 'own')
+        if(Auth::user()->role_id > 2 && cache()->get('general_setting')->staff_access == 'own')
         {
             $product_sale_data = Sale::join('product_sales', 'sales.id','=', 'product_sales.sale_id')
                 ->select(DB::raw('product_sales.product_id, product_sales.product_batch_id, product_sales.sale_unit_id, sum(product_sales.qty) as sold_qty, sum(product_sales.return_qty) as return_qty, sum(product_sales.total) as sold_amount'))
@@ -275,7 +271,7 @@ class HomeController extends Controller
         config()->set('database.connections.mysql.strict', true);
         DB::reconnect();
         //fetching data for auto updates
-        if(!config('database.connections.saleprosaas_landlord') && Auth::user()->role_id <= 2) {
+        if(!config('database.connections.retailnexis_landlord') && Auth::user()->role_id <= 2) {
             $versionUpgradeData = [];
             $versionUpgradeData = $this->versionUpgradeInfo;
         }

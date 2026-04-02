@@ -17,51 +17,28 @@ class Common
 
     public function handle(Request $request, Closure $next)
     {
-        if (!config('app.user_verified') && session()->has('database')) {
+        if (session()->has('database')) {
             \Config::set('database.connections.mysql.database', session('database'));
             DB::purge('mysql');
         }
 
-        // IMPORTANT:
-        // Many existing controllers/views still read from global keys like
-        // `cache()->get('general_setting')`. Keep those keys for backward
-        // compatibility; brand separation is handled at the tenant UI layer.
+        //get general setting value
         $general_setting =  Cache::remember('general_setting', 60*60*24*365, function () {
-            $gs = DB::table('general_settings')->latest()->first();
-
-            // Safety: if the table exists but has no rows, avoid returning/storing null.
-            if ($gs === null) {
-                return (object) [
-                    'modules' => '',
-                    'staff_access' => null,
-                    'is_packing_slip' => null,
-                    'date_format' => 'd/m/Y',
-                    'currency' => null,
-                    'currency_position' => 'prefix',
-                    'decimal' => 2,
-                    'is_zatca' => null,
-                    'company_name' => null,
-                    'vat_registration_number' => null,
-                    'without_stock' => null,
-                    'expiry_date' => null,
-                    'theme' => 'default.css',
-                    'site_title' => env('APP_NAME', 'TryOneDigital'),
-                    'developed_by' => env('APP_NAME', 'TryOneDigital'),
-                    'site_logo' => null,
-                ];
-            }
-
-            return $gs;
+            return DB::table('general_settings')->latest()->first();
         });
 
-        $todayDate = date("Y-m-d");
-        if(config('database.connections.saleprosaas_landlord')) {
+        $todayDate = date('Y-m-d');
+        if (config('database.connections.retailnexis_landlord')) {
             $subdomain = $this->getTenantId();
-            if($general_setting->expiry_date) {
-                $expiry_date = date("Y-m-d", strtotime($general_setting->expiry_date));
-                if($todayDate > $expiry_date) {
+            if ($general_setting->expiry_date) {
+                try {
+                    $expiry_date = \Carbon\Carbon::parse($general_setting->expiry_date)->format('Y-m-d');
+                } catch (\Throwable $e) {
+                    $expiry_date = null;
+                }
+                if ($expiry_date && $todayDate > $expiry_date) {
                     auth()->logout();
-                    return redirect()->route('contactForRenewal', ['id' => $subdomain]);
+                    return redirect('https://'.env('CENTRAL_DOMAIN').'/contact-for-renewal?id='.$subdomain);
                 }
             }
             View::share('subdomain', $subdomain);
@@ -89,12 +66,7 @@ class Common
         }
         $currency = Cache::remember('currency', 60*60*24*365, function () {
             $settingData = DB::table('general_settings')->select('currency')->latest()->first();
-            if (! $settingData) {
-                return (object) ['code' => 'USD'];
-            }
-
-            $currency = \App\Models\Currency::find($settingData->currency);
-            return $currency ?: (object) ['code' => 'USD'];
+            return \App\Models\Currency::find($settingData->currency);
         });
 
         View::share('general_setting', $general_setting);
@@ -121,16 +93,9 @@ class Common
         });
         View::share('role_has_permissions', $role_has_permissions);
 
-        $role_has_permissions_list = Cache::remember(
-            'role_has_permissions_list' . Auth::user()->role_id,
-            60*60*24*365,
-            function () {
-                return DB::table('permissions')->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')
-                    ->where('role_id', Auth::user()->role_id)
-                    ->select('permissions.name')
-                    ->get();
-            }
-        );
+        $role_has_permissions_list = Cache::remember('role_has_permissions_list'.Auth::user()->role_id, 60*60*24*365, function () {
+            return DB::table('permissions')->join('role_has_permissions', 'permissions.id', '=', 'role_has_permissions.permission_id')->where('role_id', Auth::user()->role_id)->select('permissions.name')->get();
+        });
         View::share('role_has_permissions_list', $role_has_permissions_list);
 
         $categories_list = Cache::remember('category_list', 60*60*24*365, function () {

@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
-use App\Http\Middleware\EnsureTenantSpatiePermissionSchema;
-
 use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\AddonInstallController;
 use App\Http\Controllers\AdjustmentController;
@@ -67,15 +65,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Prevent central-domain requests from running tenant resolution,
-// otherwise Stancl tenancy will attempt to identify a tenant and may crash.
-Route::group(['middleware'=>[
-    'web',
-    PreventAccessFromCentralDomains::class,
-    InitializeTenancyByDomain::class,
-    \App\Http\Middleware\TenantProvisioningActive::class,
-    EnsureTenantSpatiePermissionSchema::class,
-]], function () {
+Route::group(['middleware'=>['web', InitializeTenancyByDomain::class,PreventAccessFromCentralDomains::class] ], function () {
 
         Route::get('migrate', function() {
             Artisan::call('migrate');

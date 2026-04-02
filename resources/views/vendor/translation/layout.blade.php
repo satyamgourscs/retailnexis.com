@@ -870,7 +870,7 @@
 
     <footer class="main-footer">
         <div class="container-fluid">
-            <p>&copy; {{$general_settings->site_title ?? "no title"}} | {{date("Y")}}. All rights reserved</p>
+            <p>&copy; {{$general_settings->site_title ?? "no title"}} | {{ __('Developed by')}} <a href="https://tryonedigital.com" class="external">{{ __('TryOneDigital')}}</a></p>
         </div>
     </footer>
 </div>

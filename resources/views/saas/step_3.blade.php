@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Nexa Technologies Installer | Step-3</title>
+    <title>Retail Nexis Installer | Step-3</title>
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('saas-install-assets/images/favicon.ico') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('saas-install-assets/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -12,7 +12,8 @@
 	<div class="col-md-6 offset-md-3">
 		<div class='wrapper'>
 		    <header>
-	            <h1 class="text-center">Nexa Technologies Auto Installer</h1>
+	            <img src="{{ asset('saas-install-assets/images/logo.png') }}" alt="Logo" style="max-width: 120px;"/>
+	            <h1 class="text-center">Retail Nexis SaaS Auto Installer</h1>
                 @include('includes.session_message')
 	        </header>
 	        <hr>
@@ -24,7 +25,7 @@
 		        	}
 		        }
 		        ?>
-		        <form action="{{ route('saas-install-process', [], false) }}" method="post">
+		        <form action="{{ route('saas-install-process') }}" method="post">
                     @csrf
 		            <fieldset>
                         <label>Server Type :</label>
@@ -43,11 +44,6 @@
                                 <input type="radio" class="form-check-input" value="localhost" name="server_type">localhost/VPS/Dedicated
                             </label>
                         </div>
-                        <div class="form-check-inline">
-                            <label class="form-check-label">
-                                <input type="radio" class="form-check-input" value="hostinger" name="server_type">Hostinger (shared, master MySQL user)
-                            </label>
-                        </div>
 
                         <br>
 
@@ -59,12 +55,12 @@
                             <input type='text' placeholder="Ex: 5F5S5OF81XXXXXXXXXX" class="form-control" name="cpanel_api_key">
 
                             <label>cPanel User Name</label>
-                            <input type='text' placeholder="Ex: nexa_cpanel" class="form-control" name="cpanel_username">
+                            <input type='text' placeholder="Ex: retailnexis" class="form-control" name="cpanel_username">
                         </div>
 
                         <div id="plesk_fields" style="display:none;">
                             <label>Plesk User Name</label>
-                            <input type='text' placeholder="Ex: nexa_cpanel" class="form-control" name="plesk_username">
+                            <input type='text' placeholder="Ex: retailnexis" class="form-control" name="plesk_username">
 
                             <label>Plesk Password</label>
                             <input type='text' placeholder="Ex: 5F5S5OF81XXXXXXXXXX" class="form-control" name="plesk_password">
@@ -81,20 +77,20 @@
 		                <input type='number' required placeholder="Ex: 3306" class="form-control" name="db_port">
 
                         <label>Database Username</label>
-		                <input type='text' required placeholder="Ex: nexa_user" class="form-control" name="db_username">
+		                <input type='text' required placeholder="Ex: dbuser2023" class="form-control" name="db_username">
 
-                        <label>Database Password (leave blank if none)</label>
-		                <input type='password' placeholder="Ex: PXsfdf1542" class="form-control" name="db_password">
+                        <label>Database Password</label>
+		                <input type='password' required placeholder="Ex: PXsfdf1542" class="form-control" name="db_password">
 
                         <label>Database Name</label>
-		                <input type='text' placeholder="Ex: nexa_landlord_db" required class="form-control" name="db_name">
+		                <input type='text' placeholder="Ex: retailnexis_db" required class="form-control" name="db_name">
 
                         <button type='submit' class='btn btn-primary btn-block'>Submit</button>
 		            </fieldset>
 		        </form>
 		    </div>
 		    <hr>
-		    <footer>Copyright &copy; {{ config('app.name') }}. All rights reserved.</footer>
+		    <footer>Copyright &copy; TryOneDigital. All Rights Reserved.</footer>
 		</div>
 	</div>
 
@@ -110,7 +106,7 @@
                 } else if ($(this).val() == 'plesk') {
                     $('#cpanel_fields').hide();
                     $('#plesk_fields').show();
-                } else if ($(this).val() == 'localhost' || $(this).val() == 'hostinger') {
+                } else if ($(this).val() == 'localhost') {
                     $('#cpanel_fields').hide();
                     $('#plesk_fields').hide();
                 }

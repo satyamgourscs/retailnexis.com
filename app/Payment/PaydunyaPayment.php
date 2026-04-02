@@ -27,13 +27,12 @@ class PaydunyaPayment implements PaybleContract
 
         Paydunya\Checkout\Store::setName($general_setting->site_title); // Only the name is required
         Paydunya\Checkout\Store::setPhoneNumber($general_setting->phone);
-        $base = rtrim((string) config('app.url'), '/');
-        Paydunya\Checkout\Store::setWebsiteUrl($base);
-        Paydunya\Checkout\Store::setLogoUrl($base.'/landlord/images/logo/'.$general_setting->site_logo);
+        Paydunya\Checkout\Store::setWebsiteUrl("https://".env('CENTRAL_DOMAIN'));
+        Paydunya\Checkout\Store::setLogoUrl("https://".env('CENTRAL_DOMAIN')."/landlord/images/logo/".$general_setting->site_logo);
 
-        Paydunya\Checkout\Store::setCallbackUrl($base);
-        Paydunya\Checkout\Store::setReturnUrl($base.'/payment_success');
-        Paydunya\Checkout\Store::setCancelUrl($base);
+        Paydunya\Checkout\Store::setCallbackUrl("https://".env('CENTRAL_DOMAIN'));
+        Paydunya\Checkout\Store::setReturnUrl("https://".env('CENTRAL_DOMAIN')."/payment_success");
+        Paydunya\Checkout\Store::setCancelUrl("https://".env('CENTRAL_DOMAIN'));
 
         $invoice = new Paydunya\Checkout\CheckoutInvoice();
         $invoice->addItem($package->name, 1, $request->price, $request->price, $package->subscription_type." subscription.");

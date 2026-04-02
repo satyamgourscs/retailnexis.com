@@ -88,7 +88,13 @@ $(document).ready(function() {
                 source: '/purchases/get_products?check_enable_stock=false',
                 minLength: 2,
                 response: function(event, ui) {
-                    if (ui.content.length == 0) {
+                    if (ui.content.length == 1) {
+                        ui.item = ui.content[0];
+                        $(this)
+                            .data('ui-autocomplete')
+                            ._trigger('select', 'autocompleteselect', ui);
+                        $(this).autocomplete('close');
+                    } else if (ui.content.length == 0) {
                         swal(LANG.no_products_found);
                     }
                 },

@@ -187,7 +187,7 @@
     $("ul#setting").addClass("show");
     $("ul#setting #warehouse-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         numberOfWarehouse = <?php echo json_encode($numberOfWarehouse)?>;
         $.ajax({
             type: 'GET',
@@ -201,7 +201,7 @@
         });
     @endif
 
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
 
     $.ajaxSetup({
         headers: {

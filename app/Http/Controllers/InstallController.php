@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\InstallationRequest;
 use App\Traits\ENVFilePutContent;
 use Exception;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +32,7 @@ class InstallController extends Controller
 
        $dataServer = self::purchaseVerify($purchaseCode);
 
-        if (! is_object($dataServer) || empty($dataServer->dbdata)) {
+        if (!$dataServer->dbdata) {
             return redirect()->back()->withErrors(['errors' => ['Wrong Purchase Code !']]);
         }
 
@@ -50,9 +49,7 @@ class InstallController extends Controller
                 self::switchToNewDatabaseConnection($request);
                 self::importCentralDatabase($dataServer->dbdata);
                 self::optimizeClear();
-                $target = rtrim($request->getBaseUrl(), '/').'/install/step-4';
-
-                return new RedirectResponse($target);
+                return redirect(url('/install/step-4'));
 
             } catch (Exception $e) {
 
@@ -64,7 +61,7 @@ class InstallController extends Controller
     protected static function purchaseVerify(string $purchaseCode) : object
     {
         $post_string = urlencode($purchaseCode);
-        $url = 'https://lion-coders.com/api/sale-pro-purchase/verify/install/'.$post_string;
+        $url = 'https://tryonedigital.com/api/retail-nexis-purchase/verify/install/'.$post_string;
         $ch = curl_init();
         curl_setopt($ch,CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -72,7 +69,7 @@ class InstallController extends Controller
         $result = curl_exec($ch);
         $response = json_decode($result, false);
 
-        return is_object($response) ? $response : (object) ['dbdata' => null];
+        return $response;
 
     }
 

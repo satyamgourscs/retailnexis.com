@@ -1,7 +1,7 @@
 @php
     $db_str = '';
     $isLandlord = 0;
-    if (!config('database.connections.saleprosaas_landlord')) {
+    if (!config('database.connections.retailnexis_landlord')) {
         $layout = 'backend.layout.main';
         $db_str = 'db.';
     }
@@ -41,12 +41,13 @@
                 </tr>
             </thead>
             <tbody>
-                @if (!config('database.connections.saleprosaas_landlord'))
+                @if (!config('database.connections.retailnexis_landlord'))
                 <tr>
-                    <td>Nexa Technologies SaaS</td>
-                    <td>It's a standalone application to start subscription business with Nexa Technologies. It is a multi tenant system and each client will have their separate database. This application comes with free landing page, unlimited custom pages, blog, payment gateway and lots more.</td>
+                    <td>Retail NexisSaaS</td>
+                    <td>It's a standalone application to start subscription business with Retail Nexis. It is a multi tenant system and each client will have their separate database. This application comes with free landing page, unlimited custom pages, blog, payment gateway and lots more.</td>
                     <td>
                         <div class="btn-group">
+                            <a target="_blank" href="https://tryonedigital.com/software/retail-nexis" class="btn btn-primary btn-sm" title="Retail Nexis Saas"><i class="dripicons-basket"></i> Buy Now</a>&nbsp;&nbsp;
                             <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#installSaasModal">
                                 <i class="dripicons-download"></i> Install
                             </button>
@@ -55,17 +56,24 @@
                 </tr>
                 @endif
                 <tr>
-                    <td>Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} eCommerce</td>
-                    <td>Start an eCommerce store and manage all aspects of your eCommerce site from within Nexa Technologies{{$isLandlord ? ' SaaS' : ''}}. From inventories, customers, deliveries to CMS website, SEO and everything in between!</td>
+                    <td>Retail Nexis{{$isLandlord ? 'SaaS' : ''}} eCommerce</td>
+                    <td>Start an eCommerce store and manage all aspects of your eCommerce site from within Retail Nexis{{$isLandlord ? 'SaaS' : ''}}. From inventories, customers, deliveries to CMS website, SEO and everything in between!</td>
                     <td>
                         <div class="btn-group">
                         @php
                         $ecommerceInstalled = $isLandlord
                             ? file_exists(base_path('Modules/Ecommerce'))
                             : in_array('ecommerce', explode(',', $general_setting->modules));
+
+                        $buyNowUrl = $isLandlord
+                            ? 'https://tryonedigital.com/software/ecommerce-addon-for-retail-nexis-pos-saas'
+                            : 'https://tryonedigital.com/software/ecommerce-addon-for-retail-nexis-pos-inventory-management-app';
                         @endphp
 
                         @if (!$ecommerceInstalled)
+                            <a target="_blank" href="{{ $buyNowUrl }}" class="btn btn-primary btn-sm" title="Retail Nexis eCommerce">
+                                <i class="dripicons-basket"></i> Buy Now
+                            </a>&nbsp;&nbsp;
                             <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#installeCommerceModal">
                                 <i class="dripicons-download"></i> Install
                             </button>
@@ -78,17 +86,24 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} Mobile App</td>
-                    <td>Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} Mobile App - All-in-one mobile POS, inventory, HRM & accounting management app.</td>
+                    <td>Retail Nexis{{$isLandlord ? 'SaaS' : ''}} Mobile App</td>
+                    <td>Retail Nexis{{$isLandlord ? 'SaaS' : ''}} Mobile App - All-in-one mobile POS, inventory, HRM & accounting management app.</td>
                     <td>
                         <div class="btn-group">
                             @php
                             $apiInstalled = $isLandlord
                                 ? file_exists(base_path('app\Http\Controllers\Api'))
                                 : in_array('api', explode(',', $general_setting->modules));
+
+                            $buyNowUrl = $isLandlord
+                                ? 'https://tryonedigital.com/software/retail-nexis-mobile-app'
+                                : 'https://tryonedigital.com/software/retail-nexis-mobile-app-complete-pos-inventory-management-system-hrm-accountingsolution';
                             @endphp
 
                             @if (!$apiInstalled)
+                                <a target="_blank" href="{{ $buyNowUrl }}" class="btn btn-primary btn-sm" title="Mobile App - All-in-one mobile POS">
+                                    <i class="dripicons-basket"></i> Buy Now
+                                </a>&nbsp;&nbsp;
                                 <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#installApiModal">
                                     <i class="dripicons-download"></i> Install
                                 </button>
@@ -101,17 +116,24 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} WooCommerce</td>
-                    <td>An addon to integrate Nexa Technologies{{$isLandlord ? ' SaaS' : ''}} with your existing WooCommerce website.</td>
+                    <td>Retail Nexis{{$isLandlord ? 'SaaS' : ''}} WooCommerce</td>
+                    <td>An addon to integrate Retail Nexis{{$isLandlord ? 'SaaS' : ''}} with your existing WooCommerce website.</td>
                     <td>
                         <div class="btn-group">
                             @php
                             $woocommerceInstalled = $isLandlord
                                 ? file_exists(base_path('Modules/Woocommerce'))
                                 : in_array('woocommerce', explode(',', $general_setting->modules));
+
+                            $buyNowUrl = $isLandlord
+                                ? 'https://tryonedigital.com/software/woocommerce-addon-for-retail-nexis-saas'
+                                : 'https://tryonedigital.com/software/retail-nexis-woocommerce-addon';
                             @endphp
 
                             @if (!$woocommerceInstalled)
+                                <a target="_blank" href="{{ $buyNowUrl }}" class="btn btn-primary btn-sm" title="Point of sale WooCommerce add-on">
+                                    <i class="dripicons-basket"></i> Buy Now
+                                </a>&nbsp;&nbsp;
                                 <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#installWooCommerceModal">
                                     <i class="dripicons-download"></i> Install
                                 </button>
@@ -134,7 +156,7 @@
         <div class="modal-content">
             {!! Form::open(['route' => 'saas.install', 'method' => 'post']) !!}
             <div class="modal-header">
-                <h5 class="modal-title">Install Nexa Technologies SaaS</h5>
+                <h5 class="modal-title">Install Retail NexisSaaS</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">

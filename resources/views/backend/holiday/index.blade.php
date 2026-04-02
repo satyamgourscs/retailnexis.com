@@ -138,7 +138,7 @@
     }
 
     var holiday_id = [];
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
 
 	var date = $('.date');
     date.datepicker({

@@ -39,7 +39,7 @@
     <link rel="preload" href="<?php echo asset('vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="<?php echo asset('vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" rel="stylesheet"></noscript>
 
-    @if(optional(Route::current())->getName() != '/')
+    @if(Route::current()->getName() != '/')
     <!-- date range stylesheet-->
     <link rel="preload" href="<?php echo asset('vendor/daterange/css/daterangepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="<?php echo asset('vendor/daterange/css/daterangepicker.min.css') ?>" rel="stylesheet"></noscript>
@@ -76,7 +76,7 @@
 
     <script type="text/javascript" src="<?php echo asset('js/front.js') ?>"></script>
 
-    @if(optional(Route::current())->getName() != '/')
+    @if(Route::current()->getName() != '/')
     <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/moment.min.js') ?>"></script>
     <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/knockout-3.4.2.js') ?>"></script>
     <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/daterangepicker.min.js') ?>"></script>
@@ -108,7 +108,6 @@
 
     <!-- Custom stylesheet - for your changes-->
     <link rel="stylesheet" href="<?php echo asset('css/custom-'.$general_setting->theme) ?>" type="text/css" id="custom-style">
-    <link rel="stylesheet" href="<?php echo asset('css/app-premium-theme.css') ?>" type="text/css" id="app-premium-theme">
     @if( Config::get('app.locale') == 'ar')
     <!-- RTL css -->
     <link rel="stylesheet" href="<?php echo asset('vendor/bootstrap/css/bootstrap-rtl.min.css') ?>" type="text/css">
@@ -937,7 +936,6 @@
                 ?>
                 @if($add_permission_active)
                 <li class="nav-item"><a class="dropdown-item btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> POS</span></a></li>
-                <li class="nav-item ml-1 ml-md-2"><a class="dropdown-item btn-pos btn-sm text-nowrap" href="{{ route('sales.create') }}" data-toggle="tooltip" data-placement="bottom" title="Click to create a new sale"><i class="dripicons-cart"></i><span> Create Sales</span></a></li>
                 @endif
                 <li class="nav-item"><a id="btnFullscreen" data-toggle="tooltip" title="{{__('db.Full Screen')}}"><i class="dripicons-expand"></i></a></li>
                 @if(\Auth::user()->role_id <= 2)
@@ -983,35 +981,14 @@
                         @endforeach
                       </ul>
 
-                      @if (!config('app.user_verified'))
-                        @if ($language_setting_active)
-                            <li id="languages" style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
-                                <a href="{{route('languages')}}"> {{__('db.Languages')}} <span style="font-size: 16px;">→</span></i></a>
-                            </li>
-                        @endif
-                    @endif
+                      @if ($language_setting_active)
+                          <li id="languages" style="background-color: #f0f0f0; padding: 10px; border-radius: 5px;">
+                              <a href="{{route('languages')}}"> {{__('db.Languages')}} <span style="font-size: 16px;">→</span></i></a>
+                          </li>
+                      @endif
                 </li>
                 <li class="nav-item">
-                  @php
-                      $headerUser = Auth::user();
-                      // Tenant-safe display name:
-                      $headerDisplayName = '';
-                      if (function_exists('tenancy') && tenancy()->initialized) {
-                          $tenantCompanyName = tenant()?->company_name ?? '';
-                          $headerDisplayName = is_string($tenantCompanyName) ? trim($tenantCompanyName) : '';
-                      }
-
-                      if ($headerDisplayName === '') {
-                          $headerDisplayName = $headerUser?->company_name ?: $headerUser?->name;
-                          $headerDisplayName = is_string($headerDisplayName) ? trim($headerDisplayName) : '';
-                      }
-                      $headerLower = strtolower($headerDisplayName);
-
-                      if (in_array($headerLower, ['superadmin', 'lioncoders'], true)) {
-                          $headerDisplayName = tenant()?->id ?? 'Tenant';
-                      }
-                  @endphp
-                  <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst($headerDisplayName)}}</span> <i class="fa fa-angle-down"></i>
+                  <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst(Auth::user()->name)}}</span> <i class="fa fa-angle-down"></i>
                   </a>
                   <ul class="right-sidebar">
                       <li>
@@ -1052,7 +1029,7 @@
           </div>
         </nav>
       </header>
-    <div class="page app-premium-theme">
+    <div class="page">
 
       <!-- notification modal -->
       <div id="notification-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
@@ -1402,11 +1379,7 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-sm-12">
-              @if(function_exists('tenancy') && tenancy()->initialized)
-                <p>&copy; {{$general_setting->site_title}} | {{date("Y")}}. All rights reserved</p>
-              @else
-                <p>&copy; {{$general_setting->site_title}} | {{__('db.Developed')}} {{__('db.By')}} <span class="external">{{$general_setting->developed_by}}</span></p>
-              @endif
+              <p>&copy; {{$general_setting->site_title}} | {{__('db.Developed')}} {{__('db.By')}} <span class="external">{{$general_setting->developed_by}}</span></p>
             </div>
           </div>
         </div>
@@ -1415,6 +1388,7 @@
     @yield('scripts')
     <script type="text/javascript">
 
+      var user_verified = @json(config('app.demo_unlocked') ? '1' : '0');
       var alert_product = <?php echo json_encode($alert_product) ?>;
 
       if ($(window).outerWidth() > 1199) {

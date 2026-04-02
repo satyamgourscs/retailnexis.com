@@ -4,20 +4,7 @@
 @section('content')
 
     <x-error-message key="not_permitted" />
-    @error('save')
-        <div class="alert alert-danger">{{ $message }}</div>
-    @enderror
-    @if ($errors->any() && ! $errors->has('save'))
-        <div class="alert alert-danger">
-            <strong>Please fix the errors below</strong>
-            <ul class="mb-0 pl-3">
-                @foreach ($errors->all() as $err)
-                    <li>{{ $err }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
+    
     <section class="forms">
         <div class="container-fluid">
             <div class="row">
@@ -87,8 +74,8 @@
                                 <div class="col-md-4 digit_number">
                                     <div class="form-group">
                                         <label>{{ __('db.Number Of Digit (min-6, max-12)') }}*</label>
-                                        <input type="number" name="number_of_digit" id="number_of_digit_input"
-                                            placeholder="6" min="6" value="6" max="12" class="form-control">
+                                        <input type="number" name="number_of_digit" placeholder="6" required min="6"
+                                            value="6" max="12" class="form-control">
 
 
                                     </div>
@@ -97,7 +84,7 @@
                                 <div class="col-md-4 start_number">
                                     <div class="form-group">
                                         <label>{{ __('db.Start Number') }} *</label>
-                                        <input type="number" name="start_number" id="start_number_input"
+                                        <input type="number" required name="start_number"
                                             class="form-control customer-input">
                                     </div>
                                 </div>
@@ -119,27 +106,6 @@
                                         data-target="#footer-text-message"
                                         value="{{ old('footer_text') }}">
                                     <small id="footer-text-message" style="display: block; margin-top: 5px;"></small>
-                                </div>
-
-                                <div class="col-12 col-md-6 form-group">
-                                    <label for="invoice_upi_id">UPI ID</label>
-                                    <input type="text" name="upi_id" id="invoice_upi_id" class="form-control"
-                                        value="{{ old('upi_id') }}"
-                                        placeholder="abc@upi"
-                                        autocomplete="off"
-                                        maxlength="50">
-                                    <small class="text-muted d-block">Optional. Max 50 characters. Scan-to-pay QR on invoices.</small>
-                                    @error('upi_id')
-                                        <small class="text-danger d-block">{{ $message }}</small>
-                                    @enderror
-                                    <small id="upi-id-client-error" class="text-danger d-block"></small>
-                                </div>
-                                <div class="col-12 col-md-6 form-group">
-                                    <label class="d-block">UPI QR preview</label>
-                                    <div id="upi-qr-preview-wrap" class="border rounded p-2 text-center bg-light mx-auto mx-md-0" style="display:none;max-width:220px;">
-                                        <canvas id="upi-qr-preview-canvas" class="img-fluid" width="180" height="180"></canvas>
-                                    </div>
-                                    <small class="text-muted d-block mt-1">Preview updates as you type.</small>
                                 </div>
 
                                 {{-- <div class="col-md-4">
@@ -226,7 +192,7 @@
                                         'hide_total_due' => 'db.Hide Total Due',
                                     ];
 
-                                    $show_column = old('show_column', []);
+                                    $show_column = old('show_column', $invoice->show_column ?? []);
                                     if (is_string($show_column)) {
                                         $show_column = json_decode($show_column, true);
                                     }
@@ -269,31 +235,25 @@
             </div>
         </div>
     </section>
-    <script type="text/javascript" src="{{ asset('/') }}vendor/jquery/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
     <script>
-        function syncInvoiceNumberingFieldsCreate() {
-            var type = $('.numberingType').val();
-            var $num = $('input[name="number_of_digit"]');
-            var $start = $('input[name="start_number"]');
-            $num.prop('required', false);
-            $start.prop('required', false);
-            if (type === 'sequential') {
-                $('.digit_number').hide();
-                $('.start_number').show();
-                $start.prop('required', true);
-            } else if (type === 'random') {
-                $('.digit_number').show();
-                $('.start_number').hide();
-                $num.prop('required', true);
-            } else {
-                $('.digit_number').hide();
-                $('.start_number').hide();
-            }
-        }
         $(document).ready(function() {
-            $('.numberingType').on('change', syncInvoiceNumberingFieldsCreate);
-            syncInvoiceNumberingFieldsCreate();
+            $('.numberingType').on('change', function() {
+                var type = $(this).val();
+
+                if (type == 'sequential') {
+                    $('.digit_number').hide();
+                    $('.start_number').show();
+                } else if (type == 'random') {
+                    $('.digit_number').show();
+                    $('.start_number').hide();
+                } else {
+                    $('.digit_number').hide();
+                    $('.start_number').hide();
+                }
+            });
+
+            $('.numberingType').trigger('change');
         });
 
         $(document).ready(function() {
@@ -350,44 +310,6 @@
 
             $(target).text(message).css('color', color);
         });
-
-        (function () {
-            var UPI_MAX = 50;
-            function upiPayload(pa) {
-                pa = (pa || '').trim();
-                if (!pa) return '';
-                var p = new URLSearchParams();
-                p.set('pa', pa);
-                p.set('pn', 'Merchant');
-                p.set('cu', 'INR');
-                return 'upi://pay?' + p.toString();
-            }
-            function refreshUpiQrPreview() {
-                var v = ($('#invoice_upi_id').val() || '').trim();
-                var err = $('#upi-id-client-error');
-                err.text('');
-                if (!v) {
-                    $('#upi-qr-preview-wrap').hide();
-                    return;
-                }
-                if (v.length > UPI_MAX) {
-                    err.text('UPI ID must be at most ' + UPI_MAX + ' characters.');
-                    $('#upi-qr-preview-wrap').hide();
-                    return;
-                }
-                if (typeof QRCode === 'undefined') {
-                    err.text('QR preview library failed to load.');
-                    return;
-                }
-                $('#upi-qr-preview-wrap').show();
-                var canvas = document.getElementById('upi-qr-preview-canvas');
-                QRCode.toCanvas(canvas, upiPayload(v), { width: 180, margin: 2 }, function (e) {
-                    if (e) err.text('Could not generate QR preview.');
-                });
-            }
-            $('#invoice_upi_id').on('input', refreshUpiQrPreview);
-            $(refreshUpiQrPreview);
-        })();
     </script>
 @endsection
 

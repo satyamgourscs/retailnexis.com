@@ -309,10 +309,7 @@ class ReturnController extends Controller
                     $lims_biller_list = Biller::where('is_active',true)->get();
                     $lims_tax_list = Tax::where('is_active',true)->get();
                     $lims_product_return_data = ProductReturn::where('return_id', $lims_return_data->id)->get();
-                    $lims_reward_point_setting_data = RewardPointSetting::latest()->first();
-                    $lims_return_first_payment = Payment::where('sale_id', $lims_sale_data->id)->orderBy('id')->first();
-
-                    return view('backend.return.edit',compact('lims_customer_list', 'lims_product_sale_data','lims_warehouse_list', 'lims_biller_list', 'lims_tax_list', 'lims_return_data','lims_product_return_data','lims_sale_data', 'lims_reward_point_setting_data', 'lims_return_first_payment'));
+                    return view('backend.return.edit',compact('lims_customer_list', 'lims_product_sale_data','lims_warehouse_list', 'lims_biller_list', 'lims_tax_list', 'lims_return_data','lims_product_return_data','lims_sale_data'));
                 }else{
                     return redirect()->back()->with('not_permitted', __('db.This reference either does not exist or status not completed!'));
                 }
@@ -320,10 +317,7 @@ class ReturnController extends Controller
             $lims_product_sale_data = Product_Sale::where('sale_id', $lims_sale_data->id)->get();
             $lims_tax_list = Tax::where('is_active',true)->get();
             $lims_warehouse_list = Warehouse::where('is_active',true)->get();
-            $lims_reward_point_setting_data = RewardPointSetting::latest()->first();
-            $lims_return_first_payment = Payment::where('sale_id', $lims_sale_data->id)->orderBy('id')->first();
-
-            return view('backend.return.create', compact('lims_tax_list', 'lims_sale_data', 'lims_product_sale_data', 'lims_warehouse_list', 'lims_reward_point_setting_data', 'lims_return_first_payment'));
+            return view('backend.return.create', compact('lims_tax_list', 'lims_sale_data', 'lims_product_sale_data', 'lims_warehouse_list'));
         }
         else
             return redirect()->back()->with('not_permitted', __('db.Sorry! You are not allowed to access this module'));
@@ -372,7 +366,7 @@ public function store(Request $request)
 
             $ext = pathinfo($document->getClientOriginalName(), PATHINFO_EXTENSION);
             $documentName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
+            if(!config('database.connections.retailnexis_landlord')) {
                 $documentName = $documentName . '.' . $ext;
                 $document->move(public_path('documents/sale_return'), $documentName);
             }
@@ -387,14 +381,6 @@ public function store(Request $request)
 
 
         $lims_customer_data = Customer::find($data['customer_id']);
-
-        $lims_payment_for_points = Payment::where('sale_id', $data['sale_id'])->orderBy('id')->first();
-        $lims_reward_point_setting_data = RewardPointSetting::latest()->first();
-        $perPointAmount = $lims_reward_point_setting_data
-            ? (float) ($lims_reward_point_setting_data->per_point_amount ?? 0)
-            : 0.0;
-        $adjustDepositOnce = true;
-
         //collecting mail data
         $mail_data['email'] = $lims_customer_data->email;
         $mail_data['reference_no'] = $lims_return_data->reference_no;
@@ -543,30 +529,22 @@ public function store(Request $request)
             $product_sale_data->return_qty += $qty[$key];
             $product_sale_data->save();
 
-            // reward point return in customer table (null-safe: no payment row / no reward settings / per_point_amount = 0)
-            if ($perPointAmount > 0
-                && $lims_payment_for_points !== null
-                && isset($request->product_price[$key])
-            ) {
-                $lineAmount = (float) $request->product_price[$key];
-                $return_points = (int) ceil($lineAmount / $perPointAmount);
-                if ($return_points > 0) {
-                    if ($lims_payment_for_points->used_points !== null) {
-                        $lims_customer_data->update(['points' => ($return_points + $lims_customer_data->points)]);
-                    } else {
-                        $lims_customer_data->points -= $return_points;
-                        $lims_customer_data->save();
-                    }
-                }
+            // reward point return in customer table...
+            $lims_payment_data = $lims_sale_data->payments[0] ?? null;
+            $lims_reward_point_setting_data = RewardPointSetting::latest()->first();
+
+            if($lims_payment_data->used_points != null){
+                $return_points = ceil($request->product_price[$key] / $lims_reward_point_setting_data->per_point_amount);
+                $lims_customer_data->update(['points'=> ($return_points + $lims_customer_data->points)]);
+            }else{
+                $return_points = ceil($request->product_price[$key] / $lims_reward_point_setting_data->per_point_amount);
+                $lims_customer_data->points -= $return_points;
+                $lims_customer_data->save();
             }
 
-            if ($adjustDepositOnce
-                && $lims_payment_for_points !== null
-                && ($lims_payment_for_points->paying_method ?? '') === 'Deposit'
-            ) {
-                $lims_customer_data->expense -= (float) $lims_payment_for_points->amount;
+            if ($lims_payment_data->paying_method == 'Deposit') {
+                $lims_customer_data->expense -= (float) $lims_payment_data->amount;
                 $lims_customer_data->save();
-                $adjustDepositOnce = false;
             }
         }
 
@@ -866,18 +844,7 @@ public function store(Request $request)
             $lims_tax_list = Tax::where('is_active',true)->get();
             $lims_return_data = Returns::find($id);
             $lims_product_return_data = ProductReturn::where('return_id', $id)->get();
-            $lims_sale_data = $lims_return_data && $lims_return_data->sale_id
-                ? Sale::find($lims_return_data->sale_id)
-                : null;
-            $lims_product_sale_data = $lims_return_data && $lims_return_data->sale_id
-                ? Product_Sale::where('sale_id', $lims_return_data->sale_id)->get()
-                : collect();
-            $lims_reward_point_setting_data = RewardPointSetting::latest()->first();
-            $lims_return_first_payment = ($lims_sale_data && $lims_sale_data->id)
-                ? Payment::where('sale_id', $lims_sale_data->id)->orderBy('id')->first()
-                : null;
-
-            return view('backend.return.edit',compact('lims_customer_list', 'lims_warehouse_list', 'lims_biller_list', 'lims_tax_list', 'lims_return_data','lims_product_return_data', 'lims_sale_data', 'lims_product_sale_data', 'lims_reward_point_setting_data', 'lims_return_first_payment'));
+            return view('backend.return.edit',compact('lims_customer_list', 'lims_warehouse_list', 'lims_biller_list', 'lims_tax_list', 'lims_return_data','lims_product_return_data'));
         }
         else
             return redirect()->back()->with('not_permitted', __('db.Sorry! You are not allowed to access this module'));
@@ -908,7 +875,7 @@ public function store(Request $request)
 
                 $ext = pathinfo($document->getClientOriginalName(), PATHINFO_EXTENSION);
                 $documentName = date("Ymdhis");
-                if(!config('database.connections.saleprosaas_landlord')) {
+                if(!config('database.connections.retailnexis_landlord')) {
                     $documentName = $documentName . '.' . $ext;
                     $document->move(public_path('documents/sale_return'), $documentName);
                 }

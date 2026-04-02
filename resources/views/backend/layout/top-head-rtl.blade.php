@@ -355,7 +355,7 @@
           }
 
           $("div.alert").delay(3000).slideUp(750);
-          $('select').not('[data-sale-payment-line="1"]').selectpicker({
+          $('select').selectpicker({
               style: 'btn-link',
           });
 

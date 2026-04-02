@@ -57,10 +57,10 @@
     <div id="documenter_content">
         <section id="install">
             <div class="page-header">
-                <h3>Install Nexa Technologies eCommerce Add-on</h3>
+                <h3>Install Retail Nexis eCommerce Add-on</h3>
                 <hr class="notop">
             </div>
-            <p>It is presumed that you already have Nexa Technologies installed on your server. If you login to Nexa Technologies, you should see 'Addon List' menu item on your admin panel/dashboard sidebar. Click 'Addon List' and on the following page you should see 'Nexa Technologies eCommerce' listed along with other Add-ons. Unless already installed, it should show 'Buy Now' and 'Install' button. When installed, it will show 'Update' button.</p>
+            <p>It is presumed that you already have Retail Nexis installed on your server. If you login to Retail Nexis, you should see 'Addon List' menu item on your admin panel/dashboard sidebar. Click 'Addon List' and on the following page you should see 'Retail Nexis eCommerce' listed along with other Add-ons. Unless already installed, it should show 'Buy Now' and 'Install' button. When installed, it will show 'Update' button.</p>
             <p>To purchase this addon click the 'Buy Now' button. If you have already purchased, click the 'Install' button</p>
             <p>
                 <img alt="" src="read_me/assets/images/ecommerce-installation1.png">
@@ -87,13 +87,13 @@
                 <hr class="notop">
             </div>
 
-            <p>Adding product for eCommerce is just like adding product for POS/inventory in Nexa Technologies.In addition to existing input fileds on <a href="{{url('/products/create')}}">'Add Product'</a> page, few eCommerce specific input fields are added. These input options are listed right at the bottom of the 'Add Product' page.</p>
+            <p>Adding product for eCommerce is just like adding product for POS/inventory in Retail Nexis.In addition to existing input fileds on <a href="{{url('/products/create')}}">'Add Product'</a> page, few eCommerce specific input fields are added. These input options are listed right at the bottom of the 'Add Product' page.</p>
             <p>
                 <img alt="" src="read_me/assets/images/ecommerce-product.png">
             </p>
             <h4>Sell product online</h4>
             <p>By default 'Sell Online' option is checked. If you don't want to list some of your products on your eCommerce website, uncheck the checkbox while adding/editing those products.</p>
-            <p><strong>Note: </strong>If you have been using Nexa Technologies before purchasing the eCommerce add-on, you'll have to edit the products you want to list on your eCommerce website and check this option for those products.</p>
+            <p><strong>Note: </strong>If you have been using Retail Nexis before purchasing the eCommerce add-on, you'll have to edit the products you want to list on your eCommerce website and check this option for those products.</p>
             <h4>In Stock</h4>
             <p>Products listed on your eCommerce website will show 'Add to cart' button if the 'In Stock' option is checked. Otherwise, it will show 'out of stock'</p>
 
@@ -108,7 +108,7 @@
                 <h3>CATEGORY</h3>
                 <hr class="notop">
             </div>
-            <p>Category add/edit options are just like Nexa Technologies. Few eCommerce specific input fields are added. These input options are listed right at the bottom of the 'Add Category' modal on <a href="{{url('/category')}}">'Category'</a> page in your admin panel. While adding/editing a category, please insert unique meta title and meta description for that specific category. These information will help serch engines to index/list the pages on their search results, thereby improve your sales potential.</p>
+            <p>Category add/edit options are just like Retail Nexis. Few eCommerce specific input fields are added. These input options are listed right at the bottom of the 'Add Category' modal on <a href="{{url('/category')}}">'Category'</a> page in your admin panel. While adding/editing a category, please insert unique meta title and meta description for that specific category. These information will help serch engines to index/list the pages on their search results, thereby improve your sales potential.</p>
             <p>
                 <img alt="" src="read_me/assets/images/ecommerce-category1.png">
             </p>
@@ -122,7 +122,7 @@
                 <h3>BRAND</h3>
                 <hr class="notop">
             </div>
-            <p>Brand add/edit options are just like Nexa Technologies. Few eCommerce specific input fields are added. These input options are listed right at the bottom of the 'Add Brand' modal on <a href="{{url('/brand')}}">'Brand'</a> page in your admin panel. While adding/editing a brand, please insert unique meta title and meta description for that specific brand. These information will help serch engines to index/list the pages on their search results, thereby improve your sales potential.</p>
+            <p>Brand add/edit options are just like Retail Nexis. Few eCommerce specific input fields are added. These input options are listed right at the bottom of the 'Add Brand' modal on <a href="{{url('/brand')}}">'Brand'</a> page in your admin panel. While adding/editing a brand, please insert unique meta title and meta description for that specific brand. These information will help serch engines to index/list the pages on their search results, thereby improve your sales potential.</p>
             <p>If you want to show/list brands on your website, upload brand logos on brand add/edit page.</p>
 
             <p>
@@ -262,7 +262,7 @@
                 <h3>SUPPORT</h3>
                 <hr class="notop">
             </div>
-            <p>We are happy to provide support for any issues within our software. We also provide customization service for as little as $15/hour. So if you have any features in mind or suugestions, please feel free to contact us at <strong>Support</strong>. Please note that we don't provide support though any other means (example- whatsapp, comments etc.). So, please refrain from commenting your queries on codecanyon or kocking us elsewhere.</p>
+            <p>We are happy to provide support for any issues within our software. We also provide customization service for as little as $15/hour. So if you have any features in mind or suugestions, please feel free to contact us at <a href="https://tryonedigital.com/support"><strong>Support</strong></a>. Please note that we don't provide support though any other means (example- whatsapp, comments etc.). So, please refrain from commenting your queries on codecanyon or kocking us elsewhere.</p>
             <p>Also, in case of any errors/bugs/issues on your installation, please contact us with your hosting details (url, username, password), software admin access (url, username, password) and purchase code. If your support period has expired, please renew support on codecanyon before contacting us for support.</p>
             <p>Thank you and  best wishes from {{$general_setting->developed_by}}</p>
         </section>

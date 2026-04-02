@@ -52,7 +52,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['url' => route('social.store', [], false), 'files' => true, 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'social.store', 'files' => true, 'method' => 'post']) !!}
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
                         <h4>{{__('db.Social Section')}}</h4>
@@ -111,7 +111,7 @@
                     <td>{{ $social->name }}</td>
                     <td>
                         <button type="button" data-font="{{$social->icon}}" data-id="{{$social->id}}" data-name="{{$social->name}}" data-link="{{$social->link}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal" ><i class="dripicons-document-edit"></i></button>
-                        <form class="d-inline" method="post" action="{{ route('social.delete', $social->id, false) }}">
+                        <form class="d-inline" method="post" action="{{ route('social.delete', $social->id) }}">
                         @csrf
                             <button type="submit" class="btn btn-link" onclick="return confirm('{{__('db.Are you sure you want to delete?')}}')"><i class="dripicons-trash"></i></button>
                         </form>
@@ -127,7 +127,7 @@
     <div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
         <div role="document" class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action="{{ route('social.update', [], false) }}" enctype="multipart/form-data">
+            <form method="post" action="{{route('social.update')}}" enctype="multipart/form-data">
             @csrf
             <div class="modal-header">
             <h5 id="exampleModalLabel" class="modal-title">{{__('db.Update Social')}}</h5>

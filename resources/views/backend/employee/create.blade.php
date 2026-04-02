@@ -191,7 +191,7 @@
     $("ul#hrm").addClass("show");
     $("ul#hrm #employee-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         numberOfEmployee = <?php echo json_encode($numberOfEmployee)?>;
         numberOfUserAccount = <?php echo json_encode($numberOfUserAccount)?>;
         $.ajax({

@@ -61,7 +61,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['url' => route('superadminGeneralSetting.store', [], false), 'files' => true, 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'superadminGeneralSetting.store', 'files' => true, 'method' => 'post']) !!}
                 <div class="card">
                     <div class="card-header d-flex align-items-center" data-toggle="collapse" href="#gs_collapse" aria-expanded="true" aria-controls="gs_collapse">
                         <h4 class="d-flex justify-content-between w-100">{{__('db.General Setting')}} <i class="icon dripicons-chevron-up"></i></h4>
@@ -341,7 +341,9 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("#general-setting-menu").addClass("active");
+    $("ul#setting").siblings('a').attr('aria-expanded','true');
+    $("ul#setting").addClass("show");
+    $("ul#setting #general-setting-menu").addClass("active");
     $('.selectpicker').selectpicker('refresh');
     $('[data-toggle="tooltip"]').tooltip();
     $('.card-header').on('click', function() {

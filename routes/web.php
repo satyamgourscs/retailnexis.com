@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
 
 
 
@@ -65,8 +65,8 @@ Route::middleware(['cors'])->group(function () {
 });
 
 Route::controller(Auth\SuperAdminLoginController::class)->group(function () {
-    Route::get('superadmin-login', 'login');
-    Route::post('superadmin-login/store', 'store')->name('superadmin.login');
+    Route::get('superadmin-login', 'login')->name('superadmin.login.form');
+    Route::post('superadmin-login', 'store')->name('superadmin.login');
 });
 
 //landing page routes
@@ -291,7 +291,7 @@ foreach ($centralDomains as $domain) {
     Route::domain($domain)->group(function () use (&$namedCentralHome) {
         if (empty(config('app.landlord_db'))) {
             Route::get('/', function () {
-                return new RedirectResponse('/install/step-1');
+                return redirect()->route('saas-install-step-1');
             });
             return;
         }

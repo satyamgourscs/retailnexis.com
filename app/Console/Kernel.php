@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('purchase:auto')->everyFiveMinutes();
         $schedule->command('dsoalert:find')->dailyAt('00:00');
-        $schedule->command('reset:db')->everyMinute();//reset:db used for only salepro demo db reset, check the cron job of cpanel salepro
+        $schedule->command('reset:db')->everyMinute();// reset:db demo reset only; configure your server cron if used
         // Testing Purpose
         $schedule->command('quote:daily')->everyMinute();
     }

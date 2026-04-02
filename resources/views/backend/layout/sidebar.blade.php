@@ -517,16 +517,16 @@
             ?>
             @if ($addons_permission)
                 @if(\Auth::user()->role_id != 5)
-                    @if(!config('database.connections.saleprosaas_landlord'))
+                    @if(!config('database.connections.retailnexis_landlord'))
                         <li><a href="{{url('addon-list')}}" id="addon-list"> <i class="dripicons-flag"></i><span>{{__('db.Addons')}}</span></a></li>
                     @endif
                     @if(in_array('manufacturing',explode(',',$general_setting->modules)))
                     <li>
                         <a href="#manufacturing" aria-expanded="false" data-toggle="collapse"> <i class="fa fa-industry"></i><span>{{__('db.Manufacturing')}}</span></a>
                         <ul id="manufacturing" class="collapse list-unstyled ">
-                            <li id="production-list-menu"><a href="{{route('manufacturing.productions.index')}}">{{__('db.Production List')}}</a></li>
-                            <li id="production-create-menu"><a href="{{route('manufacturing.productions.create')}}">{{__('db.Add Production')}}</a></li>
-                            <li id="production-create-menu"><a href="{{route('manufacturing.recipes.index')}}">{{__('db.Recipe')}}</a></li>
+                            <li id="production-list-menu"><a href="{{route('productions.index')}}">{{__('db.Production List')}}</a></li>
+                            <li id="production-create-menu"><a href="{{route('productions.create')}}">{{__('db.Add Production')}}</a></li>
+                            <li id="production-create-menu"><a href="{{route('recipes.index')}}">{{__('db.Recipe')}}</a></li>
                         </ul>
                     </li>
                     @endif
@@ -549,7 +549,7 @@
                 @endif
             @endif
 
-            @if(config('database.connections.saleprosaas_landlord'))
+            @if(config('database.connections.retailnexis_landlord'))
             @php
                 tenancy()->central(function () use (&$disable_tenant_support_tickets) {
                     $disable_tenant_support_tickets = DB::table('general_settings')->latest()

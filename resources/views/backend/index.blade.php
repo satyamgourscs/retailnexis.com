@@ -4,18 +4,8 @@
 @push('css')
 <style>
 .bootstrap-select:not([class*="col-"]):not([class*="form-control"]):not(.input-group-btn) {width: auto;}
-/* Dashboard welcome row (scoped) */
-.dash-welcome-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 1rem 1.5rem; padding: 1.25rem 0 1.5rem; margin-bottom: 0.25rem; border-bottom: 1px solid rgba(0,0,0,.06); }
-@media (min-width: 768px) {
-  .dash-welcome-row { align-items: center; }
-}
-.dash-welcome-heading { font-size: 1.5rem; font-weight: 600; color: #1e293b; letter-spacing: -0.02em; margin: 0; line-height: 1.3; text-transform: none; }
-.dash-welcome-sub { font-size: 0.8125rem; color: #64748b; margin: 0.35rem 0 0; font-weight: 400; }
-.dash-welcome-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; }
-.dash-welcome-filters .btn-defualt, .dash-welcome-filters .btn-default { border-radius: 10px; }
-body.dark-mode .dash-welcome-row { border-bottom-color: rgba(255,255,255,.08); }
-body.dark-mode .dash-welcome-heading { color: #e8eaef; }
-body.dark-mode .dash-welcome-sub { color: #94a3b8; }
+.count-title {margin-top: 15px}
+.dashboard-counts strong {font-size: .9rem;margin-top: 5px}
 </style>
 @endpush
 
@@ -44,7 +34,7 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                 $lims_warehouse_list = App\Models\Warehouse::where('is_active', true)->get();
             @endphp
 
-            @if (!config('database.connections.saleprosaas_landlord') && \Auth::user()->role_id <= 2)
+            @if (!config('database.connections.retailnexis_landlord') && \Auth::user()->role_id <= 2)
                 @if (isset($versionUpgradeData['alert_version_upgrade_enable']) &&
                         $versionUpgradeData['alert_version_upgrade_enable'] == true)
                     <div id="alertSection" class="alert not-slide alert-primary alert-dismissible fade show" role="alert">
@@ -59,27 +49,11 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                     </div>
                 @endif
             @endif
-                <div class="col-md-12 mt-2 px-0">
-                    @php
-                        $user = Auth::user();
-                        $displayName = null;
-                        if (function_exists('tenancy') && tenancy()->initialized) {
-                            $tenantCompanyName = tenant()?->company_name ?? '';
-                            $displayName = is_string($tenantCompanyName) ? trim($tenantCompanyName) : '';
-                            if ($displayName === '') {
-                                $displayName = null;
-                            }
-                        }
-                        if ($displayName === null) {
-                            $displayName = $user?->company_name ?: $user?->name;
-                        }
-                        $displayName = is_string($displayName) ? trim($displayName) : '';
-                        $lowerDisplayName = strtolower($displayName);
-                        if (in_array($lowerDisplayName, ['superadmin', 'lioncoders'], true)) {
-                            $displayName = tenant()?->id ?: 'Tenant';
-                        }
-                    @endphp
-                @if (in_array('restaurant', explode(',', (string) ($general_setting->modules ?? ''))))
+            <div class="col-md-12 mt-2">
+                <div class="brand-text float-left mt-4">
+                    <h3 style="font-size:1em">{{ __('db.welcome') }} <span>{{ Auth::user()->name }}</span></h3>
+                </div>
+                @if (in_array('restaurant', explode(',', cache()->get('general_setting')->modules)))
                     @if (Auth::user()->role_id > 2 && isset(Auth::user()->service_staff))
                         @php
                             $cooked = DB::table('sales')
@@ -98,7 +72,7 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                         @endphp
                     @endif
                 @endif
-                @if (in_array('restaurant', explode(',', (string) ($general_setting->modules ?? ''))))
+                @if (in_array('restaurant', explode(',', cache()->get('general_setting')->modules)))
                     <a href="{{ route('kitchen.dashboard') }}">
                         <div class="alert alert-warning alert-dismissible text-center mb-2">
                             <strong>{{ $cooked }} {{ __('db.Orders to serve') }}</strong>
@@ -111,124 +85,164 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                         ->where('name', 'revenue_profit_summary')
                         ->first();
                 @endphp
-                    <div class="dash-welcome-row">
-                        <div class="dash-welcome-intro flex-grow-1 min-w-0">
-                            <h1 class="dash-welcome-heading">{{ __('Welcome back') }}, {{ $displayName }}</h1>
-                            <p class="dash-welcome-sub">{{ __('Dashboard overview') }}</p>
-                        </div>
-                        @if ($revenue_profit_summary)
-                            <div class="dash-welcome-filters flex-shrink-0">
+                @if ($revenue_profit_summary)
+                    <div class="filter-toggle btn-group d-inline-block">
+                        <div class="btn-group" role="group" style="max-width:180px">
+                            <div class="d-flex align-items-center">
+                                <i class="dripicons-location text-primary"></i>
                                 @if (\Auth::user()->role_id <= 2)
-                                <div class="d-flex align-items-center">
-                                    <i class="dripicons-location mr-1" style="color:#64748b;font-size:1.1rem;"></i>
-                                    <select name="warehouse_id" class="selectpicker" id="warehouse_btn" data-live-search="true"
-                                        data-live-search-style="begins">
-                                        <option value="0">{{ __('db.All Warehouse') }}</option>
-                                        @foreach ($lims_warehouse_list as $warehouse)
-                                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                <select name="warehouse_id" class="selectpicker" id="warehouse_btn" data-live-search="true"
+                                    data-live-search-style="begins">
+                                    <option value="0"> {{ __('db.All Warehouse') }}
+                                    </option>
+                                    @foreach ($lims_warehouse_list as $warehouse)
+                                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                    @endforeach
+                                </select>
                                 @endif
-                                <div class="dropdown">
-                                    <button type="button" class="btn btn-light border dropdown-toggle px-3 py-2" data-toggle="dropdown" style="border-radius:10px;">
-                                        <i class="dripicons-calendar"></i> {{ __('db.Date Range') }}
-                                    </button>
-                                    <div class="dropdown-menu dropdown-menu-right shadow-sm">
-                                        <button type="button" class="btn btn-default date-btn w-100 text-left border-0" style="border-radius:0;"
-                                            data-start_date="{{ date('Y-m-d') }}"
-                                            data-end_date="{{ date('Y-m-d') }}">{{ __('db.Today') }}</button>
-                                        <button type="button" class="btn btn-default date-btn w-100 text-left border-0" style="border-radius:0;"
-                                            data-start_date="{{ date('Y-m-d', strtotime(' -7 day')) }}"
-                                            data-end_date="{{ date('Y-m-d') }}">{{ __('db.Last 7 Days') }}</button>
-                                        <button type="button" class="btn btn-default date-btn w-100 active text-left border-0" style="border-radius:0;"
-                                            data-start_date="{{ date('Y') . '-' . date('m') . '-' . '01' }}"
-                                            data-end_date="{{ date('Y-m-d') }}">{{ __('db.This Month') }}</button>
-                                        <button type="button" class="btn btn-default date-btn w-100 text-left border-0" style="border-radius:0;"
-                                            data-start_date="{{ date('Y') . '-01' . '-01' }}"
-                                            data-end_date="{{ date('Y') . '-12' . '-31' }}">{{ __('db.This Year') }}</button>
-                                    </div>
-                                </div>
                             </div>
-                        @endif
+                        </div>
+
+                        <div class="dropdown d-inline">
+                            <button type="button" class="btn btn-defualt dropdown-toggle" data-toggle="dropdown">
+                                <i class="dripicons-calendar"></i> {{ __('db.Date Range') }}
+                            </button>
+                            <div class="dropdown-menu">
+                                <button class="btn btn-default date-btn w-100" style="border:none"
+                                    data-start_date="{{ date('Y-m-d') }}"
+                                    data-end_date="{{ date('Y-m-d') }}">{{ __('db.Today') }}</button>
+                                <button class="btn btn-default date-btn w-100" style="border:none"
+                                    data-start_date="{{ date('Y-m-d', strtotime(' -7 day')) }}"
+                                    data-end_date="{{ date('Y-m-d') }}">{{ __('db.Last 7 Days') }}</button>
+                                <button class="btn btn-default date-btn w-100 active" style="border:none"
+                                    data-start_date="{{ date('Y') . '-' . date('m') . '-' . '01' }}"
+                                    data-end_date="{{ date('Y-m-d') }}">{{ __('db.This Month') }}</button>
+                                <button class="btn btn-default date-btn w-100" style="border:none"
+                                    data-start_date="{{ date('Y') . '-01' . '-01' }}"
+                                    data-end_date="{{ date('Y') . '-12' . '-31' }}">{{ __('db.This Year') }}</button>
+                            </div>
+                        </div>
                     </div>
+                @endif
             </div>
         </div>
     </div>
     <!-- Counts Section -->
-    <section class="dashboard-counts pt-2">
+    <section class="dashboard-counts pt-0">
         <div class="container-fluid">
             <div class="row">
                 @if ($revenue_profit_summary)
-                    <div class="col-md-12 form-group mb-0">
-                        <div class="row dash-metric-row">
-                            <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
-                                <div class="dash-metric-card dash-metric-card--revenue" role="group"
-                                    aria-label="{{ __('db.revenue') }}">
-                                    <div class="dash-metric-card__icon" aria-hidden="true">
-                                        <span class="dash-metric-card__emoji">💰</span>
-                                        <i class="dripicons-graph-bar"></i>
+                    <div class="col-md-12 form-group">
+                        <div class="row">
+                            <!-- Count item widget-->
+                            <!-- <div class="col-sm-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon">
+                                         <i class="dripicons-cart" style="color: #863636"></i>
                                     </div>
-                                    <div class="dash-metric-card__body">
-                                        <div class="dash-metric-card__value revenue-data">
-                                            {{ number_format((float) $revenue, $general_setting->decimal, '.', '') }}
+                                    <div>
+                                        <div class="count-number total_sale-data">
+                                            {{ number_format((float) $total_sale, $general_setting->decimal, '.', '') }}</div>
+                                        <div class="name">
+                                            <strong style="color: #863636">{{ __('db.Total Sale') }}
+                                                <x-info title="Grand Total - Shipping Cost = Total Sale" type="info" />
+                                            </strong>
                                         </div>
-                                        <div class="dash-metric-card__label">
-                                            <strong>{{ __('db.revenue') }}</strong>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <!-- Count item widget-->
+                            <div class="col-sm-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon"><i class="dripicons-graph-bar" style="color: #733686"></i></div>
+                                    <div>
+                                        <div class="count-number revenue-data">
+                                            {{ number_format((float) $revenue, $general_setting->decimal, '.', '') }}</div>
+                                        <div class="name"><strong style="color: #733686">{{ __('db.revenue') }}
                                             <x-info title="(grand_total - shipping_cost) - Return +income  =  Revenue" type="info" />
-                                        </div>
+                                            </strong></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
-                                <div class="dash-metric-card dash-metric-card--sale-return" role="group"
-                                    aria-label="{{ __('db.Sale Return') }}">
-                                    <div class="dash-metric-card__icon" aria-hidden="true">
-                                        <span class="dash-metric-card__emoji">↩️</span>
-                                        <i class="dripicons-return"></i>
+
+                            <!-- Count item widget invoice due-->
+                            <!-- <div class="col-sm-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon">
+                                        <i class="dripicons-document" style="color: #0584a0"></i>
                                     </div>
-                                    <div class="dash-metric-card__body">
-                                        <div class="dash-metric-card__value return-data">
-                                            {{ number_format((float) $return, $general_setting->decimal, '.', '') }}
-                                        </div>
-                                        <div class="dash-metric-card__label">
-                                            <strong>{{ __('db.Sale Return') }}</strong>
-                                            <x-info title="Total Sale Return Amount" type="info" />
-                                        </div>
+                                    <div>
+                                        <div class="count-number invoice-due-data">
+                                            {{ number_format((float) $invoice_due, $general_setting->decimal, '.', '') }}</div>
+                                        <div class="name"><strong style="color: #0584a0">{{ __('db.Invoice Due') }}
+                                                <x-info title="Graned Total - Paid Amount = Invoice Due" type="info" />
+                                            </strong></div>
+                                    </div>
+                                </div>
+                            </div> -->
+                            <!-- Count item widget-->
+                            <div class="col-sm-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon"><i class="dripicons-return" style="color: #ff8952"></i></div>
+                                    <div>
+                                        <div class="count-number return-data">
+                                            {{ number_format((float) $return, $general_setting->decimal, '.', '') }}</div>
+                                        <div class="name"><strong style="color: #ff8952">{{ __('db.Sale Return') }}
+                                                <x-info title="Total Sale Return Amount" type="info" /></strong></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6 col-xl-3 mb-3 mb-xl-0">
-                                <div class="dash-metric-card dash-metric-card--purchase-return" role="group"
-                                    aria-label="{{ __('db.Purchase Return') }}">
-                                    <div class="dash-metric-card__icon" aria-hidden="true">
-                                        <span class="dash-metric-card__emoji">📦</span>
-                                        <i class="dripicons-box"></i>
+
+                            <!-- Count item widget-->
+                            <!-- <div class="col-sm-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon"><i class="dripicons-download" aria-hidden="true" style="color:#c60031; "></i></div>
+                                    <div>
+                                        <div class="count-number total_purchase-data">
+                                            {{ number_format((float) $purchase - $purchase_return, $general_setting->decimal, '.', '') }}
+                                        </div>
+                                        <div class="name"><strong
+                                                style="color: #c60031">{{ __('db.Total Purchase') }}</strong></div>
                                     </div>
-                                    <div class="dash-metric-card__body">
-                                        <div class="dash-metric-card__value purchase_return-data">
+                                </div>
+                            </div> -->
+
+
+                            <!-- Count item widget-->
+                            <!-- <div class="col-sm-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon"><i class="dripicons-warning" style="color: #bdbb39"></i></div>
+                                    <div>
+                                        <div class="count-number purchase_due-data">
+                                            {{ number_format((float) $purchase_due, $general_setting->decimal, '.', '') }}
+                                        </div>
+                                        <div class="name"><strong
+                                                style="color: #bdbb39">{{ __('db.Purchase Due') }}</strong></div>
+                                    </div>
+                                </div>
+                            </div> -->
+
+                            <!-- Count item widget-->
+                            <div class="col-sm-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon"><i class="dripicons-return" style="color: #00c689"></i></div>
+                                    <div>
+                                        <div class="count-number purchase_return-data">
                                             {{ number_format((float) $purchase_return, $general_setting->decimal, '.', '') }}
                                         </div>
-                                        <div class="dash-metric-card__label">
-                                            <strong>{{ __('db.Purchase Return') }}</strong>
-                                        </div>
+                                        <div class="name"><strong
+                                                style="color: #00c689">{{ __('db.Purchase Return') }}</strong></div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-sm-6 col-xl-3 mb-0">
-                                <div class="dash-metric-card dash-metric-card--profit" role="group"
-                                    aria-label="{{ __('db.profit') }}">
-                                    <div class="dash-metric-card__icon" aria-hidden="true">
-                                        <span class="dash-metric-card__emoji">📈</span>
-                                        <i class="dripicons-trophy"></i>
-                                    </div>
-                                    <div class="dash-metric-card__body">
-                                        <div class="dash-metric-card__value profit-data">
-                                            {{ number_format((float) $profit, $general_setting->decimal, '.', '') }}
-                                        </div>
-                                        <div class="dash-metric-card__label">
-                                            <strong>{{ __('db.profit') }}</strong>
-                                            <x-info title="Revenue + Purchase Return - Product Cost - Expense" type="info" />
+                            <!-- Count item widget-->
+                            <div class="col-sm-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon"><i class="dripicons-trophy" style="color: #297ff9"></i></div>
+                                    <div>
+                                        <div class="count-number profit-data">
+                                            {{ number_format((float) $profit, $general_setting->decimal, '.', '') }}</div>
+                                        <div class="name"><strong style="color: #297ff9">{{ __('db.profit') }} <x-info title="Revenue + Purchase Return - Product Cost - Expense" type="info" /></strong>
                                         </div>
                                     </div>
                                 </div>
@@ -241,9 +255,9 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                 @endphp
                 @if ($cash_flow)
                     <div class="col-md-7 mt-4">
-                        <div class="card line-chart-example dash-panel-card border">
-                            <div class="card-header d-flex align-items-center border-bottom bg-white">
-                                <h4 class="mb-0 text-dark font-weight-bold">{{ __('db.Cash Flow') }}</h4>
+                        <div class="card line-chart-example">
+                            <div class="card-header d-flex align-items-center">
+                                <h4>{{ __('db.Cash Flow') }}</h4>
                             </div>
                             <div class="card-body">
                                 <canvas id="cashFlow" data-color = "{{ $color }}"
@@ -262,9 +276,9 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                 @endphp
                 @if ($monthly_summary)
                     <div class="col-md-5 mt-4">
-                        <div class="card dash-panel-card border">
-                            <div class="card-header d-flex justify-content-between align-items-center border-bottom bg-white">
-                                <h4 class="mb-0 text-dark font-weight-bold">{{ date('F') }} {{ date('Y') }}</h4>
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4>{{ date('F') }} {{ date('Y') }}</h4>
                             </div>
                             <div class="pie-chart mb-2">
                                 <canvas id="transactionChart" data-color = "{{ $color }}"
@@ -286,9 +300,9 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                 @endphp
                 @if ($yearly_report)
                     <div class="col-md-12">
-                        <div class="card dash-panel-card border">
-                            <div class="card-header d-flex align-items-center border-bottom bg-white">
-                                <h4 class="mb-0 text-dark font-weight-bold">{{ __('db.yearly report') }}</h4>
+                        <div class="card">
+                            <div class="card-header d-flex align-items-center">
+                                <h4>{{ __('db.yearly report') }}</h4>
                             </div>
                             <div class="card-body">
                                 <canvas id="saleChart" data-sale_chart_value = "{{ json_encode($yearly_sale_amount) }}"
@@ -300,9 +314,9 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                     </div>
                 @endif
                 <div class="col-md-7">
-                    <div class="card dash-panel-card border">
-                        <div class="card-header d-flex justify-content-between align-items-center border-bottom bg-white">
-                            <h4 class="mb-0 text-dark font-weight-bold">{{ __('db.Recent Transaction') }}</h4>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4>{{ __('db.Recent Transaction') }}</h4>
                             <div class="right-column">
                                 <div class="badge badge-primary">{{ __('db.latest') }} 5</div>
                             </div>
@@ -400,9 +414,9 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                     </div>
                 </div>
                 <div class="col-md-5">
-                    <div class="card dash-panel-card border">
-                        <div class="card-header d-flex justify-content-between align-items-center border-bottom bg-white">
-                            <h4 class="mb-0 text-dark font-weight-bold">{{ __('db.Best Seller') . ' ' . date('F') }}</h4>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4>{{ __('db.Best Seller') . ' ' . date('F') }}</h4>
                             <div class="right-column">
                                 <div class="badge badge-primary">{{ __('db.top') }} 5</div>
                             </div>
@@ -423,9 +437,9 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card dash-panel-card border">
-                        <div class="card-header d-flex justify-content-between align-items-center border-bottom bg-white">
-                            <h4 class="mb-0 text-dark font-weight-bold">{{ __('db.Best Seller') . ' ' . date('Y') . '(' . __('db.qty') . ')' }}</h4>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4>{{ __('db.Best Seller') . ' ' . date('Y') . '(' . __('db.qty') . ')' }}</h4>
                             <div class="right-column">
                                 <div class="badge badge-primary">{{ __('db.top') }} 5</div>
                             </div>
@@ -446,9 +460,9 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card dash-panel-card border">
-                        <div class="card-header d-flex justify-content-between align-items-center border-bottom bg-white">
-                            <h4 class="mb-0 text-dark font-weight-bold">{{ __('db.Best Seller') . ' ' . date('Y') . '(' . __('db.Price') . ')' }}</h4>
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4>{{ __('db.Best Seller') . ' ' . date('Y') . '(' . __('db.Price') . ')' }}</h4>
                             <div class="right-column">
                                 <div class="badge badge-primary">{{ __('db.top') }} 5</div>
                             </div>
@@ -708,6 +722,8 @@ body.dark-mode .dash-welcome-sub { color: #94a3b8; }
             var warehouse_id = $(this).val();
             var start_date = $('.date-btn.active').data('start_date');
             var end_date = $('.date-btn.active').data('end_date');
+            //console.log(start_date);
+            //console.log(end_date);
             $.get('dashboard-filter/' + start_date + '/' + end_date + '/' + warehouse_id, function(data) {
                 dashboardFilter(data);
             });

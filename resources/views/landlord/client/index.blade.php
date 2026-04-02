@@ -1,13 +1,7 @@
 @extends('landlord.layout.main') @section('content')
-    @if ($errors->any())
+    @if ($errors->has('name'))
         <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-                aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+                aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}</div>
     @endif
     @if (session()->has('message'))
         <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close"
@@ -24,11 +18,11 @@
         <div class="container-fluid">
             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#createModal"><i
                     class="dripicons-plus"></i> {{ __('db.Add Client') }}</button>
-            <a href="{{ route('superadmin.backupTenantDB', [], false) }}" class="btn btn-dark"><i class="dripicons-cloud-download"></i>
+            <a href="{{ route('superadmin.backupTenantDB') }}" class="btn btn-dark"><i class="dripicons-cloud-download"></i>
                 {{ __('db.Backup Client DB') }}</a>
-            <a href="{{ route('superadmin.updateTenantDB', [], false) }}" class="btn btn-primary"><i class="dripicons-stack"></i>
+            <a href="{{ route('superadmin.updateTenantDB') }}" class="btn btn-primary"><i class="dripicons-stack"></i>
                 {{ __('db.Update Client DB') }}</a>
-            <a href="{{ route('superadmin.updateSuperadminDB', [], false) }}" class="btn btn-info"><i class="dripicons-stack"></i>
+            <a href="{{ route('superadmin.updateSuperadminDB') }}" class="btn btn-info"><i class="dripicons-stack"></i>
                 {{ __('db.Update SuperAdmin DB') }}</a>
         </div>
 
@@ -96,46 +90,56 @@
                             <td>{{ $client->id }}</td>
                             <td>{{ $client->database()->getName() }}</td>
                             <td>
-                                @foreach ($client->domains as $index => $domain)
-                                    @if ($index)
-                                        <br>
-                                    @endif
-                                    <a target="_blank" href="{!! 'https://' . $domain->domain !!}">{{ $domain->domain }}</a>
-                                @endforeach
+                                @php
+                                    $centralDomain = (string) env('CENTRAL_DOMAIN', '');
+                                    $defaultHost = $client->id . '.' . $centralDomain;
+                                    $domain = null;
+                                    foreach ($client->domains as $d) {
+                                        $h = (string) ($d->domain ?? '');
+                                        if ($h !== '' && strcasecmp($h, $defaultHost) !== 0) {
+                                            $domain = $h;
+                                            break;
+                                        }
+                                    }
+                                    if ($domain === null) {
+                                        $domain = optional($client->domains->first())->domain;
+                                    }
+                                    $hasScheme = $domain && preg_match('#^https?://#i', (string) $domain);
+                                    $url = $domain
+                                        ? ($hasScheme ? $domain : 'https://' . ltrim((string) $domain, '/'))
+                                        : 'https://' . $defaultHost;
+                                    $display = $domain ? (string) $domain : $defaultHost;
+                                @endphp
+                                <a href="{{ $url }}" target="_blank" rel="noopener noreferrer"
+                                    class="client-domain-link" style="color:#4f46e5; font-weight:500;">{{ $display }}</a>
                             </td>
                             <td>{{ $package_name }}</td>
-                            @php
-                                $provStatus = strtolower((string) ($client->provisioning_status ?? 'active'));
-                            @endphp
-                            <td>
-                                {{ $client->subscription_type }}
-                                <div class="mt-1">
-                                    @if ($provStatus === 'active')
-                                        <span class="badge badge-success">Active</span>
-                                    @elseif ($provStatus === 'provisioning')
-                                        <span class="badge badge-info">Provisioning</span>
-                                    @elseif ($provStatus === 'failed')
-                                        <span class="badge badge-danger">Failed</span>
-                                    @else
-                                        <span class="badge badge-secondary">Pending</span>
-                                    @endif
-                                </div>
-                            </td>
+                            <td>{{ $client->subscription_type }}</td>
                             <td>{{ $client->company_name }}</td>
                             <td>{{ $client->phone_number }}</td>
                             <td>{{ $client->email }}</td>
                             <td>{{ date($general_setting->date_format, strtotime($client->created_at->toDateString())) }}
                             </td>
-                            @if ($client->expiry_date >= date('Y-m-d'))
+                            @php
+                                $clientExpiry = $client->expiry_date
+                                    ? \Carbon\Carbon::parse($client->expiry_date)->startOfDay()
+                                    : null;
+                                $isExpired = $clientExpiry === null || $clientExpiry->lt(\Carbon\Carbon::today());
+                            @endphp
+                            @if (! $client->expiry_date)
+                                <td data-search="Expired">
+                                    <div class="badge badge-secondary">N/A</div>
+                                </td>
+                            @elseif (! $isExpired)
                                 <td data-search="Not Expired">
                                     <div class="badge badge-success">
-                                        {{ date($general_setting->date_format, strtotime($client->expiry_date)) }}
+                                        {{ $client->expiry_date ? \Carbon\Carbon::parse($client->expiry_date)->format('d-m-Y') : 'N/A' }}
                                     </div>
                                 </td>
                             @else
                                 <td data-search="Expired">
                                     <div class="badge badge-danger">
-                                        {{ date($general_setting->date_format, strtotime($client->expiry_date)) }}
+                                        {{ \Carbon\Carbon::parse($client->expiry_date)->format('d-m-Y') }}
                                     </div>
                                 </td>
                             @endif
@@ -151,28 +155,18 @@
                                     <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default"
                                         user="menu">
                                         <li>
-                                            @if ($provStatus === 'active')
-                                                <button type="button" data-id="{{ $client->id }}"
-                                                    data-subscription_type="{{ $client->subscription_type }}"
-                                                    data-expiry_date="{{ date('d-m-Y', strtotime($client->expiry_date)) }}"
-                                                    class="renew-btn btn btn-link" data-toggle="modal"
-                                                    data-target="#renewModal"><i class="dripicons-clockwise"></i>
-                                                    {{ __('db.Renew Subscription') }}</button>
-                                            @else
-                                                <span class="btn btn-link disabled" aria-disabled="true"><i
-                                                        class="dripicons-clockwise"></i> {{ __('db.Renew Subscription') }}</span>
-                                            @endif
+                                            <button type="button" data-id="{{ $client->id }}"
+                                                data-subscription_type="{{ $client->subscription_type }}"
+                                                data-expiry_date="{{ $client->expiry_date ? \Carbon\Carbon::parse($client->expiry_date)->format('d-m-Y') : '' }}"
+                                                class="renew-btn btn btn-link" data-toggle="modal"
+                                                data-target="#renewModal"><i class="dripicons-clockwise"></i>
+                                                {{ __('db.Renew Subscription') }}</button>
                                         </li>
                                         <li>
-                                            @if ($provStatus === 'active')
-                                                <button type="button" data-id="{{ $client->id }}"
-                                                    data-package_id="{{ $client->package_id }}" class="switch-btn btn btn-link"
-                                                    data-toggle="modal" data-target="#switchModal"><i
-                                                        class="dripicons-swap"></i> {{ __('db.Change Package') }}</button>
-                                            @else
-                                                <span class="btn btn-link disabled" aria-disabled="true"><i
-                                                        class="dripicons-swap"></i> {{ __('db.Change Package') }}</span>
-                                            @endif
+                                            <button type="button" data-id="{{ $client->id }}"
+                                                data-package_id="{{ $client->package_id }}" class="switch-btn btn btn-link"
+                                                data-toggle="modal" data-target="#switchModal"><i
+                                                    class="dripicons-swap"></i> {{ __('db.Change Package') }}</button>
                                         </li>
                                         <li>
                                             <button type="button" data-id="{{ $client->id }}"
@@ -180,7 +174,7 @@
                                                 data-target="#customDomainModal"><i class="dripicons-plus"></i>
                                                 {{ __('db.Add Custom Domain') }}</button>
                                         </li>
-                                        {{ Form::open(['url' => '/superadmin/clients/destroy/'.$client->id, 'method' => 'DELETE']) }}
+                                        {{ Form::open(['route' => ['clients.destroy', $client->id], 'method' => 'DELETE']) }}
                                         <li>
                                             <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i
                                                     class="dripicons-trash"></i> {{ __('db.delete') }}</button>
@@ -197,13 +191,13 @@
     </section>
 
     <!-- Create Modal -->
-    <div id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true"
+    <div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
         class="modal fade text-left">
         <div role="document" class="modal-dialog">
             <div class="modal-content">
-                {!! Form::open(['url' => '/superadmin/clients/store', 'method' => 'post', 'id' => 'client-form']) !!}
+                {!! Form::open(['route' => 'clients.store', 'method' => 'post', 'id' => 'client-form']) !!}
                 <div class="modal-header">
-                    <h5 id="createModalLabel" class="modal-title">{{ __('db.Add Client') }}</h5>
+                    <h5 id="exampleModalLabel" class="modal-title">{{ __('db.Add Client') }}</h5>
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
                             aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                 </div>
@@ -211,6 +205,7 @@
                     <p class="italic">
                         <small>{{ __('db.The field labels marked with * are required input fields') }}.</small>
                     </p>
+                    <form>
                         <div class="row">
                             <div class="col-md-6 form-group">
                                 <label>{{ __('db.Package') }} *</label>
@@ -224,30 +219,31 @@
                                 <label>{{ __('db.Subscription Type') }} *</label>
                                 <div class="form-check">
                                     <input type="radio" name="subscription_type" value="free trial"
-                                        class="form-check-input" id="subscription-type-create-free-trial" checked>
-                                    <label class="form-check-label" for="subscription-type-create-free-trial">
+                                        class="form-check-input" id="subscription-type-1" checked>
+                                    <label class="form-check-label" for="subscription-type-1">
                                         Free Trial
                                     </label>
                                 </div>
                                 <div class="form-check">
                                     <input type="radio" name="subscription_type" value="monthly"
-                                        class="form-check-input" id="subscription-type-create-monthly">
-                                    <label class="form-check-label" for="subscription-type-create-monthly">
+                                        class="form-check-input" id="subscription-type-1">
+                                    <label class="form-check-label" for="subscription-type-1">
                                         Monthly
                                     </label>
                                 </div>
                                 <div class="form-check">
                                     <input type="radio" name="subscription_type" value="yearly"
-                                        class="form-check-input" id="subscription-type-create-yearly">
-                                    <label class="form-check-label" for="subscription-type-create-yearly">
+                                        class="form-check-input" id="subscription-type-2">
+                                    <label class="form-check-label" for="subscription-type-2">
                                         Yearly
                                     </label>
                                 </div>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>{{ __('db.Company Name') }} *</label>
-                                <input id="company-name" class="form-control" type="text" name="company_name" required
+                                <input class="form-control" type="text" name="company_name" required
                                     placeholder="company name...">
+                                <small class="form-text text-muted">Subdomain and tenant database are created automatically from this name (unique slug).</small>
                             </div>
                             <div class="col-md-6 form-group">
                                 <label>{{ __('db.Phone Number') }} *</label>
@@ -269,22 +265,12 @@
                                 <input class="form-control" type="text" name="email" required
                                     placeholder="email...">
                             </div>
-                            <div class="col-md-6 form-group">
-                                <label>Subdomain</label>
-                                <div class="input-group">
-                                    <input id="tenant-field" class="form-control mt-0" type="text" name="tenant"
-                                        placeholder="subdomain..." aria-label="subdomain..."
-                                        aria-describedby="basic-addon2">
-                                    <span class="input-group-text"
-                                        id="basic-addon2">{{ '@' . config('app.central_domain') }}</span>
-                                </div>
-                                <small id="subdomain-hint" class="form-text text-muted"></small>
-                            </div>
                         </div>
                         <div class="form-group">
                             <input type="submit" value="{{ __('db.submit') }}" id="submit-btn"
                                 class="btn btn-primary">
                         </div>
+                    </form>
                 </div>
                 {{ Form::close() }}
             </div>
@@ -292,13 +278,13 @@
     </div>
 
     <!-- custom domain Modal -->
-    <div id="customDomainModal" tabindex="-1" role="dialog" aria-labelledby="customDomainModalLabel" aria-hidden="true"
+    <div id="customDomainModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
         class="modal fade text-left">
         <div role="document" class="modal-dialog">
             <div class="modal-content">
-                {!! Form::open(['url' => '/superadmin/clients/add-custom-domain', 'method' => 'post']) !!}
+                {!! Form::open(['route' => 'clients.addCustomDomain', 'method' => 'post']) !!}
                 <div class="modal-header">
-                    <h5 id="customDomainModalLabel" class="modal-title">{{ __('db.Add Custom Domain') }}</h5>
+                    <h5 id="exampleModalLabel" class="modal-title">{{ __('db.Add Custom Domain') }}</h5>
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
                             aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                 </div>
@@ -306,13 +292,7 @@
                     <p class="italic">
                         <small>{{ __('db.The field labels marked with * are required input fields') }}.</small>
                     </p>
-                    <div class="mb-2">
-                        <small class="text-muted">
-                            A record / DNS point to server required for this domain to work.
-                            <br>
-                            cPanel credentials required for auto-addon-domain creation (if SERVER_TYPE=cpanel).
-                        </small>
-                    </div>
+                    <form>
                         <div class="row">
                             <div class="col-md-6 form-group">
                                 <label>{{ __('db.Custom Domain') }} *</label>
@@ -325,6 +305,7 @@
                         <div class="form-group">
                             <input type="submit" value="{{ __('db.submit') }}" class="btn btn-primary">
                         </div>
+                    </form>
                 </div>
                 {{ Form::close() }}
             </div>
@@ -332,13 +313,13 @@
     </div>
 
     <!-- Renew Modal -->
-    <div id="renewModal" tabindex="-1" role="dialog" aria-labelledby="renewModalLabel" aria-hidden="true"
+    <div id="renewModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
         class="modal fade text-left">
         <div role="document" class="modal-dialog">
             <div class="modal-content">
-                {!! Form::open(['url' => '/superadmin/clients/renew', 'method' => 'post']) !!}
+                {!! Form::open(['route' => 'clients.renew', 'method' => 'post']) !!}
                 <div class="modal-header">
-                    <h5 id="renewModalLabel" class="modal-title">{{ __('db.Renew Subscription') }}</h5>
+                    <h5 id="exampleModalLabel" class="modal-title">{{ __('db.Renew Subscription') }}</h5>
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
                             aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                 </div>
@@ -346,6 +327,7 @@
                     <p class="italic">
                         <small>{{ __('db.The field labels marked with * are required input fields') }}.</small>
                     </p>
+                    <form>
                         <div class="row">
                             <div class="col-md-6 form-group">
                                 <label>{{ __('db.Expiry Date') }} *</label>
@@ -374,6 +356,7 @@
                         <div class="form-group">
                             <input type="submit" value="{{ __('db.submit') }}" class="btn btn-primary">
                         </div>
+                    </form>
                 </div>
                 {{ Form::close() }}
             </div>
@@ -381,13 +364,13 @@
     </div>
 
     <!-- Change Package Modal -->
-    <div id="switchModal" tabindex="-1" role="dialog" aria-labelledby="switchModalLabel" aria-hidden="true"
+    <div id="switchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
         class="modal fade text-left">
         <div role="document" class="modal-dialog">
             <div class="modal-content">
-                {!! Form::open(['url' => '/superadmin/clients/change-package', 'method' => 'post']) !!}
+                {!! Form::open(['route' => 'clients.changePackage', 'method' => 'post']) !!}
                 <div class="modal-header">
-                    <h5 id="switchModalLabel" class="modal-title">{{ __('db.Change Package') }}</h5>
+                    <h5 id="exampleModalLabel" class="modal-title">{{ __('db.Change Package') }}</h5>
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span
                             aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                 </div>
@@ -395,6 +378,7 @@
                     <p class="italic">
                         <small>{{ __('db.The field labels marked with * are required input fields') }}.</small>
                     </p>
+                    <form>
                         <div class="form-group">
                             <label>{{ __('db.Package') }} *</label>
                             <select required class="form-control selectpicker" name="package_id">
@@ -408,6 +392,7 @@
                         <div class="form-group">
                             <input type="submit" value="{{ __('db.submit') }}" class="btn btn-primary">
                         </div>
+                    </form>
                 </div>
                 {{ Form::close() }}
             </div>
@@ -430,6 +415,14 @@
     </div>
 @endsection
 
+@push('custom-css')
+    <style>
+        .client-domain-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+@endpush
+
 @push('scripts')
     <script type="text/javascript">
         $("ul#client").siblings('a').attr('aria-expanded', 'true');
@@ -437,11 +430,7 @@
         $("ul#client #client-list-menu").addClass("active");
 
         var client_id = [];
-        var user_verified = <?php echo json_encode((string) config('app.user_verified')); ?>;
-        var checkSubdomainUrl = '{{ route('clients.checkSubdomain', [], false) }}';
-
-        let tenantTouched = false;
-        let suppressTenantTouched = false;
+        var user_verified = <?php echo json_encode(config('app.demo_unlocked')); ?>;
 
         $.ajaxSetup({
             headers: {
@@ -461,102 +450,13 @@
             return false;
         }
 
-        function sanitizeSubdomainClientSide(value) {
-            value = String(value ?? '').toLowerCase().trim();
-            // Keep only a-z, 0-9 and hyphen.
-            value = value.replace(/[^a-z0-9-]+/g, '');
-            value = value.replace(/-+/g, '-');
-            value = value.replace(/^-+|-+$/g, '');
-            return value;
-        }
-
-        function setTenantFieldValue(nextValue) {
-            suppressTenantTouched = true;
-            $('input[name=tenant]').val(nextValue);
-            suppressTenantTouched = false;
-        }
-
-        var $companyNameInput = $("input[name='company_name']");
-        var $tenantInput = $("input[name='tenant']");
-        var $subdomainHint = $("#subdomain-hint");
-
-        // Manual edits => stop overwriting from Company Name.
-        $tenantInput.on('input', function() {
-            if (suppressTenantTouched) return;
-            tenantTouched = true;
-            $subdomainHint.text('');
-        });
-
-        // Auto-generate while user hasn't edited Subdomain manually.
-        var companyDebounce = null;
-        $companyNameInput.on('input', function() {
-            if (tenantTouched) return;
-            clearTimeout(companyDebounce);
-            companyDebounce = setTimeout(function() {
-                var raw = $companyNameInput.val();
-                if (!raw) return;
-
-                $.get(checkSubdomainUrl, { value: raw })
-                    .done(function(resp) {
-                        if (!resp || !resp.ok) return;
-                        var suggested = resp.suggested_subdomain;
-                        setTenantFieldValue(suggested);
-
-                        if (resp.sanitized_subdomain && suggested !== resp.sanitized_subdomain) {
-                            $subdomainHint.text('Adjusted to "' + suggested + '" because it already exists.');
-                        } else {
-                            $subdomainHint.text('');
-                        }
-                    });
-            }, 400);
-        });
-
-        // On blur, sanitize + enforce uniqueness (but only when user leaves the field).
-        $tenantInput.on('blur', function() {
-            var raw = $tenantInput.val();
-            if (!raw) return;
-            var sanitized = sanitizeSubdomainClientSide(raw);
-            if (!sanitized) return;
-
-            $.get(checkSubdomainUrl, { value: raw })
-                .done(function(resp) {
-                    if (!resp || !resp.ok) return;
-                    if (resp.suggested_subdomain && resp.suggested_subdomain !== $tenantInput.val()) {
-                        setTenantFieldValue(resp.suggested_subdomain);
-                        $subdomainHint.text('Adjusted to "' + resp.suggested_subdomain + '" because it already exists.');
-                    }
-                });
-        });
-
-        // When modal opens (e.g. after validation error with old input), auto-fill if user didn't touch Subdomain.
-        $('#createModal').on('shown.bs.modal', function() {
-            if (tenantTouched) return;
-            if ($tenantInput.val()) return; // keep old/manual subdomain intact
-            var rawCompany = $companyNameInput.val();
-            if (!rawCompany) return;
-
-            $.get(checkSubdomainUrl, { value: rawCompany })
-                .done(function(resp) {
-                    if (!resp || !resp.ok) return;
-                    setTenantFieldValue(resp.suggested_subdomain);
-                });
-        });
-
         $(document).on('click', '.renew-btn', function() {
             $("#renewModal input[name='id']").val($(this).data('id'));
-
-            var subType = $(this).data('subscription_type');
+            if ($(this).data('subscription_type') == 'monthly')
+                $("#subscription-type-1").prop("checked", true);
+            else
+                $("#subscription-type-2").prop("checked", true);
             $("#renewModal input[name='expiry_date']").val($(this).data('expiry_date'));
-
-            // Renew modal only supports monthly/yearly; if current is free trial, default to monthly.
-            $("#renewModal input[name='subscription_type'][value='monthly']").prop(
-                "checked",
-                subType === 'monthly' || subType === 'free trial'
-            );
-            $("#renewModal input[name='subscription_type'][value='yearly']").prop(
-                "checked",
-                subType === 'yearly'
-            );
         });
 
         $(document).on('click', '.switch-btn', function() {
@@ -671,7 +571,7 @@
                                 $('#deleteModal').modal('show');
                                 $.ajax({
                                     type: 'POST',
-                                    url: '{{ route('clients.deleteBySelection', [], false) }}',
+                                    url: 'clients/deletebyselection',
                                     data: {
                                         clientsIdArray: clients_id
                                     },
@@ -679,15 +579,7 @@
                                         $('#deleteModal').modal('hide');
                                         var selectedRows = dt.rows({page: 'current'}).nodes().to$().find('input[type="checkbox"]:checked').closest('tr');
                                         dt.rows(selectedRows).remove().draw(false);
-                                        var msg = (data && data.message) ? data.message : data;
-                                        alert(msg);
-                                    },
-                                    error: function(xhr) {
-                                        $('#deleteModal').modal('hide');
-                                        var msg = (xhr && xhr.responseJSON && xhr.responseJSON.message)
-                                            ? xhr.responseJSON.message
-                                            : 'Delete failed. Please try again.';
-                                        alert(msg);
+                                        alert(data);
                                     }
                                 });
                             }

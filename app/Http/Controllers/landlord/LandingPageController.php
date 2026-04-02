@@ -20,7 +20,8 @@ use Session;
 use Mail;
 use ZipArchive;
 use Illuminate\Support\Facades\App;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class LandingPageController extends Controller
 {
@@ -91,18 +92,39 @@ class LandingPageController extends Controller
 
     public function index()
     {
-        // Central SaaS routes must hit the landlord DB (Hostinger .env sometimes leaves DB_CONNECTION=mysql).
-        if (! empty(config('app.landlord_db'))) {
-            DB::setDefaultConnection('saleprosaas_landlord');
+        $landlordConn = (string) config('tenancy.database.central_connection', config('database.default'));
+        $currentLocale = App::getLocale();
+        $present_lang = null;
+
+        try {
+            if (Schema::connection($landlordConn)->hasTable('languages')) {
+                $present_lang = DB::connection($landlordConn)->table('languages')->where('code', $currentLocale)->first()
+                    ?? DB::connection($landlordConn)->table('languages')->where('is_default', true)->first()
+                    ?? DB::connection($landlordConn)->table('languages')->orderBy('id')->first();
+            }
+        } catch (\Throwable $e) {
+            Log::warning('LandingPageController languages: '.$e->getMessage());
         }
 
-        $currentLocale = App::getLocale();
-        $present_lang = DB::table('languages')->where('code', $currentLocale)->first();
-        $lang_id = $present_lang->id ?? 1;
+        if (! $present_lang) {
+            $present_lang = (object) [
+                'id' => 1,
+                'code' => 'en',
+                'name' => 'English',
+                'is_default' => true,
+            ];
+        }
+
+        App::setLocale($present_lang->code ?? 'en');
+        $lang_id = (int) ($present_lang->id ?? 1);
 
         $general_setting =  Cache::remember('general_setting', 60*60*24*365, function () {
             return DB::table('general_settings')->latest()->first();
         });
+
+        if (! $general_setting) {
+            abort(503, 'Landlord database is not initialized. Run: php artisan migrate:fresh --path=database/migrations/landlord --force && php artisan db:seed --force');
+        }
 
         $packages =  Cache::remember('packages', 60*60*24*365, function () {
             return DB::table('packages')->where('is_active', true)->get();
@@ -167,88 +189,14 @@ class LandingPageController extends Controller
 
         $all_features = $this->features();
 
-        if (! $general_setting) {
-            abort(503, 'Landlord database has no general_settings row. Re-run the installer or restore the landlord database.');
-        }
+        $frontend_layout = $general_setting->frontend_layout ?? 'regular';
 
-        $this->applyNexaProBrandingToLandingCms(
-            $hero,
-            $module_description,
-            $faq_description,
-            $tenant_signup_description,
-            $packages,
-            $modules,
-            $features,
-            $faqs,
-            $testimonials,
-            $blogs,
-            $pages,
-            $coupon_list
-        );
+        if ($frontend_layout == 'regular') {
+            return view('landlord.index', compact('general_setting', 'hero', 'all_features', 'packages', 'faq_description', 'faqs', 'modules', 'module_description', 'features', 'testimonials', 'socials','blogs', 'pages', 'tenant_signup_description', 'present_lang', 'coupon_list'));
 
-        $layout = $general_setting->frontend_layout ?? 'regular';
-
-        if ($layout === 'custom') {
-            return view('landlord.custom_index', compact('general_setting', 'hero', 'all_features', 'packages', 'modules', 'module_description', 'testimonials', 'tenant_signup_description'));
         }
-
-        return view('landlord.index', compact('general_setting', 'hero', 'all_features', 'packages', 'faq_description', 'faqs', 'modules', 'module_description', 'features', 'testimonials', 'socials', 'blogs', 'pages', 'tenant_signup_description', 'present_lang', 'coupon_list'));
-    }
-
-    /**
-     * Replace legacy "SalePro" text from CMS DB rows with "NexaPro" on output (no DB migration).
-     */
-    private function applyNexaProBrandingToLandingCms(
-        $hero,
-        $module_description,
-        $faq_description,
-        $tenant_signup_description,
-        $packages,
-        $modules,
-        $features,
-        $faqs,
-        $testimonials,
-        $blogs,
-        $pages,
-        $coupon_list
-    ): void {
-        foreach ([$hero, $module_description, $faq_description, $tenant_signup_description] as $row) {
-            $this->replaceSaleProWithNexaProInObject($row);
-        }
-        foreach ([$packages, $modules, $features, $faqs, $testimonials, $blogs, $pages] as $collection) {
-            if (! $collection) {
-                continue;
-            }
-            foreach ($collection as $row) {
-                $this->replaceSaleProWithNexaProInObject($row);
-            }
-        }
-        if ($coupon_list) {
-            foreach ($coupon_list as $row) {
-                $this->replaceSaleProWithNexaProInObject($row);
-            }
-        }
-    }
-
-    private function replaceSaleProWithNexaProInObject($row): void
-    {
-        if (! $row || ! is_object($row)) {
-            return;
-        }
-        if ($row instanceof Model) {
-            foreach ($row->getAttributes() as $key => $val) {
-                if (is_string($val) && $val !== '' && stripos($val, 'SalePro') !== false) {
-                    $row->setAttribute($key, str_ireplace('SalePro', 'NexaPro', $val));
-                }
-            }
-
-            return;
-        }
-        foreach (array_keys(get_object_vars($row)) as $key) {
-            $val = $row->{$key};
-            if (is_string($val) && $val !== '' && stripos($val, 'SalePro') !== false) {
-                $row->{$key} = str_ireplace('SalePro', 'NexaPro', $val);
-            }
+        elseif ($frontend_layout == 'custom') {
+            return view('landlord.custom_index', compact('general_setting','hero', 'all_features', 'packages', 'modules', 'module_description', 'testimonials', 'tenant_signup_description'));
         }
     }
 
@@ -300,7 +248,7 @@ class LandingPageController extends Controller
 
     public function updateTenantDB()
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $tenant_all = Tenant::all();
         if(count($tenant_all)) {
@@ -314,7 +262,7 @@ class LandingPageController extends Controller
 
     public function updateSuperadminDB()
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         \Artisan::call('migrate --path=/database/migrations/landlord');
         \Artisan::call('db:seed');
@@ -323,7 +271,7 @@ class LandingPageController extends Controller
 
     public function backupTenantDB()
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $tenants = Tenant::select('id')->get();
         if (count($tenants)) {
@@ -426,7 +374,7 @@ class LandingPageController extends Controller
 
     public function renewSubscription(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         //return $request;
         $tenant = Tenant::find($request->id);
@@ -467,14 +415,16 @@ class LandingPageController extends Controller
                 }
             }
 
-            if($request->subscription_type == 'monthly') {
-                //$request->price = $packageData->monthly_fee;
+            if ($request->subscription_type == 'monthly') {
+                $request->numberOfDaysToExpired = 30;
+            } elseif ($request->subscription_type == 'yearly') {
+                $request->numberOfDaysToExpired = 365;
+            } else {
                 $request->numberOfDaysToExpired = 30;
             }
-            elseif($request->subscription_type == 'yearly') {
-                //$request->price = $packageData->yearly_fee;
-                $request->numberOfDaysToExpired = 365;
-            }
+
+            $days = (int) ($request->numberOfDaysToExpired ?? 0);
+            $days = $days > 0 ? $days : 30;
 
             $request->modules = $modules;
             $request->permission_ids = json_encode($permission_ids);
@@ -486,7 +436,7 @@ class LandingPageController extends Controller
             $terms_and_condition_page = Page::select('slug')->where('title', 'LIKE', "%{$search}%")->first();
 
             if ($packageData->monthly_fee == 0 || $packageData->yearly_fee == 0) {
-                $expiry_date = date('Y-m-d', strtotime('+'.$request->numberOfDaysToExpired.' days'));
+                $expiry_date = now()->addDays($days)->format('Y-m-d');
                 $tenant->update(['expiry_date' => $expiry_date, 'package_id' => $request->package_id, 'subscription_type' => $request->subscription_type]);
                 $this->changePermission(
                     $tenant,
@@ -497,7 +447,7 @@ class LandingPageController extends Controller
                     $expiry_date,
                     $request->subscription_type
                 );
-                return \Redirect::to('https://' . $request->id . '.' . config('app.central_domain'));
+                return \Redirect::to('https://' . $request->id . '.' . env('CENTRAL_DOMAIN'));
             }
             else {
                 return view('payment.tenant_checkout', compact('request', 'payment_gateways', 'terms_and_condition_page'));

@@ -331,12 +331,6 @@
                     <?php echo '<img style="max-width:100%" src="data:image/png;base64,' . DNS1D::getBarcodePNG($lims_sale_data->reference_no, 'C128') . '" alt="barcode"   />';?>
                     <br><br>
                     <?php echo '<img style="width:5%" src="data:image/png;base64,' . DNS2D::getBarcodePNG($qrText, 'QRCODE') . '" alt="barcode"   />';?>
-                    @include('backend.setting.invoice_setting.partials.upi_qr_invoice', [
-                        'upiQrMaxWidth' => '128px',
-                        'upiQrModuleW' => 3,
-                        'upiQrModuleH' => 3,
-                        'upiQrType' => 'QRCODE,M',
-                    ])
                 </td>
             </tr>
         </table>

@@ -7,9 +7,10 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use App\Jobs\ConditionalMigrateTenantDatabase;
+use App\Jobs\TenantCreatedJobPipeline;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Events;
-use App\Jobs\PoolAwareCreateDatabase;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
@@ -23,18 +24,11 @@ class TenancyServiceProvider extends ServiceProvider
     {
         return [
             // Tenant events
-            Events\CreatingTenant::class => [
-                \App\Listeners\AllocateTenantDatabaseFromPool::class,
-            ],
+            Events\CreatingTenant::class => [],
             Events\TenantCreated::class => [
-                JobPipeline::make([
-                    PoolAwareCreateDatabase::class,
-                    Jobs\MigrateDatabase::class,
-                    // Jobs\SeedDatabase::class,
-
-                    // Your own jobs to prepare the tenant.
-                    // Provision API keys, create S3 buckets, anything you want!
-
+                TenantCreatedJobPipeline::make([
+                    Jobs\CreateDatabase::class,
+                    ConditionalMigrateTenantDatabase::class,
                 ])->send(function (Events\TenantCreated $event) {
                     return $event->tenant;
                 })->shouldBeQueued(true),
@@ -49,7 +43,7 @@ class TenancyServiceProvider extends ServiceProvider
                     Jobs\DeleteDatabase::class,
                 ])->send(function (Events\TenantDeleted $event) {
                     return $event->tenant;
-                })->shouldBeQueued(true),
+                })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.
             ],
 
             // Domain events
@@ -102,18 +96,13 @@ class TenancyServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        // config:cache makes env() null outside config files — use config('app.landlord_db').
-        if (empty(config('app.landlord_db'))) {
+        if (empty(env('LANDLORD_DB'))) {
             return;
         }
         $this->bootEvents();
         $this->mapRoutes();
 
-        // EMERGENCY (central-domain outage):
-        // Disable global auto-prepending of tenant identification middleware.
-        // This prevents central/root-domain requests from being treated as tenant requests.
-        // Tenant initialization will still run for routes explicitly using tenancy middleware (routes/tenant.php).
-        // $this->makeTenancyMiddlewareHighestPriority();
+        $this->makeTenancyMiddlewareHighestPriority();
     }
 
     protected function bootEvents()
@@ -131,13 +120,10 @@ class TenancyServiceProvider extends ServiceProvider
 
     protected function mapRoutes()
     {
-        // routes/api.php is registered in RouteServiceProvider (per central domain + api middleware).
-        // Do not load it here — duplicate names break `php artisan route:cache`.
         if (file_exists(base_path('routes/tenant.php'))) {
             Route::namespace(static::$controllerNamespace)
                 ->group(base_path('routes/tenant.php'));
         }
-
     }
 
     protected function makeTenancyMiddlewareHighestPriority()

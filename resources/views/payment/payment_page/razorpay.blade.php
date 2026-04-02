@@ -31,7 +31,7 @@
                     @csrf
                     <input type="hidden" name="requestData" value="{{$requestData}}">
                     <input type="hidden" name="totalAmount" value="{{$totalAmount}}">
-                    <input type="hidden" name="central_domain" value="{{config('app.central_domain')}}">
+                    <input type="hidden" name="central_domain" value="{{env('CENTRAL_DOMAIN')}}">
                     <input type="hidden" name="redirectUrl" value="muri">
 
                     <script src="https://checkout.razorpay.com/v1/checkout.js"
@@ -69,7 +69,7 @@
 @push('payment_scripts')
     <script type="text/javascript">
         var requestData = JSON.parse(@json($requestData));
-        var centralDomain = "{{ config('app.central_domain') }}";
+        var centralDomain = "{{ env('CENTRAL_DOMAIN') }}";
         if (requestData.tenant) {
             successUrl = 'https://' + requestData.tenant + '.' + centralDomain;
         }

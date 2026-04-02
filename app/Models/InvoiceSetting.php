@@ -8,9 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class InvoiceSetting extends Model
 {
     use HasFactory;
-
     protected $table = 'invoice_settings';
-
     protected $fillable = [
         'template_name',
         'invoice_name',
@@ -20,7 +18,6 @@ class InvoiceSetting extends Model
         'number_of_digit',
         'numbering_type',
         'start_number',
-        'last_invoice_number',
         'status',
         'header_text',
         'header_title',
@@ -43,20 +40,13 @@ class InvoiceSetting extends Model
         'logo_height',
         'logo_width',
         'primary_color',
+        'primary_color',
         'text_color',
         'secondary_color',
         'size',
         'invoice_date_format',
-        'upi_id',
-        'upi_qr_image',
-        'extra',
         'created_by',
         'updated_by',
-    ];
-
-    protected $casts = [
-        'show_column' => 'array',
-        'extra' => 'array',
     ];
 
     protected static function boot(){

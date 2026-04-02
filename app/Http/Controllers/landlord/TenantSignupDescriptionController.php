@@ -20,7 +20,7 @@ class TenantSignupDescriptionController extends Controller
 
     public function store(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $tenant_signup_description = TenantSignupDescription::where('lang_id', $request->language_id)->first();
         if(!$tenant_signup_description)

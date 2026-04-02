@@ -30,4 +30,3 @@ class DemoAutoUpdateController extends Controller
         ], 200);
     }
 }
-

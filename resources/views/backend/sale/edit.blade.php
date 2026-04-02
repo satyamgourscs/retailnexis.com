@@ -598,8 +598,6 @@
     </div>
 </section>
 
-@include('backend.sale.partials.out_of_stock_modal')
-
 <section id="print-layout">
 </section>
 
@@ -638,7 +636,7 @@
             $noResults.hide();
 
             $.ajax({
-                url: '{{url("/")}}/sales/search/' + warehouse_id + '/' + encodeURIComponent(search),
+                url: '{{url("/")}}/sales/search/' + warehouse_id + '/' + search,
                 type: 'GET',
                 success: function (data) {
                     $results.empty();
@@ -704,6 +702,15 @@
                             clearResults();
                         });
 
+                        // Auto-click if only one result
+                        if (data.length === 1) {
+                            if(click === 0){
+                                $('#product-results-container .product-img').first().trigger('click');
+                            }
+                            clearResults();
+                            click = 1;
+                        }
+
                     } else {
                         clearResults();
                         $noResults.show();
@@ -715,10 +722,13 @@
             });
         }
 
+        var click = 0;
+
         // Trigger on input
         $input.on('input', function () {
             const value = $(this).val().trim();
-            if (value.length >= 1) {
+            if (value.length >= 3) {
+                click = 0;
                 clearTimeout(typingTimer);
                 typingTimer = setTimeout(() => searchProducts(value), doneTypingInterval);
             } else {
@@ -729,7 +739,8 @@
         // Trigger on paste
         $input.on('paste', function (e) {
             const pastedData = (e.originalEvent || e).clipboardData.getData('text');
-            if (pastedData.length >= 1) {
+            if (pastedData.length >= 3) {
+                click = 0;
                 searchProducts(pastedData.trim());
             }
         });
@@ -780,7 +791,7 @@
     $("ul#sale").addClass("show");
     $("ul#sale #sale-create-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         @if(isset($numberOfInvoice))
             numberOfInvoice = <?php echo json_encode($numberOfInvoice)?>;
             $.ajax({
@@ -801,32 +812,6 @@
     var currencyChange = false;
     var without_stock = <?php echo json_encode($general_setting->without_stock) ?>;
     var authUser = <?php echo json_encode($authUser) ?>;
-
-    function showOutOfStockModal(message, onHidden) {
-        var $modal = $('#outOfStockModal');
-        var fallback = ($modal.find('[data-oos-message]').data('default') || 'Out of Stock');
-        var text = (message && String(message).trim() !== '') ? message : fallback;
-        if ($modal.length) {
-            $modal.find('[data-oos-message]').text(text);
-            $modal.off('hidden.bs.modal.oos').on('hidden.bs.modal.oos', function () {
-                $('body').removeClass('modal-open');
-                $('.modal-backdrop').remove();
-                var $t = $('#product-search-input');
-                if ($t.length) {
-                    setTimeout(function () { $t.trigger('focus'); }, 50);
-                }
-                if (typeof onHidden === 'function') {
-                    onHidden();
-                }
-            });
-            $modal.modal({ backdrop: true, keyboard: true, show: true });
-        } else {
-            alert(text);
-            if (typeof onHidden === 'function') {
-                onHidden();
-            }
-        }
-    }
 
     $('#currency').val(currency['id']);
 
@@ -1164,25 +1149,16 @@ function productSearch(data) {
             embedded: data.embedded,
             batch: data.batch,
             price: data.price,
-            customer_id: $('#customer_id').val(),
-            warehouse_id: $('#warehouse_id').val()
+            customer_id: $('#customer_id').val()
         };
         $.ajax({
             type: 'GET',
-            dataType: 'json',
+            async: false,
             url: '{{url("sales/lims_product_search")}}',
             data: {
                 data: product
             },
-            success: function(resp) {
-                if (!Array.isArray(resp)) {
-                    if (resp && resp.error === 'out_of_stock') {
-                        showOutOfStockModal(resp.message);
-                        $('#product-search-input').val('');
-                    }
-                    return;
-                }
-                data = resp;
+            success: function(data) {
                 if(data[23]) {
                     data[15] = 1;
                     pre_qty = 0;
@@ -1218,14 +1194,6 @@ function productSearch(data) {
                     else
                         imeiNumbers = data[18];
                     $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.imei-number').val(imeiNumbers);
-                }
-            },
-            error: function(xhr) {
-                var j = xhr.responseJSON;
-                if (xhr.status === 422 && j && j.error === 'out_of_stock') {
-                    showOutOfStockModal(j.message);
-                    $('#product-search-input').val('');
-                    return;
                 }
             }
         });
@@ -1619,68 +1587,36 @@ function checkDiscount(qty, flag, price = 0) {
 }
 
 function checkQuantity(sale_qty, flag) {
-    var $row = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')');
-    var maxAttr = $row.find('.qty').attr('max');
-    var maxStock = parseFloat(maxAttr);
-    if (maxAttr === undefined || maxAttr === '' || isNaN(maxStock)) {
-        maxStock = Infinity;
-    }
-    var product_type = ($row.find('.product_type').val() || '').trim();
+    var row_product_code = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product-code').val();
+    var qty = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').attr('max');
+    var product_type = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product_type').val();
     if(without_stock == 'no') {
-        if(product_type == 'standard' || product_type == 'combo') {
-            var operator = (unit_operator[rowindex] || '*').split(',');
-            var operation_value = (unit_operation_value[rowindex] || '1').split(',');
-            var saleQtyNum = parseFloat(sale_qty);
-            if (isNaN(saleQtyNum)) {
-                saleQtyNum = 0;
-            }
-            var total_qty;
+        if(product_type.trim() == 'standard' || product_type.trim() == 'combo') {
+            var operator = unit_operator[rowindex].split(',');
+            var operation_value = unit_operation_value[rowindex].split(',');
             if(operator[0] == '*')
-                total_qty = saleQtyNum * parseFloat(operation_value[0] || 1);
+                total_qty = sale_qty * operation_value[0];
             else if(operator[0] == '/')
-                total_qty = saleQtyNum / parseFloat(operation_value[0] || 1);
-            else
-                total_qty = saleQtyNum;
-
-            if (maxStock !== Infinity && maxStock <= 0 && total_qty > 0) {
-                showOutOfStockModal(null, function () {
-                    if (!flag) {
-                        edit();
-                    }
-                });
+                total_qty = sale_qty / operation_value[0];
+            if (total_qty > parseFloat(qty)) {
+                alert('Quantity exceeds stock quantity!');
                 if (flag) {
-                    $row.find('.ibtnDel').trigger('click');
-                } else {
-                    $row.find('.qty').val(0);
+                    sale_qty = (sale_qty - 1);
+                    checkQuantity(sale_qty, true);
                 }
-                return;
-            }
-
-            if (maxStock !== Infinity && total_qty > maxStock) {
-                showOutOfStockModal(null, function () {
-                    if (!flag) {
-                        edit();
-                    }
-                });
-                var maxSaleQty = operator[0] == '*'
-                    ? maxStock / parseFloat(operation_value[0] || 1)
-                    : maxStock * parseFloat(operation_value[0] || 1);
-                if (!isFinite(maxSaleQty) || maxSaleQty < 0) {
-                    maxSaleQty = 0;
+                else {
+                    edit();
+                    return;
                 }
-                sale_qty = maxSaleQty;
-                $row.find('.qty').val(sale_qty);
-                calculateRowProductData(sale_qty);
-                return;
             }
-            $row.find('.qty').val(sale_qty);
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val(sale_qty);
         }
     }
     else
-        $row.find('.qty').val(sale_qty);
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val(sale_qty);
     if(!flag) {
         $('#editModal').modal('hide');
-        $row.find('.qty').val(sale_qty);
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val(sale_qty);
     }
     calculateRowProductData(sale_qty);
 }

@@ -93,7 +93,7 @@
     $("ul#people").addClass("show");
     $("ul#people #user-list-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         if(localStorage.getItem("message")) {
             alert(localStorage.getItem("message"));
             localStorage.removeItem("message");
@@ -112,7 +112,7 @@
     @endif
 
     var user_id = [];
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
     var all_permission = <?php echo json_encode($all_permission) ?>;
 
     $.ajaxSetup({

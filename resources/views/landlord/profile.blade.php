@@ -23,9 +23,7 @@
                     </div>
                     <div class="card-body">
                         <p class="italic"><small>{{__('db.The field labels marked with * are required input fields')}}.</small></p>
-                        <form method="POST" action="{{ route('user.superadminProfileUpdate', ['id' => $lims_user_data->id], false) }}">
-                            @csrf
-                            @method('PUT')
+                        {!! Form::open(['route' => ['user.superadminProfileUpdate', Auth::id()], 'method' => 'put']) !!}
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -59,7 +57,7 @@
                                 </div>
                             </div>
                         </div>
-                        </form>
+                        {!! Form::close() !!}
                     </div>
                 </div>
             </div>
@@ -70,9 +68,7 @@
                         <h4>{{__('db.Change Password')}}</h4>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('user.superadminPassword', ['id' => $lims_user_data->id], false) }}">
-                            @csrf
-                            @method('PUT')
+                        {!! Form::open(['route' => ['user.superadminPassword', Auth::id()], 'method' => 'put']) !!}
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -96,7 +92,7 @@
                                 </div>
                             </div>
                         </div>
-                        </form>
+                        {!! Form::close() !!}
                     </div>
                 </div>
             </div>
@@ -109,7 +105,9 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("#superadmin-profile-menu").addClass("active");
+    $("ul#setting").siblings('a').attr('aria-expanded','true');
+    $("ul#setting").addClass("show");
+    $("ul#setting #user-menu").addClass("active");
 
 
 

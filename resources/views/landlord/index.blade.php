@@ -6,16 +6,16 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="{{$general_setting->developed_by}}" />
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="CmSeExxpkZmScDB9ArBZKMGKAyzPqnxEriplXWrS">
     <link rel="icon" type="image/png" href="{{url('landlord/images/logo', $general_setting->site_logo)}}" />
     <!-- Document Title -->
-    <title>{{$general_setting->meta_title ?? 'Nexa Technologies'}}</title>
+    <title>{{$general_setting->meta_title ?? 'Retail Nexis'}}</title>
     <!-- Links -->
-    <meta name="description" content="{{$general_setting->meta_description ?? 'Nexa Technologies — SaaS POS & inventory management platform'}}" />
+    <meta name="description" content="{{$general_setting->meta_description ?? 'Buy Retail Nexis inventory management & POS SaaS php script'}}" />
     <meta property="og:url" content="{{url()->full()}}" />
-    <meta property="og:title" content="{{$general_setting->og_title ?? 'Nexa Technologies'}}" />
-    <meta property="og:description" content="{{$general_setting->og_description ?? 'Nexa Technologies — SaaS POS & inventory management platform'}}" />
-    <meta property="og:image" content="{{url('/landlord/images/og-image')}}/{{$general_setting->og_image ?? 'saleprosaas.jpg'}}" />
+    <meta property="og:title" content="{{$general_setting->og_title ?? 'Retail Nexis'}}" />
+    <meta property="og:description" content="{{$general_setting->og_description ?? 'Buy Retail Nexis inventory management & POS SaaS php script'}}" />
+    <meta property="og:image" content="{{url('/landlord/images/og-image')}}/{{$general_setting->og_image ?? 'retail-nexis-default-og.jpg'}}" />
 
     <!-- Bootstrap CSS -->
     <link href="{{url('/')}}/landlord/css/bootstrap.min.css" rel="stylesheet">
@@ -31,11 +31,11 @@
 
     <!-- common style CSS -->
     <link id="switch-style" href="{{url('/')}}/landlord/css/common-style-light.css" rel="stylesheet">
-    <!-- Nova (Lindy UI Kit) — design system; no duplicate Bootstrap loaded -->
-    <link href="{{url('/')}}/landlord/nova/css/LineIcons.2.0.css?v=1" rel="stylesheet">
-    <link href="{{url('/')}}/landlord/nova/css/lindy-uikit.css?v=1" rel="stylesheet">
-    <link href="{{url('/')}}/landlord/css/nova-landing-bridge.css?v=1" rel="stylesheet">
-    <link href="{{url('/')}}/landlord/css/landing-saas-premium.css?v=1" rel="stylesheet">
+
+    <!-- google fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 
     @if(isset($general_setting->fb_pixel_script))
     {!!$general_setting->fb_pixel_script!!}
@@ -46,97 +46,95 @@
     </style>
 </head>
 
-<body class="home nova-landing">
+<body class="home">
     @if(session()->has('not_permitted'))
       <div class="alert alert-danger alert-dismissible text-center">{{ session()->get('not_permitted') }}</div>
     @endif
     <!--Header-->
     <!--Header Area starts-->
-    @if(config('app.user_verified')==1)
-    <div style="display:none;position:fixed;right:0;top:200px;z-index:99">
+    @if(!config('app.demo_unlocked'))
+    <div class="notice">
+        <a target="_blank" href="https://tryonedigital.com/software/retail-nexis">Buy Retail Nexis with full source code</a>
+    </div>
+    @endif
+
+    @if(config('app.demo_unlocked')==1)
+    <div style="position:fixed;right:0;top:200px;z-index:99">
         <span id="light-theme" class="btn btn-light d-block"><i class="fa fa-sun-o"></i></span>
         <span id="dark-theme" class="btn btn-dark d-block"><i class="fa fa-moon-o"></i></span>
     </div>
     @endif
 
-    {{-- Single dynamic header + hero --}}
-    <section class="hero-section-wrapper-5">
-        <header id="header-middle" class="header-middle saas-header">
-            <div class="container">
-                <nav class="navbar navbar-expand-lg saas-navbar">
-                        <a class="navbar-brand saas-navbar-brand m-0 p-0" href="{{url('/')}}">
-                            <img class="lazy" src="{{url('landlord/images/logo', $general_setting->site_logo)}}" alt="{{ $general_setting->site_title ?? 'Brand logo' }}">
+    <header id="header-middle" class="header-middle">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-7">
+                    <div class="mobile-menu-icon d-lg-none"><i class="ti-menu"></i></div>
+                    <div class="logo">
+                        <a href="{{url('/')}}">
+                            <img class="lazy" src="{{url('landlord/images/logo', $general_setting->site_logo)}}" alt="Brand logo">
                         </a>
-
-                        <button class="navbar-toggler saas-navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#landingNavbarDesk" aria-controls="landingNavbarDesk" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="saas-navbar-toggler__line"></span>
-                            <span class="saas-navbar-toggler__line"></span>
-                            <span class="saas-navbar-toggler__line"></span>
-                        </button>
-
-                        <div class="collapse navbar-collapse middle-column" id="landingNavbarDesk">
-                            <div id="main-menu" class="main-menu ms-lg-auto">
-                                <ul class="navbar-nav align-items-lg-center">
-                                    <li class="nav-item"><a class="page-scroll nav-link" href="{{url('/')}}#features">{{__('db.Features')}}</a></li>
-                                    <li class="nav-item"><a class="page-scroll nav-link" href="{{url('/')}}#faq">{{__('db.FAQ')}}</a></li>
-                                    <li class="nav-item"><a class="page-scroll nav-link" href="{{url('/')}}#packages">{{__('db.Pricing')}}</a></li>
-                                    <li class="nav-item"><a class="page-scroll nav-link" href="{{url('/blog')}}">{{__('db.Blog')}}</a></li>
-                                    <li class="nav-item"><a class="page-scroll nav-link" href="{{url('/')}}#contact">{{__('db.Contact')}}</a></li>
-                                    <li class="nav-item d-lg-none mt-2">
-                                        <a href="#packages" class="button saas-nav-cta w-100 text-center">{{__('db.Try Now')}}</a>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="d-none d-lg-flex ms-lg-3">
-                                <a href="#packages" class="button saas-nav-cta">{{__('db.Try Now')}}</a>
-                            </div>
-                        </div>
-                </nav>
-            </div>
-        </header>
-
-        {{-- Hero: single 2-col grid; decorative blobs scoped inside .saas-hero-block only --}}
-        <div class="saas-hero-block">
-            <div class="saas-hero-blobs" aria-hidden="true">
-                <span class="saas-hero-blob saas-hero-blob--a"></span>
-                <span class="saas-hero-blob saas-hero-blob--b"></span>
-            </div>
-            <div class="container saas-hero-container">
-                <div class="row align-items-center gy-5">
-                    <div class="col-12 col-lg-6">
-                        <div class="saas-hero-copy">
-                            <h1 class="hero-title">{{$hero->heading}}</h1>
-                            <p class="hero-lead">{{$hero->sub_heading}}</p>
-                            <a href="#packages" class="button button-lg saas-hero-cta">{{$hero->button_text}} <i class="lni lni-chevron-right"></i></a>
-                        </div>
                     </div>
-                    <div class="col-12 col-lg-6">
-                        <div class="saas-hero-visual d-flex justify-content-center justify-content-lg-end align-items-center">
-                            <div class="saas-hero-mockup w-100">
-                                <div class="saas-hero-mockup__inner">
-                                    <img src="{{url('/landlord/images')}}/{{$hero->image}}" alt="{{ $hero->heading }}">
-                                </div>
-                            </div>
-                        </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-flex d-xl-flex middle-column justify-content-center">
+                    <div id="main-menu" class="main-menu">
+                        <ul class="pl-0">
+                            <li><a href="{{url('/')}}#features">{{__('db.Features')}}</a></li>
+
+                            <li><a href="{{url('/')}}#faq">{{__('db.FAQ')}}</a></li>
+
+                            <li><a href="{{url('/')}}#packages">{{__('db.Pricing')}}</a></li>
+
+                            <li><a href="{{url('/blog')}}">{{__('db.Blog')}}</a></li>
+
+                            <li><a href="{{url('/')}}#contact">{{__('db.Contact')}}</a></li>
+                        </ul>
                     </div>
+                </div>
+
+                <div class="col-lg-3 col-5" style="text-align:right">
+                    <ul class="offset-menu-wrapper p-0 d-none d-lg-flex d-xl-flex">
+                        <li>
+                            <a class="button style2" href="#packages">{{__('db.Try Now')}}</a>
+                        </li>
+                    </ul>
+                    <a class="button style2 d-lg-none" href="#packages">{{__('db.Try Now')}}</a>
+                </div>
+            </div>
+        </div>
+        <nav id="mobile-nav">
+            <div class="mobile-menu-close-icon d-lg-none" styel="line-height:50px"><i class="ti-close"></i></div>
+            <div class="container"></div>
+        </nav>
+    </header>
+
+    <section class="hero mt-0">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 offset-md-2 text-center hero-text mb-5">
+                    <h1 class="heading">{{$hero->heading}}</h1>
+                    <h2 class="sub-heading light h5 mb-5">{{$hero->sub_heading}}</h2>
+                    <a href="#packages" class="button lg style2">{{$hero->button_text}}</a>
                 </div>
             </div>
         </div>
     </section>
-    <section class="testimonial-section bg-white pt-100 pb-100">
+    <section class="hero-img">
+        <img src="{{url('/landlord/images')}}/{{$hero->image}}" alt=""/>
+    </section>
+    <section>
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-8">
-                    <div class="section-title text-center mb-60">
-                        <h3 class="mb-15">{{ __('db.Testimonials') }}</h3>
-                    </div>
+            <div class="row">
+                <div class="col-md-6 offset-md-3 text-center mb-5">
+                    <h2 class="heading">{{ __('db.Testimonials') }}</h2>
                 </div>
             </div>
-            <div class="swiper mySwiper nova-swiper-testimonials swiper-container-horizontal swiper-container-autoheight">
-                <div class="swiper-wrapper">
+            <div class="swiper mySwiper swiper-container-horizontal swiper-container-autoheight" style="border-bottom:1px solid #ddd">
+                <div class="swiper-wrapper" style="height: 348px;">
                 @foreach($testimonials as $testimonial)
-                    <div class="swiper-slide h-100">
-                        <div class="review nova-testimonial-card d-flex flex-column h-100 w-100">
+                    <div class="swiper-slide swiper-slide-active" style="width: 563px; margin-right: 50px;">
+                        <div class="review">
                             <div class="rating">
                                 <i class="fa fa-star"></i>
                                 <i class="fa fa-star"></i>
@@ -147,49 +145,39 @@
                             <div class="review-text">
                                 {!!$testimonial->text!!}
                             </div>
-                            <div class="reviewer d-flex align-items-center mt-auto">
-                                <img src="{{asset('/landlord/images/testimonial')}}/{{$testimonial->image}}" alt="{{$testimonial->name}}">
-                                <span>{{$testimonial->name}}@if($testimonial->business_name), {{$testimonial->business_name}}@endif</span>
-                            </div>
+                            <div class="reviewer"><img src="{{asset('/landlord/images/testimonial')}}/{{$testimonial->image}}" alt="{{$testimonial->name}}" /> {{$testimonial->name}}@if($testimonial->business_name), {{$testimonial->business_name}}@endif</div>
                         </div>
                     </div>
                 @endforeach
                 </div>
-                <div class="swiper-nav-next" tabindex="0" role="button" aria-label="Next slide"><i class="ti-arrow-right"></i></div>
-                <div class="swiper-nav-prev" tabindex="0" role="button" aria-label="Previous slide"><i class="ti-arrow-left"></i></div>
+                <div class="swiper-nav-next" tabindex="0" role="button" aria-label="Next slide" aria-disabled="false"><i class="ti-arrow-right"></i></div>
+                <div class="swiper-nav-prev swiper-button-disabled" tabindex="0" role="button" aria-label="Previous slide" aria-disabled="true"><i class="ti-arrow-left"></i></div>
                 <span class="swiper-notification" aria-live="assertive" aria-atomic="true"></span>
             </div>
         </div>
     </section>
 
     @if(count($modules) > 0)
-    <section id="features" class="feature-section feature-style-5">
+    <section id="features" class="">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-8">
-                    <div class="section-title text-center mb-60">
-                        @if($module_description)
-                            <h3 class="mb-15">{{$module_description->heading}}</h3>
-                            <div class="module-desc">{!! $module_description->sub_heading !!}</div>
-                        @else
-                            <h3 class="mb-15">One App, all the features</h3>
-                            <p>Nexa Technologies is packed with all the features you will need to seamlessly run your business</p>
-                        @endif
-                    </div>
+            <div class="row">
+                <div class="col-md-6 offset-md-3 text-center mb-5">
+                    @if($module_description)
+                        <h2 class="heading">{{$module_description->heading}}</h2>
+                        {!! $module_description->sub_heading !!}
+                    @else
+                        <h2 class="heading">One App, all the features</h2>
+                        <p class="lead mb-5">Retail Nexis is packed with all the features you will need to seamlessly run your business</p>
+                    @endif
                 </div>
-            </div>
-            <div class="row g-4">
                 @foreach($modules as $module)
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div id="feature-{{ \Illuminate\Support\Str::slug($module->name) }}-{{ $loop->index }}" class="single-feature saas-feature-card">
-                        <div class="icon">
+                <div class="col-md-4">
+                    <div class="feature">
+                        <div class="icon m-auto mb-3">
                             <i class="{{$module->icon}}"></i>
-                            <svg width="110" height="72" viewBox="0 0 110 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M110 54.7589C110 85.0014 85.3757 66.2583 55 66.2583C24.6243 66.2583 0 85.0014 0 54.7589C0 24.5164 24.6243 0 55 0C85.3757 0 110 24.5164 110 54.7589Z" fill="#EBF4FF"/></svg>
                         </div>
-                        <div class="content">
-                            <h5>{{$module->name}}</h5>
-                            <p>{{$module->description}}</p>
-                        </div>
+                        <h3>{{$module->name}}</h3>
+                        <p>{{$module->description}}</p>
                     </div>
                 </div>
                 @endforeach
@@ -199,15 +187,15 @@
     @endif
 
     @if(count($features) > 0)
-    <section class="nova-mini-features pt-80 pb-80">
+    <section class="grey-bg">
         <div class="container">
             <div class="row">
                 @foreach($features as $feature)
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <div class="nova-mini-card">
-                        <div class="icon"><i class="{{$feature->icon}}"></i></div>
-                        <h6>{{$feature->name}}</h6>
+                <div class="col-md-3 feature2">
+                    <div class="icon">
+                        <i class="{{$feature->icon}}"></i>
                     </div>
+                    <h4 class="h6">{{$feature->name}}</h4>
                 </div>
                 @endforeach
             </div>
@@ -216,497 +204,328 @@
     @endif
 
     @if(count($faqs) > 0)
-    <section id="faq" class="faq-section saas-faq-section pt-100 pb-100 bg-white">
+    <section id="faq" class="accordion pb-0" id="accordionExample">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
-                    <div class="section-title faq-heading-block text-center mb-50">
-                        @if($faq_description)
-                            <h3 class="mb-15">{{$faq_description->heading}}</h3>
-                            <p class="faq-subtitle">{{$faq_description->sub_heading}}</p>
-                        @else
-                            <h3 class="mb-15">Frequently Asked Questions</h3>
-                            <p class="faq-subtitle">Have questions? we have answered common ones below.</p>
-                        @endif
-                    </div>
+            <div class="row">
+                <div class="col-md-6 offset-md-3 text-center mb-5">
+                    @if($faq_description)
+                        <h2 class="heading">{{$faq_description->heading}}</h2>
+                        <p class="lead">{{$faq_description->sub_heading}}</p>
+                    @else
+                        <h2 class="heading">Frequently Asked Questions</h2>
+                        <p class="lead">Have questions? we have answered common ones below.</p>
+                    @endif
                 </div>
-            </div>
-            @php
-                $faqItems = $faqs->take(6)->values();
-                $faqLeft = $faqItems->take(3)->values();
-                $faqRight = $faqItems->slice(3, 3)->values();
-            @endphp
-            <div class="row g-4 justify-content-center">
-                <div class="col-xl-5 col-lg-6 col-md-10">
-                    <div class="accordion nova-accordion saas-faq-accordion" id="accordionLeft">
-                    @foreach($faqLeft as $index => $faq)
+                <div class="col-md-6 offset-md-3 mb-5">
+                    @foreach($faqs as $key => $faq)
                     <div class="accordion-item">
-                        <h2 class="accordion-header" id="{{'headingLeft'.$index}}">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="{{'#collapseLeft'.$index}}" aria-expanded="false" aria-controls="{{'collapseLeft'.$index}}">
+                        <h2 class="accordion-header" id="{{'heading'.$key}}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="{{'#collapse'.$key}}" aria-expanded="false" aria-controls="{{'collapse'.$key}}">
                             {{$faq->question}}
                         </button>
                         </h2>
-                        <div id="{{'collapseLeft'.$index}}" class="accordion-collapse collapse" aria-labelledby="{{'headingLeft'.$index}}" data-bs-parent="#accordionLeft">
+                        <div id="{{'collapse'.$key}}" class="accordion-collapse collapse" aria-labelledby="{{'heading'.$key}}" data-bs-parent="#accordionExample">
                             <div class="accordion-body">
                                 {!!$faq->answer!!}
                             </div>
                         </div>
                     </div>
                     @endforeach
-                    </div>
-                </div>
-                <div class="col-xl-5 col-lg-6 col-md-10">
-                    <div class="accordion nova-accordion saas-faq-accordion" id="accordionRight">
-                    @foreach($faqRight as $index => $faq)
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="{{'headingRight'.$index}}">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="{{'#collapseRight'.$index}}" aria-expanded="false" aria-controls="{{'collapseRight'.$index}}">
-                            {{$faq->question}}
-                        </button>
-                        </h2>
-                        <div id="{{'collapseRight'.$index}}" class="accordion-collapse collapse" aria-labelledby="{{'headingRight'.$index}}" data-bs-parent="#accordionRight">
-                            <div class="accordion-body">
-                                {!!$faq->answer!!}
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                    </div>
                 </div>
             </div>
         </div>
     </section>
     @endif
 
-    <section id="packages" class="pricing-section pricing-style-4">
+    <section id="packages"class="grey-bg">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xxl-6 col-xl-6 col-lg-8 col-md-10 text-center mb-60">
-                    <div class="section-title">
-                        <h3 class="mb-15">{{__('db.Pricing Plans')}}</h3>
-                    </div>
-                    <ul class="nav nav-tabs pricing-tab" id="pricingTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                          <button class="nav-link active" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly-tab-pane" type="button" role="tab" aria-controls="monthly-tab-pane" aria-selected="true">{{ __('db.Monthly') }}</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                          <button class="nav-link" id="yearly-tab" data-bs-toggle="tab" data-bs-target="#yearly-tab-pane" type="button" role="tab" aria-controls="yearly-tab-pane" aria-selected="false">{{ __('db.Yearly') }} <span class="badge rounded-pill nova-pricing-badge">Save 20%</span></button>
-                        </li>
-                    </ul>
-                    {{-- Empty panes satisfy Bootstrap tab targets (pricing amounts still driven by existing JS) --}}
-                    <div class="tab-content visually-hidden" id="pricingTabPanes" aria-hidden="true">
-                        <div class="tab-pane fade show active" id="monthly-tab-pane" role="tabpanel"></div>
-                        <div class="tab-pane fade" id="yearly-tab-pane" role="tabpanel"></div>
+            <div class="col-md-6 offset-md-3 text-center mb-5">
+                <h2 class="heading">{{__('db.Pricing Plans')}}</h2>
+
+                <ul class="nav nav-tabs pricing-tab" id="pricingTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link active" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly-tab-pane" type="button" role="tab" aria-controls="monthly-tab-pane" aria-selected="true">{{ __('db.Monthly') }}</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="yearly-tab" data-bs-toggle="tab" data-bs-target="#yearly-tab-pane" type="button" role="tab" aria-controls="yearly-tab-pane" aria-selected="false">{{ __('db.Yearly') }} <span class="badge">Save 20%</span>
+                      </button>
+                    </li>
+                </ul>
+
+            </div>
+            <div class="d-none d-lg-flex d-xl-flex justify-content-between mb-5">
+                <div class="col" style="min-width: 300px;">
+                    <div class="pricing">
+                        <div class="sticker">
+                            <div class="pricing-header">
+                                <span class="h3">{{__('db.Plan')}}</span>
+                            </div>
+                            <div class="price">
+                                <span class="h4">{{__('db.Price')}}</span>
+                            </div>
+                        </div>
+                        <div class="pricing-details">
+                            <p>{{__('db.Free Trial')}}</p>
+                            @foreach ($all_features as $feature)
+                            <p>{{ $feature['name'] }}</p>
+                            @endforeach
+                            <p>{{__('db.Number of Warehouses')}}</p>
+                            <p>{{__('db.Number of Products')}}</p>
+                            <p>{{__('db.Number of Invoices')}}</p>
+                            <p>{{__('db.Number of User Account')}}</p>
+                            <p>{{__('db.Number of Employees')}}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row g-4 justify-content-center saas-pricing-desktop d-none d-lg-flex">
                 @foreach($packages as $package)
-                @php
+                <?php
                     $package_features = json_decode($package->features);
-                    $saasPopular = $loop->iteration === (int) round(($loop->count + 1) / 2);
-                @endphp
-                <div class="col-xl-4 col-lg-4 d-flex">
-                    <div class="saas-pricing-card w-100 {{ $saasPopular ? 'is-popular' : '' }}">
-                        @if($saasPopular)
-                        <span class="saas-pricing-card__badge">{{ __('db.Most Popular') }}</span>
-                        @endif
-                        <h3 class="saas-pricing-card__title">{{$package->name}}</h3>
-                        <div class="saas-pricing-card__price-block">
-                            <span class="saas-pricing-card__currency">{{$general_setting->currency}}</span>
-                            <span class="package-price saas-pricing-card__amount" data-monthly="{{$package->monthly_fee}}" data-yearly="{{$package->yearly_fee}}">{{$package->monthly_fee}}/month</span>
-                        </div>
-                        <ul class="saas-pricing-card__list">
-                            <li>
-                                <span class="feat-label">{{__('db.Free Trial')}}</span>
-                                <span class="feat-val">@if($package->is_free_trial){{$general_setting->free_trial_limit}} days @else N/A @endif</span>
-                            </li>
-                            @foreach ($all_features as $key => $feature)
-                            <li>
-                                <span class="feat-label">{{ $feature['name'] }}</span>
-                                <span class="feat-icon">
-                                    @if(in_array($key, $package_features))
-                                    <i class="ti-check"></i>
+                ?>
+                <div class="col">
+                    <div class="pricing">
+                        <div class="sticker">
+                            <div class="pricing-header">
+                                <span class="h3">{{$package->name}}</span>
+                            </div>
+                            <div class="price">
+                                <div>
+                                    <span class="h4"><span class="currency-code">{{$general_setting->currency}}</span> <span class="package-price" data-monthly="{{$package->monthly_fee}}" data-yearly="{{$package->yearly_fee}}">{{$package->monthly_fee}}/month</span></span><br>
+                                    @if($general_setting->disable_frontend_signup)
+                                    <a class="button style2 mt-2" href="{{url('/')}}#contact">{{__('db.Contact')}}</a>
                                     @else
-                                    <i class="ti-close"></i>
+                                    <button  data-bs-toggle="modal" data-bs-target="#signupModal" data-free="{{$package->is_free_trial}}" data-package_id="{{$package->id}}" class="button style2 signup-btn mt-2">Sign Up</button>
                                     @endif
-                                </span>
-                            </li>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pricing-details">
+                            @if($package->is_free_trial)
+                                <p>{{$general_setting->free_trial_limit}} days</p>
+                            @else
+                                <p>N/A</p>
+                            @endif
+
+                            @foreach ($all_features as $key => $feature)
+                                @if(in_array($key, $package_features))
+                                    <p><i class="ti-check"></i></p>
+                                @else
+                                    <p><i class="ti-close"></i></p>
+                                @endif
                             @endforeach
-                            <li>
-                                <span class="feat-label">{{__('db.Number of Warehouses')}}</span>
-                                <span class="feat-val">@if($package->number_of_warehouse){{$package->number_of_warehouse}}@else{{__('db.Unlimited')}}@endif</span>
-                            </li>
-                            <li>
-                                <span class="feat-label">{{__('db.Number of Products')}}</span>
-                                <span class="feat-val">@if($package->number_of_product){{$package->number_of_product}}@else{{__('db.Unlimited')}}@endif</span>
-                            </li>
-                            <li>
-                                <span class="feat-label">{{__('db.Number of Invoices')}}</span>
-                                <span class="feat-val">@if($package->number_of_invoice){{$package->number_of_invoice}}@else{{__('db.Unlimited')}}@endif</span>
-                            </li>
-                            <li>
-                                <span class="feat-label">{{__('db.Number of User Account')}}</span>
-                                <span class="feat-val">@if($package->number_of_user_account){{$package->number_of_user_account}}@else{{__('db.Unlimited')}}@endif</span>
-                            </li>
-                            <li>
-                                <span class="feat-label">{{__('db.Number of Employees')}}</span>
-                                <span class="feat-val">@if($package->number_of_employee){{$package->number_of_employee}}@else{{__('db.Unlimited')}}@endif</span>
-                            </li>
-                        </ul>
-                        @if($general_setting->disable_frontend_signup)
-                        <a class="button saas-pricing-card__btn saas-pricing-card__btn--outline" href="{{url('/')}}#contact">{{__('db.Contact')}}</a>
-                        @else
-                        <button type="button" data-bs-toggle="modal" data-bs-target="#signupModal" data-free="{{$package->is_free_trial}}" data-package_id="{{$package->id}}" class="button signup-btn saas-pricing-card__btn">Sign Up</button>
-                        @endif
+
+                            @if($package->number_of_warehouse)
+                                <p>{{$package->number_of_warehouse}}</p>
+                            @else
+                                <p>{{__('db.Unlimited')}}</p>
+                            @endif
+
+                            @if($package->number_of_product)
+                                <p>{{$package->number_of_product}}</p>
+                            @else
+                                <p>{{__('db.Unlimited')}}</p>
+                            @endif
+
+                            @if($package->number_of_invoice)
+                                <p>{{$package->number_of_invoice}}</p>
+                            @else
+                                <p>{{__('db.Unlimited')}}</p>
+                            @endif
+
+                            @if($package->number_of_user_account)
+                                <p>{{$package->number_of_user_account}}</p>
+                            @else
+                                <p>{{__('db.Unlimited')}}</p>
+                            @endif
+
+                            @if($package->number_of_employee)
+                                <p>{{$package->number_of_employee}}</p>
+                            @else
+                                <p>{{__('db.Unlimited')}}</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 @endforeach
             </div>
 
-            <div class="d-lg-none">
             @foreach($packages as $package)
-            @php
+            <?php
                 $package_features = json_decode($package->features);
-                $saasPopularM = $loop->iteration === (int) round(($loop->count + 1) / 2);
-            @endphp
-            <div class="saas-pricing-card saas-pricing-card--mobile {{ $saasPopularM ? 'is-popular' : '' }}">
-                @if($saasPopularM)
-                <span class="saas-pricing-card__badge">{{ __('db.Most Popular') }}</span>
-                @endif
-                <h3 class="saas-pricing-card__title">{{$package->name}}</h3>
-                <div class="saas-pricing-card__price-block">
-                    <span class="saas-pricing-card__currency">{{$general_setting->currency}}</span>
-                    <span class="package-price saas-pricing-card__amount" data-monthly="{{$package->monthly_fee}}" data-yearly="{{$package->yearly_fee}}">{{$package->monthly_fee}}/month</span>
+            ?>
+            <div class="pricing-m d-block d-lg-none d-xl-none mb-5">
+                <div class="d-flex justify-content-between">
+                    <div class="pricing-header">
+                        <span class="h3">{{$package->name}}</span>
+                    </div>
+                    <div class="price">
+                        <span class="h4"><span class="currency-code">{{$general_setting->currency}}</span> <span class="package-price" data-monthly="{{$package->monthly_fee}}" data-yearly="{{$package->yearly_fee}}">{{$package->monthly_fee}}/month</span></span>
+                    </div>
                 </div>
-                <ul class="saas-pricing-card__list">
-                    <li>
-                        <span class="feat-label">{{__('db.Free Trial')}}</span>
-                        <span class="feat-val">@if($package->is_free_trial){{$general_setting->free_trial_limit}} days @else N/A @endif</span>
-                    </li>
-                    @foreach ($all_features as $key => $feature)
-                    <li>
-                        <span class="feat-label">{{ $feature['name'] }}</span>
-                        <span class="feat-icon">
+                <div class="price">
+                    @if($general_setting->disable_frontend_signup)
+                    <a class="button style2 mt-2" href="{{url('/')}}#contact">{{__('db.Contact')}}</a>
+                    @else
+                    <button  data-bs-toggle="modal" data-bs-target="#signupModal" data-free="{{$package->is_free_trial}}" data-package_id="{{$package->id}}" class="button style2 d-block w-100 signup-btn mt-2">Sign Up</button>
+                    @endif
+                </div>
+                <div class="d-flex justify-content-between">
+                    <div class="pricing-details">
+                        <p>{{__('db.Free Trial')}}</p>
+                        @foreach ($all_features as $feature)
+                        <p>{{ $feature['name'] }}</p>
+                        @endforeach
+                        <p>{{__('db.Number of Warehouses')}}</p>
+                        <p>{{__('db.Number of Products')}}</p>
+                        <p>{{__('db.Number of Invoices')}}</p>
+                        <p>{{__('db.Number of User Account')}}</p>
+                        <p>{{__('db.Number of Employees')}}</p>
+                    </div>
+                    <div class="pricing-details">
+                        @if($package->is_free_trial)
+                            <p>{{$general_setting->free_trial_limit}} days</p>
+                        @else
+                            <p>N/A</p>
+                        @endif
+
+                        @foreach ($all_features as $key => $feature)
                             @if(in_array($key, $package_features))
-                            <i class="ti-check"></i>
+                                <p><i class="ti-check"></i></p>
                             @else
-                            <i class="ti-close"></i>
+                                <p><i class="ti-close"></i></p>
                             @endif
-                        </span>
-                    </li>
-                    @endforeach
-                    <li>
-                        <span class="feat-label">{{__('db.Number of Warehouses')}}</span>
-                        <span class="feat-val">@if($package->number_of_warehouse){{$package->number_of_warehouse}}@else{{__('db.Unlimited')}}@endif</span>
-                    </li>
-                    <li>
-                        <span class="feat-label">{{__('db.Number of Products')}}</span>
-                        <span class="feat-val">@if($package->number_of_product){{$package->number_of_product}}@else{{__('db.Unlimited')}}@endif</span>
-                    </li>
-                    <li>
-                        <span class="feat-label">{{__('db.Number of Invoices')}}</span>
-                        <span class="feat-val">@if($package->number_of_invoice){{$package->number_of_invoice}}@else{{__('db.Unlimited')}}@endif</span>
-                    </li>
-                    <li>
-                        <span class="feat-label">{{__('db.Number of User Account')}}</span>
-                        <span class="feat-val">@if($package->number_of_user_account){{$package->number_of_user_account}}@else{{__('db.Unlimited')}}@endif</span>
-                    </li>
-                    <li>
-                        <span class="feat-label">{{__('db.Number of Employees')}}</span>
-                        <span class="feat-val">@if($package->number_of_employee){{$package->number_of_employee}}@else{{__('db.Unlimited')}}@endif</span>
-                    </li>
-                </ul>
-                @if($general_setting->disable_frontend_signup)
-                <a class="button saas-pricing-card__btn saas-pricing-card__btn--outline" href="{{url('/')}}#contact">{{__('db.Contact')}}</a>
-                @else
-                <button type="button" data-bs-toggle="modal" data-bs-target="#signupModal" data-free="{{$package->is_free_trial}}" data-package_id="{{$package->id}}" class="button signup-btn saas-pricing-card__btn">Sign Up</button>
-                @endif
+                        @endforeach
+
+                        @if($package->number_of_warehouse)
+                            <p>{{$package->number_of_warehouse}}</p>
+                        @else
+                            <p>{{__('db.Unlimited')}}</p>
+                        @endif
+
+                        @if($package->number_of_product)
+                            <p>{{$package->number_of_product}}</p>
+                        @else
+                            <p>{{__('db.Unlimited')}}</p>
+                        @endif
+
+                        @if($package->number_of_invoice)
+                            <p>{{$package->number_of_invoice}}</p>
+                        @else
+                            <p>{{__('db.Unlimited')}}</p>
+                        @endif
+
+                        @if($package->number_of_user_account)
+                            <p>{{$package->number_of_user_account}}</p>
+                        @else
+                            <p>{{__('db.Unlimited')}}</p>
+                        @endif
+
+                        @if($package->number_of_employee)
+                            <p>{{$package->number_of_employee}}</p>
+                        @else
+                            <p>{{__('db.Unlimited')}}</p>
+                        @endif
+                    </div>
+                </div>
             </div>
             @endforeach
-            </div>
         </div>
     </section>
 
     @if(count($blogs) > 0)
-    <section id="blog" class="feature-section feature-style-5 pt-50 pb-100">
+    <section id="blog">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-8">
-                    <div class="section-title text-center mb-60">
-                        <h3 class="mb-15">{{ __('db.Blog') }}</h3>
-                    </div>
-                </div>
-            </div>
             <div class="row">
+                <div class="col-md-6 offset-md-3 text-center mb-5">
+                    <h2 class="heading">{{ __('db.Blog') }}</h2>
+                </div>
                 @foreach($blogs as $blog)
-                <div class="col-lg-4 col-md-6">
-                    <a href="{{url('/blog')}}/{{$blog->slug}}" class="text-decoration-none d-block h-100">
-                        <div class="nova-blog-card">
-                            <img src="{{asset('landlord/images/blog')}}/{{$blog->featured_image}}" alt="{{$blog->title}}">
-                            <h5>{{$blog->title}}</h5>
+                <div class="col-md-4">
+                    <a href="{{url('/blog')}}/{{$blog->slug}}">
+                        <div class="blog-item">
+                            <img src="{{asset('landlord/images/blog')}}/{{$blog->featured_image}}" alt="{{$blog->title}}"/>
+                            <h4 class="mt-3">{{$blog->title}}</h4>
                         </div>
                     </a>
                 </div>
                 @endforeach
-            </div>
-            <div class="row justify-content-center mt-4">
-                <div class="col-auto text-center">
-                    <a href="{{url('blog')}}" class="button border-button radius-30">{{ __('db.All Blogs') }}</a>
+                <div class="col-md-6 offset-md-3 text-center mt-3 mb-5">
+                    <a href="{{url('blog')}}" class="button style1">{{ __('db.All Blogs') }}</a>
                 </div>
             </div>
         </div>
+
     </section>
     @endif
 
-    <section id="contact" class="contact-section contact-style-3 pt-100 pb-100">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
-                    <div class="section-title text-center mb-50">
-                        <h3 class="mb-15">{{ __('db.Contact Us') }}</h3>
-                        @if(!empty($general_setting->meta_description))
-                            <p>{{ $general_setting->meta_description }}</p>
-                        @endif
-                    </div>
-                </div>
-            </div>
+    <section id="contact" class="grey-bg">
+        <div class="container mb-5">
             <div class="row">
-                <div class="col-lg-8">
-                    <div class="contact-form-wrapper">
-                        <form action="{{ route('contactForm', [], false) }}" method="POST" class="form contact-form">
-                            @csrf
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="single-input">
-                                        <input class="form-control" type="text" name="name" placeholder="name..." required>
-                                        <i class="lni lni-user"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="single-input">
-                                        <input class="form-control" type="text" name="phone" placeholder="contact number..." required>
-                                        <i class="lni lni-phone"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="single-input">
-                                        <input class="form-control" type="text" name="email" placeholder="email..." required>
-                                        <i class="lni lni-envelope"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="single-input">
-                                        <textarea class="form-control" name="message" placeholder="your message" rows="6" required></textarea>
-                                        <i class="lni lni-comments-alt"></i>
-                                    </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <p id="contact-waiting-msg" class="mb-2"></p>
-                                    <div class="form-button">
-                                        <input id="contact-submit-btn" type="submit" class="button" value="{{__('db.submit')}}">
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                <div class="col-md-5">
+                    <h3 class="heading mt-5">{{ __('db.Contact Us') }}</h3>
+                    <p class="lead contact-details"><i class="fa fa-phone"></i> {{$general_setting->phone}}</p>
+                    <p class="lead contact-details"><i class="fa fa-envelope"></i> {{$general_setting->email}}</p>
+                    <hr>
+                    <h3 class="heading">{{ __('db.Connect with Us') }}</h3>
+                    <ul class="footer-social p-0 pt-3 pb-3">
+                        @foreach($socials as $social)
+                        <li>
+                            <a href="{{$social->link}}"><i class="{{$social->icon}}"></i></a>
+                        </li>
+                        @endforeach
+                    </ul>
                 </div>
-                <div class="col-lg-4">
-                    <div class="left-wrapper">
+                <div class="col-md-6 offset-md-1">
+                    <form action="{{route('contactForm')}}" method="POST"  class="form contact-form">
+                        @csrf
                         <div class="row">
-                            <div class="col-lg-12 col-md-6">
-                                <div class="single-item">
-                                    <div class="icon"><i class="lni lni-phone"></i></div>
-                                    <div class="text"><p>{{$general_setting->phone}}</p></div>
-                                </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" name="name"  placeholder="name..." required>
                             </div>
-                            <div class="col-lg-12 col-md-6">
-                                <div class="single-item">
-                                    <div class="icon"><i class="lni lni-envelope"></i></div>
-                                    <div class="text"><p>{{$general_setting->email}}</p></div>
-                                </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" name="phone"  placeholder="contact number..." required>
+                            </div>
+                            <div class="col-md-12">
+                                <input class="form-control" type="text" name="email"  placeholder="email..." required>
+                            </div>
+                            <div class="col-md-12">
+                                <textarea class="form-control" name="message"  placeholder="your message" required></textarea>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <p id="contact-waiting-msg" class="mb-3"></p>
+                                <input id="contact-submit-btn" type="submit" class="button style2 d-block w-100" value="{{__('db.submit')}}">
                             </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
+
         </div>
     </section>
 
-    @php
-        $landingPages = collect($pages ?? []);
-        $policyKeywords = ['term', 'privacy', 'refund', 'cookie', 'gdpr', 'legal', 'disclaimer'];
-        $companyKeywords = ['about', 'support', 'help', 'career', 'team', 'contact'];
-
-        $policyPages = $landingPages->filter(function ($page) use ($policyKeywords) {
-            $slug = strtolower((string) ($page->slug ?? ''));
-            $title = strtolower((string) ($page->title ?? ''));
-            foreach ($policyKeywords as $kw) {
-                if ($kw !== '' && (str_contains($slug, $kw) || str_contains($title, $kw))) {
-                    return true;
-                }
-            }
-            return false;
-        })->values();
-
-        $companyPages = $landingPages->filter(function ($page) use ($policyPages, $companyKeywords) {
-            if ($policyPages->contains('id', $page->id)) {
-                return false;
-            }
-            $slug = strtolower((string) ($page->slug ?? ''));
-            $title = strtolower((string) ($page->title ?? ''));
-            foreach ($companyKeywords as $kw) {
-                if ($kw !== '' && (str_contains($slug, $kw) || str_contains($title, $kw))) {
-                    return true;
-                }
-            }
-            return false;
-        })->values();
-
-        $policyOrder = [
-            'terms-conditions' => 1,
-            'terms_and_conditions' => 1,
-            'terms-and-conditions' => 1,
-            'privacy-policy' => 2,
-            'privacy_policy' => 2,
-            'refund-policy' => 3,
-            'refund_policy' => 3,
-        ];
-        $policyPages = $policyPages->sortBy(function ($page) use ($policyOrder) {
-            $slug = (string) ($page->slug ?? '');
-            return $policyOrder[$slug] ?? 50;
-        })->values();
-
-        $companyPages = $companyPages->sortBy(function ($page) {
-            return strtolower((string) ($page->title ?? ''));
-        })->values();
-
-        $hasSitemapFile = file_exists(public_path('sitemap.xml'));
-        $hasFeaturesSection = isset($modules) && count($modules) > 0;
-
-        $footerFeatureAnchor = function (array $needles) use ($modules, $hasFeaturesSection) {
-            foreach ($modules ?? [] as $index => $module) {
-                $hay = strtolower(($module->name ?? '').' '.($module->description ?? ''));
-                foreach ($needles as $needle) {
-                    $n = strtolower((string) $needle);
-                    if ($n !== '' && str_contains($hay, $n)) {
-                        if ($hasFeaturesSection) {
-                            return url('/').'#feature-'.\Illuminate\Support\Str::slug($module->name).'-'.$index;
-                        }
-                        return url('/');
-                    }
-                }
-            }
-            return $hasFeaturesSection ? url('/').'#features' : url('/');
-        };
-    @endphp
-
-    <!-- Footer (Nova footer-style-4) -->
-    <footer class="footer footer-style-4 footer-dark footer-wrapper saas-premium-footer">
+    <!-- Footer section Starts-->
+    <div class="footer-wrapper">
         <div class="container">
-            <div class="saas-premium-footer__main widget-wrapper pt-5 pb-2">
-                <div class="row g-4 g-lg-5">
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="footer-widget saas-premium-footer__brand">
-                            <div class="logo saas-premium-footer__logo">
-                                <a href="{{url('/')}}"><img src="{{url('landlord/images/logo', $general_setting->site_logo)}}" alt="{{ $general_setting->site_title ?? '' }}"></a>
-                            </div>
-                            @if(!empty($general_setting->meta_description))
-                                <p class="desc saas-premium-footer__desc">{{ $general_setting->meta_description }}</p>
-                            @endif
-                            <ul class="saas-premium-footer__contact list-unstyled small mt-3 mb-0">
-                                @if(!empty($general_setting->phone))
-                                    <li><a href="tel:{{ preg_replace('/\s+/', '', $general_setting->phone) }}"><i class="lni lni-phone"></i> {{ $general_setting->phone }}</a></li>
-                                @endif
-                                @if(!empty($general_setting->email))
-                                    <li><a href="mailto:{{ $general_setting->email }}"><i class="lni lni-envelope"></i> {{ $general_setting->email }}</a></li>
-                                @endif
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="footer-widget">
-                            <h6 class="saas-premium-footer__heading">{{ __('db.Quick Links') }}</h6>
-                            <ul class="saas-premium-footer__links list-unstyled">
-                                <li><a href="{{ url('/') }}">Home</a></li>
-                                <li><a href="{{ url('/#features') }}">{{ __('db.Features') }}</a></li>
-                                <li><a href="{{ url('/#packages') }}">{{ __('db.Pricing') }}</a></li>
-                                <li><a href="{{ url('/#faq') }}">{{ __('db.FAQ') }}</a></li>
-                                <li><a href="{{ url('/blog') }}">{{ __('db.Blog') }}</a></li>
-                                <li><a href="{{ url('/#contact') }}">{{ __('db.Contact') }}</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="footer-widget">
-                            <h6 class="saas-premium-footer__heading">{{ __('db.Legal & Company') }}</h6>
-                            @if($policyPages->isNotEmpty())
-                                <p class="saas-premium-footer__subheading">{{ __('db.Policies') }}</p>
-                                <ul class="saas-premium-footer__links list-unstyled mb-3">
-                                    @foreach($policyPages as $page)
-                                        <li><a href="{{ url('page/'.$page->slug) }}">{{ $page->title }}</a></li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                            @if($companyPages->isNotEmpty())
-                                <p class="saas-premium-footer__subheading">{{ __('db.Company') }}</p>
-                                <ul class="saas-premium-footer__links list-unstyled mb-3">
-                                    @foreach($companyPages as $page)
-                                        <li><a href="{{ url('page/'.$page->slug) }}">{{ $page->title }}</a></li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                            <ul class="saas-premium-footer__links list-unstyled">
-                                <li><a href="{{ url('/#contact') }}">{{ __('db.Support') }}</a></li>
-                                <li><a href="{{ url('/#faq') }}">{{ __('db.Help Center') }}</a></li>
-                                @if($hasSitemapFile)
-                                    <li><a href="{{ url('/sitemap.xml') }}" rel="nofollow">{{ __('db.Sitemap') }}</a></li>
-                                @endif
-                            </ul>
-                            @php $shownIds = $policyPages->pluck('id')->merge($companyPages->pluck('id')); @endphp
-                            @if($landingPages->pluck('id')->diff($shownIds)->isNotEmpty())
-                                <p class="saas-premium-footer__subheading mt-3">{{ __('db.More pages') }}</p>
-                                <ul class="saas-premium-footer__links list-unstyled">
-                                    @foreach($landingPages as $page)
-                                        @if($shownIds->contains($page->id))
-                                            @continue
-                                        @endif
-                                        <li><a href="{{ url('page/'.$page->slug) }}">{{ $page->title }}</a></li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <div class="footer-widget">
-                            <h6 class="saas-premium-footer__heading">{{ __('db.Resources') }}</h6>
-                            <ul class="saas-premium-footer__links list-unstyled">
-                                <li><a href="{{ $footerFeatureAnchor(['inventory', 'stock', 'warehouse', 'barcode']) }}">{{ __('db.Inventory Management') }}</a></li>
-                                <li><a href="{{ $footerFeatureAnchor(['pos', 'point of sale', 'billing', 'invoice', 'checkout']) }}">{{ __('db.POS Billing') }}</a></li>
-                                <li><a href="{{ $footerFeatureAnchor(['purchase', 'supplier', 'procurement']) }}">{{ __('db.Purchase Management') }}</a></li>
-                                <li><a href="{{ $footerFeatureAnchor(['sale', 'return', 'customer']) }}">{{ __('db.Sales & Returns') }}</a></li>
-                                <li><a href="{{ $footerFeatureAnchor(['tax', 'gst', 'vat', 'e-way', 'eway']) }}">{{ __('db.GST / Tax Support') }}</a></li>
-                                <li><a href="{{ $footerFeatureAnchor(['report', 'analytic', 'dashboard']) }}">{{ __('db.Reports & Analytics') }}</a></li>
-                            </ul>
-                            <h6 class="saas-premium-footer__heading mt-4">{{ __('db.Connect with Us') }}</h6>
-                            <ul class="saas-premium-footer__socials socials justify-content-start flex-wrap">
-                                @foreach($socials as $social)
-                                    <li>
-                                        <a href="{{ $social->link }}" rel="noopener noreferrer" target="_blank" aria-label="social">
-                                            <i class="{{ $social->icon }}"></i>
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
+            @if(!config('app.demo_unlocked'))
+            <div class="mt-5 mb-5 cta">
+                <h3 class="h1 mb-5">Start your software subscription business</h3>
+                <a class="button lg style2" href="https://tryonedigital.com/software/retail-nexis">Get Retail Nexis</a>
+            </div>
+            @endif
+            <hr>
+            <div class="d-flex justify-content-between mt-5">
+                <div class="footer-links">
+                    @foreach($pages as $page)
+                    <a href="{{url('page/'.$page->slug)}}">{{$page->title}}</a>
+                    @endforeach
+                </div>
+                <div class="footer-bottom">
+                    <p class="copyright">&copy; {{$general_setting->site_title}} {{date('Y')}}. All rights reserved</p>
                 </div>
             </div>
-            <div class="saas-premium-footer__bottom copyright-wrapper text-center">
-                <p class="mb-0">&copy; {{$general_setting->site_title}} {{date('Y')}}. {{ __('db.All rights reserved') }}</p>
-            </div>
         </div>
-    </footer>
+    </div>
+    <!-- Footer section Ends-->
 
     {{-- <a href="https://wa.me/8801924756759" target="_blank">
         <div class="contact-button" style="background-color: #9fe870;border-radius: 50%;bottom: 20px;height: 70px;right: 20px;width: 70px;font-size: 30px;color: #f5f6f7;text-align: center;line-height: 64px;position: fixed;z-index: 999;">
@@ -718,7 +537,7 @@
     </a> --}}
 
     <!--Scroll to top starts-->
-    <a href="#" id="scrolltotop" class="scroll-top"><i class="lni lni-chevron-up"></i></a>
+    <a href="#" id="scrolltotop"><i class="ti-arrow-up"></i></a>
     <!--Scroll to top ends-->
 
     <div class="body__overlay"></div>
@@ -734,10 +553,10 @@
                                 <p class="lead mb-3">{{$tenant_signup_description->sub_heading}}</p>
                             @else
                                 <h2 class="heading">Sign Up</h2>
-                                <p class="lead mb-3">Nexa Technologies is packed with all the features you'll need to seamlessly run your business</p>
+                                <p class="lead mb-3">Retail Nexis is packed with all the features you'll need to seamlessly run your business</p>
                             @endif
                         </div>
-                        <form action="/tenant-checkout" method="POST"  class="form row customer-signup-form">
+                        <form action="{{route('tenant.checkout')}}" method="POST"  class="form row customer-signup-form">
                             @csrf
                             <div class="col-6">
                                 <input type="hidden" name="package_id" value="1">
@@ -776,7 +595,7 @@
                             <div class="col-md-12">
                                 <div class="input-group mt-3">
                                     <input class="form-control mt-0" type="text" name="tenant"  placeholder="subdomain..." aria-label="subdomain..." aria-describedby="basic-addon2" required>
-                                <span class="input-group-text" id="basic-addon2">{{'@'.config('app.central_domain')}}</span>
+                                <span class="input-group-text" id="basic-addon2">{{'@'.env('CENTRAL_DOMAIN')}}</span>
                                 </div>
                             </div>
                             @if($general_setting->dedicated_ip)
@@ -850,15 +669,10 @@
 
             $(".signup-btn").on("click", function () {
                 $('input[name=package_id]').val($(this).data('package_id'));
-                var $ctx = $(this).closest('.saas-pricing-card');
-                if (!$ctx.length) {
-                    $ctx = $(this).closest('.pricing-m, .pricing');
-                }
-                var $pp = $ctx.find('.package-price').first();
                 if($('input[name=subscription_type]').val() == 'monthly') {
-                    $('input[name=price]').val($pp.data('monthly'));
+                    $('input[name=price]').val($(this).parent().parent().find('.package-price').data('monthly'));
                 } else {
-                    $('input[name=price]').val($pp.data('yearly'));
+                    $('input[name=price]').val($(this).parent().parent().find('.package-price').data('yearly'));
                 }
                 // $('html, body').animate({
                 //     scrollTop: $("#customer-signup").offset().top
@@ -896,11 +710,8 @@
                 $(this).prop('disabled', true).text('Sending...');
 
                 $.ajax({
-                    url: '/send-otp',
+                    url: "{{ route('send.otp') }}", // Route to send OTP
                     type: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
                     data: {
                         email: email,
                         _token: '{{ csrf_token() }}'
@@ -936,11 +747,8 @@
                 $(this).prop('disabled', true).text('Verifying...');
 
                 $.ajax({
-                    url: '/verify-otp',
+                    url: "{{ route('verify.otp') }}", // Route to verify OTP
                     type: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
                     data: {
                         email: email,
                         otp: otp,
@@ -1053,7 +861,7 @@
     {!!$general_setting->chat_script!!}
     @endif
 
-    @if(config('app.user_verified')==1)
+    @if(config('app.demo_unlocked')==1)
     <script>
         $('#light-theme').on('click',function(){
             var css = $('#switch-style').attr('href');

@@ -156,7 +156,7 @@
     }
 
     var attendance_selected = [];
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
 
     $.ajaxSetup({
         headers: {

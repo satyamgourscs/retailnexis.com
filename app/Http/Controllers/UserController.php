@@ -132,7 +132,7 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $this->validate($request, [
@@ -177,48 +177,18 @@ class UserController extends Controller
 
     public function profileUpdate(Request $request, $id)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
+        $input = $request->all();
         $lims_user_data = User::find($id);
-        if (! $lims_user_data) {
-            return redirect()->back()->with('not_permitted', __('db.Sorry! User not found'));
-        }
-
-        // Only update fields present in superadmin profile form.
-        // This avoids mass-assigning non-user fields like `_method`, `_token`, etc.
-        $this->validate($request, [
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('users')
-                    ->ignore($id)
-                    ->where(fn ($query) => $query->where('is_deleted', false)),
-            ],
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users')
-                    ->ignore($id)
-                    ->where(fn ($query) => $query->where('is_deleted', false)),
-            ],
-            'phone' => ['required', 'string', 'max:255'],
-            'company_name' => ['nullable', 'string', 'max:255'],
-        ]);
-
-        $input = $request->only(['name', 'email', 'phone', 'company_name']);
         $lims_user_data->update($input);
-
-        // Redirect back to the stable profile URL (not the PUT action URL).
-        $target = $request->getSchemeAndHttpHost() . '/superadmin/user/profile/' . $id;
-        return redirect($target)->with('message3', __('db.Data updated successfullly'));
+        return redirect()->back()->with('message3', __('db.Data updated successfullly'));
     }
 
     public function changePassword(Request $request, $id)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $input = $request->all();
@@ -234,8 +204,7 @@ class UserController extends Controller
             return redirect("user/" .  "profile/" . $id )->with('message1', __("db.Current Password does not match"));
         }
         auth()->logout();
-        $target = $request->getSchemeAndHttpHost() . '/';
-        return redirect($target);
+        return redirect('/');
     }
 
     public function deleteBySelection(Request $request)
@@ -252,7 +221,7 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $lims_user_data = User::find($id);

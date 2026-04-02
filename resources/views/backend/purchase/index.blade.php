@@ -410,7 +410,7 @@
     var all_permission = <?php echo json_encode($all_permission) ?>;
 
     var purchase_id = [];
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
     var starting_date = <?php echo json_encode($starting_date); ?>;
     var ending_date = <?php echo json_encode($ending_date); ?>;
     var warehouse_id = <?php echo json_encode($warehouse_id); ?>;

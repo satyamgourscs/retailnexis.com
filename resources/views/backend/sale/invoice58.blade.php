@@ -299,14 +299,6 @@
                     <tr>
                         <td class="centered" colspan="3">
                         <?php echo '<img style="margin:10px auto;width:30px" src="data:image/png;base64,' . DNS2D::getBarcodePNG($qrText, 'QRCODE') . '" alt="QRcode"   />';?>
-                        @include('backend.setting.invoice_setting.partials.upi_qr_invoice', [
-                            'upiQrMaxWidth' => '76px',
-                            'upiQrModuleW' => 2,
-                            'upiQrModuleH' => 2,
-                            'upiQrType' => 'QRCODE,M',
-                            'upiQrThermal' => true,
-                            'upiQrTitle' => 'UPI',
-                        ])
                         </td>
                     </tr>
                 </tbody>

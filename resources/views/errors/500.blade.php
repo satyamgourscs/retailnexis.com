@@ -10,7 +10,7 @@
 
 
     <!-- Links -->
-    <link rel="icon" type="image/ico" href="{{ isset($ecommerce_setting) ? asset('frontend/images/'.($ecommerce_setting->favicon ?? '')) : asset('favicon.ico') }}" />
+    <link rel="icon" type="image/ico" href="{{ asset('frontend/images') }}/{{$ecommerce_setting->favicon ?? ''}}" />
     <!-- Plugins CSS -->
     <link href="{{ asset('frontend/css/plugins.css') }}" rel="stylesheet" />
 
@@ -37,10 +37,10 @@
                 </div>
                 <div class="col-md-6 offset-md-3  error-text text-center">
                     <i class="las la-binoculars"style="color:var(--theme-color);font-size: 90px;margin-bottom:30px"></i>
-                    <h2 class="h1">Oh server just snapped!</h2>
-                    <p class="lead">An error occurred because the server could not handle your request.
+                    <h2 class="h1">{{__('db.Oh server just snapped!')}}</h2>
+                    <p class="lead">{{__('db.An error occured due to server not being to able to handle your request')}}
                     <a href="{{ url()->previous() ?? url('/') }}" class="btn btn-primary">
-                        Go Back
+                        {{ __('db.Go Back') }}
                     </a>
                 </div>
             </div>

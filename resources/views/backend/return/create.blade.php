@@ -23,18 +23,6 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <input type="hidden" name="sale_id" value="{{ $lims_sale_data->id }}">
-                                            @php
-                                                $__returnPerPoint = (float) (optional($lims_reward_point_setting_data ?? null)->per_point_amount ?? 0);
-                                                $__usedPointsOnSale = $lims_return_first_payment ? ($lims_return_first_payment->used_points ?? 0) : 0;
-                                            @endphp
-                                            @if ($__returnPerPoint > 0)
-                                                <p class="small text-muted mb-2">
-                                                    Reward points: {{ number_format($__returnPerPoint, $general_setting->decimal, '.', '') }} per point.
-                                                    @if ($lims_return_first_payment && $lims_return_first_payment->used_points !== null && (float) $__usedPointsOnSale > 0)
-                                                        Points used on this sale: {{ (int) $__usedPointsOnSale }}.
-                                                    @endif
-                                                </p>
-                                            @endif
                                             <h5>{{ __('db.Order Table') }} *</h5>
                                             <div class="table-responsive mt-3">
                                                 <table id="myTable" class="table table-hover order-list">
@@ -302,7 +290,7 @@
 
                 <td><strong>{{ __('db.Return Discount') }} <x-info title="Current Return Discount"/></strong>
                     <span class="pull-right" id="order_discount"
-                        data-total_discount="{{ $lims_sale_data->order_discount ?? 0 }}">{{ number_format((float) ($lims_sale_data->order_discount ?? 0), $general_setting->decimal, '.', '') }}</span>
+                        data-total_discount="{{ $lims_sale_data->order_discount ?? 0 }}">{{ number_format($lims_sale_data->order_discount, $general_setting->decimal, '.', '') }}</span>
                 </td>
 
                 <td><strong>{{ __('db.grand total') }} <x-info title="(Sutotal + tax) - Return Discount = Grand Total"/></strong>

@@ -9,8 +9,8 @@
     <meta name="csrf-token" content="CmSeExxpkZmScDB9ArBZKMGKAyzPqnxEriplXWrS">
 
     <!-- Document Title -->
-    <title>{{$general_setting->meta_title ?? 'Nexa Technologies'}}</title>
-    <meta name="description" content="{{$general_setting->meta_description ?? 'Nexa Technologies — multi-tenant SaaS POS & inventory management. Sell subscriptions under your own brand.'}}" />
+    <title>{{$general_setting->meta_title ?? 'Retail Nexis'}}</title>
+    <meta name="description" content="{{$general_setting->meta_description ?? 'Retail Nexis is a multi-tenant SAAS POS & inventory management system allows you to sell subscriptions under your own brand. We handle support & customization, while you make money!'}}" />
     <!-- Links -->
     <link rel="icon" type="image/png" href="{{url('landlord/images/logo', $general_setting->site_logo)}}" />
 
@@ -59,7 +59,7 @@
                     @if(!$payment_gateway_count)
                         <h1 class="heading h2 text-center">Your Subscription has expired! Please contact with superadmin</h1>
                     @else
-                        <form action="{{ route('renewSubscription', [], false) }}" method="POST" class="renew-subscription-form">
+                        <form action="{{route('renewSubscription')}}" method="POST" class="renew-subscription-form">
                             @csrf
                             <h1 class="heading h2 text-center">Your Subscription has expired!</h1>
                             <div class="row">
@@ -92,7 +92,7 @@
                                 <div class="col-md-8 offset-md-2">
                                     <div class="input-group mt-3">
                                         <input class="form-control mt-0" type="text" name="id" value="{{$subdomain}}" required placeholder="Type your subdomain to renew..." aria-label="subdomain..." aria-describedby="basic-addon2">
-                                      <span class="input-group-text" id="basic-addon2">{{'@'.config('app.central_domain')}}</span>
+                                      <span class="input-group-text" id="basic-addon2">{{'@'.env('CENTRAL_DOMAIN')}}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-8 offset-md-2 mt-2 coupon-section">
@@ -130,6 +130,7 @@
                         <a href="{{$social->link}}"><i class="{{$social->icon}}"></i></a>
                     </li>
                     @endforeach
+                    <!-- <li><a href="https://www.facebook.com/tryonedigital"><i class="ti-facebook"></i></a></li> -->
                 </ul>
                 <p class="copyright">&copy; {{$general_setting->meta_title.' '.date("Y")}}. All rights reserved</p>
             </div>

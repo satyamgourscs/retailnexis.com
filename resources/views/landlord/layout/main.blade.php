@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    @if(!config('database.connections.saleprosaas_landlord'))
+    @if(!config('database.connections.retailnexis_landlord'))
     <link rel="icon" type="image/png" href="{{url('public/logo', $general_setting->site_logo)}}" />
     <title>{{$general_setting->site_title}}</title>
     <meta name="description" content="">
@@ -37,7 +37,7 @@
     <link rel="preload" href="<?php echo asset('vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="<?php echo asset('vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" rel="stylesheet"></noscript>
 
-    @if(optional(Route::current())->getName() != '/')
+    @if(Route::current()->getName() != '/')
     <!-- date range stylesheet-->
     <link rel="preload" href="<?php echo asset('vendor/daterange/css/daterangepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="<?php echo asset('vendor/daterange/css/daterangepicker.min.css') ?>" rel="stylesheet"></noscript>
@@ -61,7 +61,7 @@
       <link rel="stylesheet" href="<?php echo asset('css/custom-rtl.css') ?>" type="text/css" id="custom-style">
     @endif
     @else
-    <link rel="icon" type="image/png" href="{{url('landlord/images/logo', $general_setting->site_logo)}}" />
+    <link rel="icon" type="image/png" href="{{ asset('landlord/images/logo/'.$general_setting->site_logo) }}" />
     <title>{{$general_setting->site_title}}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -69,53 +69,53 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="manifest" href="{{url('manifest.json')}}">
     <!-- Bootstrap CSS-->
-    <link rel="stylesheet" href="<?php echo asset('../../vendor/bootstrap/css/bootstrap.min.css') ?>" type="text/css">
-    <link rel="preload" href="<?php echo asset('../../vendor/bootstrap-toggle/css/bootstrap-toggle.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/bootstrap-toggle/css/bootstrap-toggle.min.css') ?>" rel="stylesheet"></noscript>
-    <link rel="preload" href="<?php echo asset('../../vendor/bootstrap/css/bootstrap-datepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/bootstrap/css/bootstrap-datepicker.min.css') ?>" rel="stylesheet"></noscript>
-    <link rel="preload" href="<?php echo asset('../../vendor/jquery-timepicker/jquery.timepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/jquery-timepicker/jquery.timepicker.min.css') ?>" rel="stylesheet"></noscript>
-    <link rel="preload" href="<?php echo asset('../../vendor/bootstrap/css/awesome-bootstrap-checkbox.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/bootstrap/css/awesome-bootstrap-checkbox.css') ?>" rel="stylesheet"></noscript>
-    <link rel="preload" href="<?php echo asset('../../vendor/bootstrap/css/bootstrap-select.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/bootstrap/css/bootstrap-select.min.css') ?>" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="<?php echo asset('vendor/bootstrap/css/bootstrap.min.css') ?>" type="text/css">
+    <link rel="preload" href="<?php echo asset('vendor/bootstrap-toggle/css/bootstrap-toggle.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/bootstrap-toggle/css/bootstrap-toggle.min.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/bootstrap/css/bootstrap-datepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/bootstrap/css/bootstrap-datepicker.min.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/jquery-timepicker/jquery.timepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/jquery-timepicker/jquery.timepicker.min.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/bootstrap/css/awesome-bootstrap-checkbox.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/bootstrap/css/awesome-bootstrap-checkbox.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/bootstrap/css/bootstrap-select.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/bootstrap/css/bootstrap-select.min.css') ?>" rel="stylesheet"></noscript>
     <!-- Font Awesome CSS-->
-    <link rel="preload" href="<?php echo asset('../../vendor/font-awesome/css/font-awesome.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/font-awesome/css/font-awesome.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet"></noscript>
     <!-- Drip icon font-->
-    <link rel="preload" href="<?php echo asset('../../vendor/dripicons/webfont.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/dripicons/webfont.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/dripicons/webfont.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/dripicons/webfont.css') ?>" rel="stylesheet"></noscript>
 
     <!-- jQuery Circle-->
-    <link rel="preload" href="<?php echo asset('../../css/grasp_mobile_progress_circle-1.0.0.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../css/grasp_mobile_progress_circle-1.0.0.min.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('css/grasp_mobile_progress_circle-1.0.0.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('css/grasp_mobile_progress_circle-1.0.0.min.css') ?>" rel="stylesheet"></noscript>
     <!-- Custom Scrollbar-->
-    <link rel="preload" href="<?php echo asset('../../vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css') ?>" rel="stylesheet"></noscript>
 
-    @if(optional(Route::current())->getName() != '/')
+    @if(Route::current()->getName() != '/')
     <!-- date range stylesheet-->
-    <link rel="preload" href="<?php echo asset('../../vendor/daterange/css/daterangepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/daterange/css/daterangepicker.min.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/daterange/css/daterangepicker.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/daterange/css/daterangepicker.min.css') ?>" rel="stylesheet"></noscript>
     <!-- table sorter stylesheet-->
-    <link rel="preload" href="<?php echo asset('../../vendor/datatable/dataTables.bootstrap4.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link href="<?php echo asset('../../vendor/datatable/dataTables.bootstrap4.min.css') ?>" rel="stylesheet"></noscript>
+    <link rel="preload" href="<?php echo asset('vendor/datatable/dataTables.bootstrap4.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="<?php echo asset('vendor/datatable/dataTables.bootstrap4.min.css') ?>" rel="stylesheet"></noscript>
     <link rel="preload" href="https://cdn.datatables.net/fixedheader/3.1.6/css/fixedHeader.bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://cdn.datatables.net/fixedheader/3.1.6/css/fixedHeader.bootstrap.min.css" rel="stylesheet"></noscript>
     <link rel="preload" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css" rel="stylesheet"></noscript>
     @endif
 
-    <link rel="stylesheet" href="<?php echo asset('../../css/style.default.css') ?>" id="theme-stylesheet" type="text/css">
-    <link rel="stylesheet" href="<?php echo asset('../../css/dropzone.css') ?>">
+    <link rel="stylesheet" href="<?php echo asset('css/style.default.css') ?>" id="theme-stylesheet" type="text/css">
+    <link rel="stylesheet" href="<?php echo asset('css/dropzone.css') ?>">
     <!-- Custom stylesheet - for your changes-->
-    <link rel="stylesheet" href="<?php echo asset('../../css/custom-default.css') ?>" type="text/css" id="custom-style">
+    <link rel="stylesheet" href="<?php echo asset('css/custom-default.css') ?>" type="text/css" id="custom-style">
 
     @if( Config::get('app.locale') == 'ar' || $general_setting->is_rtl)
       <!-- RTL css -->
-      <link rel="stylesheet" href="<?php echo asset('../../vendor/bootstrap/css/bootstrap-rtl.min.css') ?>" type="text/css">
-      <link rel="stylesheet" href="<?php echo asset('../../css/custom-rtl.css') ?>" type="text/css" id="custom-style">
+      <link rel="stylesheet" href="<?php echo asset('vendor/bootstrap/css/bootstrap-rtl.min.css') ?>" type="text/css">
+      <link rel="stylesheet" href="<?php echo asset('css/custom-rtl.css') ?>" type="text/css" id="custom-style">
     @endif
     @endif
     <!-- Google fonts - Roboto -->
@@ -139,19 +139,19 @@
           </a>
         </span>
         <ul id="side-main-menu" class="side-menu list-unstyled">
-            <li><a href="{{ route('superadmin.dashboard', [], false) }}"> <i class="dripicons-meter"></i><span>{{ __('db.dashboard') }}</span></a></li>
+            <li><a href="{{route('superadmin.dashboard')}}"> <i class="dripicons-meter"></i><span>{{ __('db.dashboard') }}</span></a></li>
             <li><a target="_blank" href="{{url('/')}}"> <i class="dripicons-monitor"></i><span>{{ __('db.frontend') }}</span></a></li>
             <li><a href="#client" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-list"></i><span>{{__('db.Client')}}</span><span></a>
                 <ul id="client" class="collapse list-unstyled ">
-                    <li id="client-list-menu"><a href="{{ route('clients.index', [], false) }}">{{__('db.Client List')}}</a></li>
+                    <li id="client-list-menu"><a href="{{route('clients.index')}}">{{__('db.Client List')}}</a></li>
                 </ul>
             </li>
-            <li><a href="{{ route('payments.index', [], false) }}"><i class="dripicons-card"></i> {{__('db.Payments')}}</a></li>
-            <li id="coupon-menu"><a href="{{ route('coupon.index', [], false) }}"><i class="dripicons-card"></i> {{__('db.Coupon List')}}</a></li>
+            <li><a href="{{route('payments.index')}}"><i class="dripicons-card"></i> {{__('db.Payments')}}</a></li>
+            <li><a href="{{route('coupon.index')}}"><i class="dripicons-card"></i> {{__('db.Coupon List')}}</a></li>
             <li><a href="#package" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-archive"></i><span>{{__('db.Package')}}</span><span></a>
                 <ul id="package" class="collapse list-unstyled ">
-                    <li id="package-list-menu"><a href="{{ route('packages.index', [], false) }}">{{__('db.Package List')}}</a></li>
-                    <li id="package-create-menu"><a href="{{ route('packages.create', [], false) }}">{{__('db.Add Package')}}</a></li>
+                    <li id="package-list-menu"><a href="{{route('packages.index')}}">{{__('db.Package List')}}</a></li>
+                    <li id="package-create-menu"><a href="{{route('packages.create')}}">{{__('db.Add Package')}}</a></li>
                 </ul>
             </li>
             <li><a href="#cms" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-stack"></i><span>{{__('db.CMS')}}</span><span></a>
@@ -169,11 +169,14 @@
                 </ul>
             </li>
             @if(!$general_setting->disable_tenant_support_tickets)
-            <li><a href="{{ route('superadmin.tickets.index', [], false) }}"><i class="dripicons-ticket"></i> {{__('db.support_tickets')}}</a></li>
+            <li><a href="{{route('superadmin.tickets.index')}}"><i class="dripicons-ticket"></i> {{__('db.support_tickets')}}</a></li>
             @endif
-            <li id="general-setting-menu"><a href="{{ route('superadminGeneralSetting', [], false) }}"><i class="dripicons-gear"></i> {{__('db.settings')}}</a></li>
-            <li id="mail-setting-menu"><a href="{{ route('superadminMailSetting', [], false) }}"><i class="dripicons-mail"></i> {{__('db.Mail Setting')}}</a></li>
+            <li><a href="{{route('superadminGeneralSetting')}}"><i class="dripicons-gear"></i> {{__('db.settings')}}</a></li>
+            <li><a href="{{route('superadminMailSetting')}}"><i class="dripicons-mail"></i> {{__('db.Mail Setting')}}</a></li>
             <li><a href="{{url('superadmin/addon-list')}}"><i class="dripicons-flag"></i> {{__('db.Addons')}}</a></li>
+            @if(Auth::user()->role_id != 5)
+            <li><a target="_blank" href="https://tryonedigital.com/docs/retail-nexis/"> <i class="dripicons-information"></i><span>{{__('db.Documentation')}}</span></a></li>
+            @endif
         </ul>
       </nav>
 
@@ -244,41 +247,22 @@
                     </ul>
             </li>
             <li class="nav-item">
-                @php
-                    $headerUser = Auth::user();
-                    // Tenant-safe display name:
-                    $headerDisplayName = '';
-                    if (function_exists('tenancy') && tenancy()->initialized) {
-                        $tenantCompanyName = tenant()?->company_name ?? '';
-                        $headerDisplayName = is_string($tenantCompanyName) ? trim($tenantCompanyName) : '';
-                    }
-
-                    if ($headerDisplayName === '') {
-                        $headerDisplayName = $headerUser?->company_name ?: $headerUser?->name;
-                        $headerDisplayName = is_string($headerDisplayName) ? trim($headerDisplayName) : '';
-                    }
-                    $headerLower = strtolower($headerDisplayName);
-
-                    if (in_array($headerLower, ['superadmin', 'lioncoders'], true)) {
-                        $headerDisplayName = tenant()?->id ?? 'Tenant';
-                    }
-                @endphp
-                <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst($headerDisplayName)}}</span> <i class="fa fa-angle-down"></i>
+                <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst(Auth::user()->name)}}</span> <i class="fa fa-angle-down"></i>
                 </a>
                 <ul class="right-sidebar">
-                    <li id="superadmin-profile-menu">
-                        <a href="{{ route('user.superadminProfile', ['id' => Auth::id()], false) }}"><i class="dripicons-user"></i> {{__('db.profile')}}</a>
+                    <li>
+                        <a href="{{route('user.superadminProfile', ['id' => Auth::id()])}}"><i class="dripicons-user"></i> {{__('db.profile')}}</a>
                     </li>
                     <li>
-                        <a href="{{ route('superadminGeneralSetting', [], false) }}"><i class="dripicons-gear"></i> {{__('db.settings')}}</a>
+                        <a href="{{route('superadminGeneralSetting')}}"><i class="dripicons-gear"></i> {{__('db.settings')}}</a>
                     </li>
                     <li>
-                    <a href="{{ route('superadmin.logout', [], false) }}"
+                    <a href="{{ route('superadmin.logout') }}"
                         onclick="event.preventDefault();
                                         document.getElementById('logout-form').submit();"><i class="dripicons-power"></i>
                         {{__('db.logout')}}
                     </a>
-                    <form id="logout-form" action="{{ route('superadmin.logout', [], false) }}" method="POST" style="display: none;">
+                    <form id="logout-form" action="{{ route('superadmin.logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
                     </li>
@@ -296,17 +280,13 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-sm-12">
-              @if(function_exists('tenancy') && tenancy()->initialized)
-                <p>&copy; {{$general_setting->site_title}} | {{date("Y")}}. All rights reserved | V {{env('VERSION')}}</p>
-              @else
-                <p>&copy; {{ $general_setting->site_title }} | {{ __('db.Developed By') }} <span class="external">{{ $general_setting->developed_by }}</span>@if(env('VERSION')) | V {{ env('VERSION') }}@endif</p>
-              @endif
+              <p>&copy; {{$general_setting->site_title}} | {{__('db.Developed By')}} <span class="external">{{$general_setting->developed_by}}</span> | V {{env('VERSION')}}</p>
             </div>
           </div>
         </div>
       </footer>
     </div>
-    @if(!config('database.connections.saleprosaas_landlord'))
+    @if(!config('database.connections.retailnexis_landlord'))
         <script type="text/javascript" src="<?php echo asset('vendor/jquery/jquery.min.js') ?>"></script>
         <script type="text/javascript" src="<?php echo asset('vendor/jquery/jquery-ui.min.js') ?>"></script>
         <script type="text/javascript" src="<?php echo asset('vendor/jquery/bootstrap-datepicker.min.js') ?>"></script>
@@ -330,7 +310,7 @@
           <script type="text/javascript" src="<?php echo asset('js/front.js') ?>"></script>
         @endif
 
-        @if(optional(Route::current())->getName() != '/')
+        @if(Route::current()->getName() != '/')
         <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/moment.min.js') ?>"></script>
         <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/knockout-3.4.2.js') ?>"></script>
         <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/daterangepicker.min.js') ?>"></script>
@@ -361,54 +341,54 @@
         <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
         @endif
     @else
-        <script type="text/javascript" src="<?php echo asset('../../vendor/jquery/jquery.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/jquery/jquery-ui.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/jquery/bootstrap-datepicker.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/jquery/jquery.timepicker.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/popper.js/umd/popper.min.js') ?>">
+        <script type="text/javascript" src="<?php echo asset('vendor/jquery/jquery.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/jquery/jquery-ui.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/jquery/bootstrap-datepicker.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/jquery/jquery.timepicker.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/popper.js/umd/popper.min.js') ?>">
         </script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/bootstrap/js/bootstrap.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/bootstrap-toggle/js/bootstrap-toggle.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/bootstrap/js/bootstrap-select.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/bootstrap/js/bootstrap.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/bootstrap-toggle/js/bootstrap-toggle.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/bootstrap/js/bootstrap-select.min.js') ?>"></script>
 
-        <script type="text/javascript" src="<?php echo asset('../../js/grasp_mobile_progress_circle-1.0.0.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/jquery.cookie/jquery.cookie.js') ?>">
+        <script type="text/javascript" src="<?php echo asset('js/grasp_mobile_progress_circle-1.0.0.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/jquery.cookie/jquery.cookie.js') ?>">
         </script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/chart.js/Chart.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../js/charts-custom.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/jquery-validation/jquery.validate.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js')?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/chart.js/Chart.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('js/charts-custom.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/jquery-validation/jquery.validate.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js')?>"></script>
         @if( Config::get('app.locale') == 'ar' || $general_setting->is_rtl)
-          <script type="text/javascript" src="<?php echo asset('../../js/front_rtl.js') ?>"></script>
+          <script type="text/javascript" src="<?php echo asset('js/front_rtl.js') ?>"></script>
         @else
-          <script type="text/javascript" src="<?php echo asset('../../js/front.js') ?>"></script>
+          <script type="text/javascript" src="<?php echo asset('js/front.js') ?>"></script>
         @endif
 
-        @if(optional(Route::current())->getName() != '/')
-        <script type="text/javascript" src="<?php echo asset('../../vendor/daterange/js/moment.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/daterange/js/knockout-3.4.2.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/daterange/js/daterangepicker.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/tinymce/js/tinymce/tinymce.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../js/dropzone.js') ?>"></script>
+        @if(Route::current()->getName() != '/')
+        <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/moment.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/knockout-3.4.2.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/daterange/js/daterangepicker.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/tinymce/js/tinymce/tinymce.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('js/dropzone.js') ?>"></script>
 
         <!-- table sorter js-->
         @if( Config::get('app.locale') == 'ar')
-            <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/pdfmake_arabic.min.js') ?>"></script>
-            <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/vfs_fonts_arabic.js') ?>"></script>
+            <script type="text/javascript" src="<?php echo asset('vendor/datatable/pdfmake_arabic.min.js') ?>"></script>
+            <script type="text/javascript" src="<?php echo asset('vendor/datatable/vfs_fonts_arabic.js') ?>"></script>
         @else
-            <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/pdfmake.min.js') ?>"></script>
-            <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/vfs_fonts.js') ?>"></script>
+            <script type="text/javascript" src="<?php echo asset('vendor/datatable/pdfmake.min.js') ?>"></script>
+            <script type="text/javascript" src="<?php echo asset('vendor/datatable/vfs_fonts.js') ?>"></script>
         @endif
-        <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/jquery.dataTables.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/dataTables.bootstrap4.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/dataTables.buttons.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/buttons.bootstrap4.min.js') ?>">"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/buttons.colVis.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/buttons.html5.min.js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/buttons.printnew.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/datatable/jquery.dataTables.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/datatable/dataTables.bootstrap4.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/datatable/dataTables.buttons.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/datatable/buttons.bootstrap4.min.js') ?>">"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/datatable/buttons.colVis.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/datatable/buttons.html5.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/datatable/buttons.printnew.js') ?>"></script>
 
-        <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/sum().js') ?>"></script>
-        <script type="text/javascript" src="<?php echo asset('../../vendor/datatable/dataTables.checkboxes.min.js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/datatable/sum().js') ?>"></script>
+        <script type="text/javascript" src="<?php echo asset('vendor/datatable/dataTables.checkboxes.min.js') ?>"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/fixedheader/3.1.6/js/dataTables.fixedHeader.min.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
         <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
@@ -428,13 +408,13 @@
         $('#switch-theme').click(function() {
             if(theme == 'light') {
                 theme = 'dark';
-                var url = <?php echo json_encode(route('switchTheme', ['theme' => 'dark'], false)); ?>;
+                var url = <?php echo json_encode(route('switchTheme', 'dark')); ?>;
                 $('body').addClass('dark-mode');
                 $('#switch-theme i').addClass('dripicons-brightness-low');
             }
             else {
                 theme = 'light';
-                var url = <?php echo json_encode(route('switchTheme', ['theme' => 'light'], false)); ?>;
+                var url = <?php echo json_encode(route('switchTheme', 'light')); ?>;
                 $('body').removeClass('dark-mode');
                 $('#switch-theme i').addClass('dripicons-brightness-max');
             }

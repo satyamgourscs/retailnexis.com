@@ -80,6 +80,7 @@ class PaymentService
         $lims_payment_data->payment_at = $data['payment_at'];
         $lims_payment_data->save();
 
+        $lims_payment_data = Payment::latest()->first();
         $data['payment_id'] = $lims_payment_data->id;
         $lims_pos_setting_data = PosSetting::latest()->first();
         if($paying_method == 'Credit Card' && $lims_pos_setting_data->stripe_secret_key){
@@ -98,13 +99,7 @@ class PaymentService
             PaymentWithCreditCard::create($data);
         }
         elseif ($paying_method == 'Cheque') {
-            $cn = isset($data['cheque_no']) ? trim((string) $data['cheque_no']) : '';
-            if ($cn !== '') {
-                PaymentWithCheque::create([
-                    'payment_id' => $lims_payment_data->id,
-                    'cheque_no' => $cn,
-                ]);
-            }
+            PaymentWithCheque::create($data);
         }
 
         return [

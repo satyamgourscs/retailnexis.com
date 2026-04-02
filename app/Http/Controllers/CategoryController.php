@@ -137,7 +137,7 @@ class CategoryController extends Controller
         if ($image) {
             $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
             $imageName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
+            if(!config('database.connections.retailnexis_landlord')) {
                 $imageName = $imageName . '.' . $ext;
                 $image->move(public_path('images/category'), $imageName);
             }
@@ -162,7 +162,7 @@ class CategoryController extends Controller
             }
             $ext = pathinfo($icon->getClientOriginalName(), PATHINFO_EXTENSION);
             $iconName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
+            if(!config('database.connections.retailnexis_landlord')) {
                 $iconName = $iconName . '.' . $ext;
                 $icon->move(public_path('images/category/icons/'), $iconName);
             }
@@ -218,7 +218,7 @@ class CategoryController extends Controller
 
     public function update(UpdateCategoryRequest $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
 
         $lims_category_data = DB::table('categories')->where('id', $request->category_id)->first();
@@ -231,7 +231,7 @@ class CategoryController extends Controller
 
             $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
             $imageName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
+            if(!config('database.connections.retailnexis_landlord')) {
                 $imageName = $imageName . '.' . $ext;
                 $image->move(public_path('images/category'), $imageName);
             }
@@ -260,7 +260,7 @@ class CategoryController extends Controller
 
             $ext = pathinfo($icon->getClientOriginalName(), PATHINFO_EXTENSION);
             $iconName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
+            if(!config('database.connections.retailnexis_landlord')) {
                 $iconName = $iconName . '.' . $ext;
                 $icon->move(public_path('images/category/icons/'), $iconName);
             }

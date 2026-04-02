@@ -81,7 +81,7 @@ class RoleController extends Controller
 
     public function setPermission(Request $request)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
         
         $lims_permissions = Permission::pluck('name')->toArray();
@@ -116,7 +116,7 @@ class RoleController extends Controller
 
     public function destroy($id)
     {
-        if(!config('app.user_verified'))
+        if(!config('app.demo_unlocked'))
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
         $lims_role_data = Roles::find($id);
         $lims_role_data->is_active = false;

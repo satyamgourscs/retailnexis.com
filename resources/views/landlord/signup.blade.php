@@ -50,7 +50,7 @@
               <div class="text-center">
                 <div class="mt-40 box-line-throught mb-40"><span class="text-body-text color-gray-500">Innovation, efficacité et productivité</span></div>
               </div>
-              <form action="/tenant-checkout" method="POST"  class="form row customer-signup-form">
+              <form action="{{route('tenant.checkout')}}" method="POST"  class="form row customer-signup-form">
                   @csrf
                   <div class="box-form-signup mb-200">
                     <input type="hidden" name="package_id" value="{{$request->package_id}}">
@@ -61,7 +61,7 @@
                     <div class="form-group"><input required name="phone_number" class="form-control" placeholder="Votre téléphone *"></div>
                     <div class="form-group"><input required name="name" class="form-control" placeholder="username *"></div>
                     <div class="form-group"><input required name="password" type="password" class="form-control" placeholder="password *"></div>
-                    <div class="form-group"><input required name="tenant" class="form-control" placeholder="{{'your_sub_domain@'.config('app.central_domain')}}"></div>
+                    <div class="form-group"><input required name="tenant" class="form-control" placeholder="{{'your_sub_domain@'.env('CENTRAL_DOMAIN')}}"></div>
                     @if($terms_and_condition_page)
                     <div class="form-group"><label class="text-body-small color-gray-500"><input required class="chkbox" type="checkbox"> Acceptez <a href="{{url('page/'.$terms_and_condition_page->slug)}}">les termes &amp; conditions</a></label></div>
                     @endif

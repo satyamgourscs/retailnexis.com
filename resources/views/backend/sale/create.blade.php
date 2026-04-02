@@ -1,14 +1,27 @@
 @extends('backend.layout.main') @section('content')
+@push('css')
+<style>
+    @media print {
+        .hidden-print {
+            display: none !important;
+        }
+    }
+    #product-results-container{background:#f5f6f7;position: absolute;overflow: hidden;max-height: 300px;overflow-y: auto;padding-top: 10px;top:40px;width:100%;z-index:999}
+    #product-results-container .product-img{border-radius: 3px; color: #7c5cc4;font-size:13px;padding-top:7px;padding-bottom:7px;text-align:left}
+    #product-results-container .product-img:hover{background-color: #7c5cc4;color: #FFF}
+</style>
+@endpush
+
 <x-error-message key="not_permitted" />
 <x-error-message key="error" />
 
 <?php $authUser = Auth::user()->role_id; ?>
 
-<section id="pos-layout" class="forms hidden-print sale-create-premium">
+<section id="pos-layout" class="forms hidden-print">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="card sale-premium-main-card">
+                <div class="card">
                     <div class="card-header d-flex align-items-center">
                         <h4>{{__('db.Add Sale')}}</h4>
                     </div>
@@ -126,8 +139,7 @@
                                         </div>
                                     </div>
                                     @endif
-                                    {{-- Currency / exchange rate: managed in settings (shared $currency); keep fields for submit + JS --}}
-                                    <div class="col-md-2 d-none" aria-hidden="true">
+                                    <div class="col-md-2">
                                         <div class="form-group">
                                             <label>{{__('db.Currency')}} *</label>
                                             <select name="currency_id" id="currency" class="form-control selectpicker" data-toggle="tooltip" title="" data-original-title="Sale currency">
@@ -137,7 +149,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-2 d-none" aria-hidden="true">
+                                    <div class="col-md-2">
                                         <div class="form-group mb-0">
                                             <label>{{__('db.Exchange Rate')}} *</label>
                                         </div>
@@ -208,22 +220,22 @@
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-md-12">
-                                        <label class="sale-premium-field-label d-block">{{__('db.Select Product')}}</label>
-                                        <div class="search-box form-group mb-2 sale-premium-search-wrap">
+                                        <label>{{__('db.Select Product')}}</label>
+                                        <div class="search-box form-group mb-2" style="position:relative">
                                             <div class="input-group pos">
-                                                <input type="text" name="product_code_name" id="product-search-input" placeholder="Scan/Search product by name/code/IMEI" class="form-control" autofocus />
+                                                <input style="border: 1px solid #7c5cc4;" type="text" name="product_code_name" id="product-search-input" placeholder="Scan/Search product by name/code/IMEI" class="form-control" autofocus />
                                                 <button type="button" class="btn btn-primary" onclick="barcode()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upc" viewBox="0 0 16 16"><path d="M3 4.5a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0zm2 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0zm2 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3 0a.5.5 0 0 1 1 0v7a.5.5 0 0 1-1 0z"/></svg></button>
                                             </div>
                                             <div id="product-results-container">
 
                                             </div>
-                                            <div id="no-results-message" class="mt-1 px-2 py-1" style="display: none;">No results found</div>
+                                            <div id="no-results-message" style="background-color: #f5f6f7;color: #666; margin-top: 5px;padding: 3px 5px; display: none;">No results found</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row mt-5">
                                     <div class="col-md-12">
-                                        <h5 class="sale-premium-section-title">{{__('db.Order Table')}} *</h5>
+                                        <h5>{{__('db.Order Table')}} *</h5>
                                         <div class="table-responsive mt-3">
                                             <table id="myTable" class="table table-hover order-list">
                                                 <thead>
@@ -395,6 +407,18 @@
                                             <x-validation-error fieldName="sale_status" />
                                         </div>
                                     </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>{{__('db.Payment Status')}} *</label>
+                                            <select name="payment_status" id="payment_status" class="form-control">
+                                                <option value="1">{{__('db.Pending')}}</option>
+                                                <option value="2">{{__('db.Due')}}</option>
+                                                <option value="3">{{__('db.Partial')}}</option>
+                                                <option value="4">{{__('db.Paid')}}</option>
+                                            </select>
+                                            <x-validation-error fieldName="payment_status" />
+                                        </div>
+                                    </div>
                                     <?php
                                         $accountSelection = $role_has_permissions_list->where('name', 'account-selection')->first();
                                     ?>
@@ -413,17 +437,12 @@
                                         </div>
                                     @endif
                                 </div>
-                                @include('backend.sale.partials.universal_payment_summary')
                                 <div id="payment">
-                                    <p class="small text-muted mb-2 sale-premium-payment-intro"><strong>Payment methods</strong> <span class="d-none d-md-inline">(optional — add rows to split by method)</span></p>
-                                    <div class="payment-lines-wrap">
-                                        <div class="payment-line border rounded p-2 mb-2 bg-light">
-                                            <div class="row align-items-end">
-                                        <div class="col-12 col-md-6">
-                                            <div class="form-group mb-2 mb-md-0">
-                                                <label class="mb-0" for="sale-paid-by-0">{{__('db.Paid By')}}</label>
-                                                {{-- Native select: front.js applies selectpicker to ALL selects; we destroy on payment rows so clones work --}}
-                                                <select name="paid_by_id[]" id="sale-paid-by-0" class="form-control js-paid-by-select" data-sale-payment-line="1" autocomplete="off">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>{{__('db.Paid By')}}</label>
+                                                <select name="paid_by_id[]" class="form-control">
                                                     @if(in_array("cash",$options))
                                                     <option value="1">{{ __('db.Cash') }}</option>
                                                     @endif
@@ -456,39 +475,32 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-12 col-md-5">
-                                            <div class="form-group mb-2 mb-md-0">
-                                                <label>Amount</label>
-                                                <input type="number" name="paid_amount[]" class="form-control js-paid-amount-input" id="paid-amount" step="any" value="{{ number_format(0, $general_setting->decimal, '.', '') }}" min="0"/>
-                                                <input type="hidden" name="paying_amount[]" class="js-paying-amount-input" id="paying-amount" value="{{ number_format(0, $general_setting->decimal, '.', '') }}" />
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>{{__('db.Recieved Amount')}} *</label>
+                                                <input type="number" name="paying_amount[]" class="form-control" id="paying-amount" step="any" />
                                             </div>
                                         </div>
-                                        <div class="col-12 col-md-1 text-md-right">
-                                            <button type="button" class="btn btn-sm btn-outline-danger btn-remove-payment-line d-none mt-2 mt-md-4" title="Remove">&times;</button>
-                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>{{__('db.Paying Amount')}} *</label>
+                                                <input type="number" name="paid_amount[]" class="form-control" id="paid-amount" step="any"/>
                                             </div>
-                                            <div class="row js-cheque-field-wrap d-none mt-2">
-                                                <div class="col-12">
-                                                    <div class="form-group mb-0">
-                                                        <label class="mb-0" for="sale-cheque-0">{{ __('db.Cheque Number') }} <span class="text-danger">*</span></label>
-                                                        <input type="text" name="cheque_no[]" id="sale-cheque-0" class="form-control js-cheque-no-input" autocomplete="off" placeholder="{{ __('db.Cheque Number') }}" />
-                                                        <small class="form-text text-muted">Required when this row is paid by cheque.</small>
-                                                    </div>
-                                                </div>
+                                            <div class="alert alert-danger d-none p-2 position-absolute" id="paying-amount-error">
+                                                Paying amount must be greater than 0
                                             </div>
+
                                         </div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col-12">
-                                            <button type="button" class="btn btn-sm btn-outline-primary" id="btn-add-payment-line">+ Add payment method</button>
-                                        </div>
-                                    </div>
-                                    <p id="change" class="d-none">{{number_format(0, $general_setting->decimal, '.', '')}}</p>
-                                    <div class="row d-none sale-create-payment-extra">
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>{{__('db.Payment Receiver')}}</label>
                                                 <input type="text" name="payment_receiver" class="form-control" id="payment-receiver"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>{{__('db.Change')}}</label>
+                                                <p id="change" class="ml-2">{{number_format(0, $general_setting->decimal, '.', '')}}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -509,10 +521,18 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row d-none sale-create-payment-extra">
+                                    <div class="row" id="cheque">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>{{__('db.Cheque Number')}} *</label>
+                                                <input type="text" name="cheque_no" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-md-12">
                                             <label>{{__('db.Payment Note')}}</label>
-                                            <textarea rows="2" class="form-control" name="payment_note"></textarea>
+                                            <textarea rows="3" class="form-control" name="payment_note"></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -542,7 +562,7 @@
             </div>
         </div>
     </div>
-    <div class="container-fluid sale-premium-totals-bar">
+    <div class="container-fluid">
         <table class="table table-bordered table-condensed totals">
             <td><strong>{{__('db.Items')}}</strong>
                 <span class="pull-right" id="item">{{number_format(0, $general_setting->decimal, '.', '')}}</span>
@@ -710,8 +730,6 @@
     </div>
 </section>
 
-@include('backend.sale.partials.out_of_stock_modal')
-
 <section id="print-layout">
 </section>
 
@@ -748,7 +766,7 @@
             $noResults.hide();
 
             $.ajax({
-                url: '{{url("/sales/search")}}/' + warehouse_id + '/' + encodeURIComponent(search),
+                url: '{{url("/sales/search")}}/' + warehouse_id + '/' + search,
                 type: 'GET',
                 success: function (data) {
                     $results.empty();
@@ -814,6 +832,15 @@
                             clearResults();
                         });
 
+                        // Auto-click if only one result
+                        if (data.length === 1) {
+                            if(click === 0){
+                                $('#product-results-container .product-img').first().trigger('click');
+                            }
+                            clearResults();
+                            click = 1;
+                        }
+
                     } else {
                         clearResults();
                         $noResults.show();
@@ -825,10 +852,13 @@
             });
         }
 
+        var click = 0;
+
         // Trigger on input
         $input.on('input', function () {
             const value = $(this).val().trim();
-            if (value.length >= 1) {
+            if (value.length >= 3) {
+                click = 0;
                 clearTimeout(typingTimer);
                 typingTimer = setTimeout(() => searchProducts(value), doneTypingInterval);
             } else {
@@ -839,7 +869,8 @@
         // Trigger on paste
         $input.on('paste', function (e) {
             const pastedData = (e.originalEvent || e).clipboardData.getData('text');
-            if (pastedData.length >= 1) {
+            if (pastedData.length >= 3) {
+                click = 0;
                 searchProducts(pastedData.trim());
             }
         });
@@ -886,32 +917,11 @@
 </script>
 <script type="text/javascript">
 
-    /** Strip bootstrap-select if present (defensive; front.js skips data-sale-payment-line selects). */
-    function __saleNativePaymentPaidBySelects() {
-        $('.payment-lines-wrap select.js-paid-by-select[data-sale-payment-line="1"]').each(function () {
-            var $el = $(this);
-            try {
-                if ($el.data('selectpicker')) {
-                    $el.selectpicker('destroy');
-                }
-            } catch (e) { /* not initialized */ }
-            var $wrap = $el.closest('.bootstrap-select');
-            if ($wrap.length) {
-                $wrap.replaceWith($el);
-            }
-            $el.removeClass('selectpicker').removeData('selectpicker');
-        });
-    }
-
-    $(function () {
-        __saleNativePaymentPaidBySelects();
-    });
-
     $("ul#sale").siblings('a').attr('aria-expanded','true');
     $("ul#sale").addClass("show");
     $("ul#sale #sale-create-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         numberOfInvoice = <?php echo json_encode($numberOfInvoice)?>;
         $.ajax({
             type: 'GET',
@@ -934,302 +944,6 @@
     var without_stock = <?php echo json_encode($general_setting->without_stock) ?>;
     var authUser = <?php echo json_encode($authUser) ?>;
 
-    function showOutOfStockModal(message, onHidden) {
-        var $modal = $('#outOfStockModal');
-        var fallback = ($modal.find('[data-oos-message]').data('default') || 'Out of Stock');
-        var text = (message && String(message).trim() !== '') ? message : fallback;
-        if ($modal.length) {
-            $modal.find('[data-oos-message]').text(text);
-            $modal.off('hidden.bs.modal.oos').on('hidden.bs.modal.oos', function () {
-                $('body').removeClass('modal-open');
-                $('.modal-backdrop').remove();
-                var $t = $('#product-search-input');
-                if ($t.length) {
-                    setTimeout(function () { $t.trigger('focus'); }, 50);
-                }
-                if (typeof onHidden === 'function') {
-                    onHidden();
-                }
-            });
-            $modal.modal({ backdrop: true, keyboard: true, show: true });
-        } else {
-            alert(text);
-            if (typeof onHidden === 'function') {
-                onHidden();
-            }
-        }
-    }
-    var __saleDec = {{ (int) $general_setting->decimal }};
-    window.__salePaymentSyncing = false;
-
-    function __saleFt(n) {
-        return (parseFloat(n) || 0).toFixed(__saleDec);
-    }
-
-    function __saleGrandTotalVal() {
-        return parseFloat($('input[name="grand_total"]').val()) || 0;
-    }
-
-    function __saleSumPaid() {
-        var s = 0;
-        $('input[name="paid_amount[]"]').each(function () { s += parseFloat($(this).val()) || 0; });
-        return s;
-    }
-
-    function __saleSumPaying() {
-        var s = 0;
-        $('input[name="paying_amount[]"]').each(function () { s += parseFloat($(this).val()) || 0; });
-        return s;
-    }
-
-    function __saleUpdateChangeDisplay() {
-        $('#change').text(__saleFt(__saleSumPaying() - __saleSumPaid()));
-    }
-
-    function __saleToggleRemoveButtons() {
-        var n = $('.payment-line').length;
-        $('.btn-remove-payment-line').toggleClass('d-none', n <= 1);
-    }
-
-    /** Per payment line: show cheque field only for Paid By = Cheque; require number when amount &gt; 0. */
-    function __saleUpdateChequeUI($line) {
-        if (!$line || !$line.length) return;
-        var id = String($line.find('.js-paid-by-select').val() || '');
-        var $wrap = $line.find('.js-cheque-field-wrap');
-        var $inp = $line.find('.js-cheque-no-input');
-        var amt = parseFloat($line.find('input[name="paid_amount[]"]').val()) || 0;
-        if (id === '4') {
-            $wrap.removeClass('d-none');
-            $inp.prop('required', amt > 1e-9);
-        } else {
-            $wrap.addClass('d-none');
-            $inp.prop('required', false).val('');
-        }
-    }
-
-    function __saleRefreshAllChequeFields() {
-        $('.payment-line').each(function () {
-            __saleUpdateChequeUI($(this));
-        });
-    }
-
-    function __saleSyncPayingFromPaid() {
-        $('.payment-line').each(function () {
-            var $paid = $(this).find('input[name="paid_amount[]"]');
-            var $pay = $(this).find('input[name="paying_amount[]"]');
-            var p = parseFloat($paid.val()) || 0;
-            $pay.val(__saleFt(p));
-        });
-    }
-
-    function __saleClampPaidInputsToGrandTotal() {
-        var gt = __saleGrandTotalVal();
-        var $lines = $('.payment-line');
-        $lines.each(function (idx) {
-            var $paid = $(this).find('input[name="paid_amount[]"]');
-            var others = 0;
-            $lines.each(function (j) {
-                if (j !== idx) {
-                    others += parseFloat($(this).find('input[name="paid_amount[]"]').val()) || 0;
-                }
-            });
-            var maxForRow = Math.max(0, gt - others);
-            var p = parseFloat($paid.val()) || 0;
-            if (p > maxForRow) {
-                $paid.val(__saleFt(maxForRow));
-            }
-        });
-        __saleSyncPayingFromPaid();
-    }
-
-    function __saleUpdatePaymentStatusDisplay() {
-        var ps = String($('#payment_status').val() || '1');
-        if (['1', '3', '4'].indexOf(ps) === -1) {
-            ps = '1';
-        }
-        var $disp = $('#sale_payment_status_display');
-        if ($disp.length) {
-            $disp.val(ps);
-        }
-    }
-
-    window.salePaymentRecalc = function () {
-        if (!$('#sale_payment_total_due').length) return;
-        var gt = __saleGrandTotalVal();
-        $('#sale_payment_total_due').val(__saleFt(gt));
-        if ($('#sale_payment_fully_paid').is(':checked')) {
-            var $rows = $('.payment-line');
-            if ($rows.length) {
-                $rows.first().find('input[name="paid_amount[]"]').val(__saleFt(gt));
-                $rows.slice(1).each(function () {
-                    $(this).find('input[name="paid_amount[]"]').val(__saleFt(0));
-                });
-            }
-            __saleSyncPayingFromPaid();
-        } else {
-            __saleClampPaidInputsToGrandTotal();
-        }
-        var sumPaid = __saleSumPaid();
-        if (!window.__salePaymentSyncing) {
-            $('#sale_payment_amount_received').val(__saleFt(sumPaid));
-        }
-        $('#sale_payment_remaining_due').val(__saleFt(Math.max(0, gt - sumPaid)));
-        __saleUpdateChangeDisplay();
-
-        if ($('#sale_payment_fully_paid').is(':checked')) {
-            $('#payment_status').val('4');
-        } else if (sumPaid <= 1e-9) {
-            $('#payment_status').val('1');
-        } else if (sumPaid + 1e-9 < gt) {
-            $('#payment_status').val('3');
-        } else {
-            $('#payment_status').val('4');
-        }
-        __saleUpdatePaymentStatusDisplay();
-        payment_amount();
-    };
-
-    $('#sale_payment_amount_received').on('input', function () {
-        window.__salePaymentSyncing = true;
-        var gt = __saleGrandTotalVal();
-        var v = Math.min(Math.max(0, parseFloat($(this).val()) || 0), gt);
-        $(this).val(__saleFt(v));
-        var $rows = $('.payment-line');
-        if ($rows.length) {
-            $rows.first().find('input[name="paid_amount[]"]').val(__saleFt(v));
-            $rows.first().find('input[name="paying_amount[]"]').val(__saleFt(v));
-            $rows.slice(1).each(function () {
-                $(this).find('input[name="paid_amount[]"]').val(__saleFt(0));
-                $(this).find('input[name="paying_amount[]"]').val(__saleFt(0));
-            });
-        }
-        window.__salePaymentSyncing = false;
-        window.salePaymentRecalc();
-    });
-
-    $('#sale_payment_fully_paid').on('change', function () {
-        var checked = $(this).is(':checked');
-        $('#sale_payment_amount_received').prop('readonly', checked);
-        if (checked) {
-            var gt = __saleGrandTotalVal();
-            $('#payment_status').val('4');
-            __saleUpdatePaymentStatusDisplay();
-            var $rows = $('.payment-line');
-            if ($rows.length) {
-                $rows.first().find('input[name="paid_amount[]"]').val(__saleFt(gt));
-                $rows.first().find('input[name="paying_amount[]"]').val(__saleFt(gt));
-                $rows.slice(1).each(function () {
-                    $(this).find('input[name="paid_amount[]"]').val(__saleFt(0));
-                    $(this).find('input[name="paying_amount[]"]').val(__saleFt(0));
-                });
-            }
-            $('#sale_payment_amount_received').val(__saleFt(gt));
-            $('#sale_payment_remaining_due').val(__saleFt(0));
-            $('input[name="paid_amount[]"], input[name="paying_amount[]"]').prop('disabled', true);
-            payment_amount();
-        } else {
-            $('input[name="paid_amount[]"], input[name="paying_amount[]"]').prop('disabled', false);
-            payment_amount();
-            window.salePaymentRecalc();
-        }
-    });
-
-    $('#btn-add-payment-line').on('click', function () {
-        var $wrap = $('.payment-lines-wrap');
-        var lineIndex = $wrap.find('.payment-line').length;
-        var $first = $wrap.find('.payment-line').first();
-        var $clone = $first.clone(false, false);
-        $clone.find('.bootstrap-select').remove();
-        $clone.find('select.js-paid-by-select').each(function () {
-            var $s = $(this);
-            try {
-                if ($s.data('selectpicker')) {
-                    $s.selectpicker('destroy');
-                }
-            } catch (e) {}
-            $s.removeClass('selectpicker').removeData('selectpicker');
-            $s.attr({
-                'id': 'sale-paid-by-' + lineIndex,
-                'data-sale-payment-line': '1',
-                'autocomplete': 'off'
-            });
-        });
-        $clone.find('input').each(function () {
-            var $inp = $(this);
-            $inp.removeAttr('id');
-            if ($inp.attr('type') === 'number') {
-                $inp.val(__saleFt(0));
-            } else if ($inp.attr('type') === 'hidden') {
-                $inp.val(__saleFt(0));
-            } else {
-                $inp.val('');
-            }
-        });
-        $clone.find('select.js-paid-by-select').prop('selectedIndex', 0);
-        var $label = $clone.find('.form-group').first().find('label');
-        if ($label.length) {
-            $label.attr('for', 'sale-paid-by-' + lineIndex);
-        }
-        var $chequeInp = $clone.find('.js-cheque-no-input');
-        if ($chequeInp.length) {
-            $chequeInp.attr('id', 'sale-cheque-' + lineIndex);
-            var $chequeLbl = $clone.find('.js-cheque-field-wrap label');
-            if ($chequeLbl.length) {
-                $chequeLbl.attr('for', 'sale-cheque-' + lineIndex);
-            }
-        }
-        $wrap.append($clone);
-        __saleUpdateChequeUI($clone);
-        __saleToggleRemoveButtons();
-        window.salePaymentRecalc();
-    });
-
-    $(document).on('click', '.btn-remove-payment-line', function () {
-        if ($('.payment-line').length <= 1) return;
-        var $line = $(this).closest('.payment-line');
-        var $sel = $line.find('select.js-paid-by-select');
-        try {
-            if ($sel.data('selectpicker')) {
-                $sel.selectpicker('destroy');
-            }
-        } catch (e) {}
-        $line.remove();
-        $('.payment-lines-wrap .payment-line').each(function (i) {
-            var $s = $(this).find('select.js-paid-by-select');
-            var nid = 'sale-paid-by-' + i;
-            $s.attr('id', nid);
-            $(this).find('.form-group').first().find('label').attr('for', nid);
-        });
-        __saleToggleRemoveButtons();
-        __saleRefreshAllChequeFields();
-        window.salePaymentRecalc();
-    });
-
-    $(document).on('input', '.payment-line input[name="paid_amount[]"]', function () {
-        if ($('#sale_payment_fully_paid').is(':checked')) return;
-        __saleClampPaidInputsToGrandTotal();
-        window.__salePaymentSyncing = false;
-        window.salePaymentRecalc();
-        var sumPaid = __saleSumPaid();
-        var gt = __saleGrandTotalVal();
-        if (sumPaid > gt + 1e-9) {
-            $("#submit-button").prop('disabled', true).css('cursor', 'default');
-        } else {
-            $("#submit-button").prop('disabled', false).css('cursor', 'pointer');
-        }
-        __saleUpdateChequeUI($(this).closest('.payment-line'));
-    });
-
-    $(function () {
-        $('#sale_payment_amount_received').prop('readonly', $('#sale_payment_fully_paid').is(':checked'));
-        if (typeof window.salePaymentRecalc === 'function') {
-            window.salePaymentRecalc();
-        }
-        if (typeof __saleRefreshAllChequeFields === 'function') {
-            __saleRefreshAllChequeFields();
-        }
-    });
-
     $('#currency').val(currency['id']);
 
     $('#currency').val(currency['id']);
@@ -1240,6 +954,7 @@
         $('#exchange_rate').val(rate);
         //$('input[name="currency_id"]').val(currency_id);
         currency['exchange_rate'] = rate;
+        alert(currency['exchange_rate']);
         $("table.order-list tbody .product-id").each(function(index) {
             rowindex = index;
             currencyChange = true;
@@ -1281,8 +996,10 @@ $(window).on('load', async function () {
     setCustomerGroupRate(customer_id);
 });
 
+$("#payment").hide();
 $(".card-element").hide();
 $("#gift-card").hide();
+$("#cheque").hide();
 
 // array data depend on warehouse
 var lims_product_array = [];
@@ -1352,31 +1069,6 @@ $("#myTable").on('input', '.qty', function() {
         checkQuantity($(this).val(), true);
     else
         checkDiscount($(this).val(), true);
-});
-
-// Per-unit line discount (editable in grid; capped at unit price before discount)
-$("#myTable").on('input blur', '.line-unit-discount', function() {
-    var $tr = $(this).closest('tr');
-    rowindex = $tr.index();
-    // Use row's product type — do not rely on warehouse product_code.indexOf (fails when catalog not loaded or duplicate codes).
-    pos = product_code.indexOf($tr.find('.product-code').val());
-    var qty = parseFloat($tr.find('.qty').val()) || 0;
-    var raw = parseFloat($(this).val());
-    if ($(this).val() === '' || isNaN(raw) || raw < 0) {
-        raw = 0;
-    }
-    if (($tr.find('.product_type').val() || '') == 'standard') {
-        unitConversion();
-    } else {
-        row_product_price = parseFloat(product_price[rowindex]) || 0;
-    }
-    var maxU = parseFloat(row_product_price) || 0;
-    if (raw > maxU) {
-        raw = maxU;
-    }
-    $(this).val(raw.toFixed(__saleDec));
-    product_discount[rowindex] = raw;
-    calculateRowProductData(qty);
 });
 
 
@@ -1617,25 +1309,16 @@ function productSearch(data) {
             embedded: data.embedded,
             batch: data.batch,
             price: data.price,
-            customer_id: $('#customer_id').val(),
-            warehouse_id: $('#warehouse_id').val()
+            customer_id: $('#customer_id').val()
         };
         $.ajax({
             type: 'GET',
-            dataType: 'json',
+            async: false,
             url: '{{url("sales/lims_product_search")}}',
             data: {
                 data: product
             },
-            success: function(resp) {
-                if (!Array.isArray(resp)) {
-                    if (resp && resp.error === 'out_of_stock') {
-                        showOutOfStockModal(resp.message);
-                        $('#product-search-input').val('');
-                    }
-                    return;
-                }
-                data = resp;
+            success: function(data) {
                 if(data[23]) {
                     data[15] = 1;
                     pre_qty = 0;
@@ -1672,14 +1355,6 @@ function productSearch(data) {
                         imeiNumbers = data[18];
                     $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.imei-number').val(imeiNumbers);
                 }
-            },
-            error: function(xhr) {
-                var j = xhr.responseJSON;
-                if (xhr.status === 422 && j && j.error === 'out_of_stock') {
-                    showOutOfStockModal(j.message);
-                    $('#product-search-input').val('');
-                    return;
-                }
             }
         });
     }
@@ -1696,14 +1371,14 @@ function addNewProduct(data){
     let stockDisplay = '';
 
     if (authUser > 2) {
-        cols += '<td class="product-title"><strong>' + data[0] + '<br><span>' + data[1] + '</span>' + stockDisplay + ' <strong class="product-price-mobile d-md-none"></strong>';
+        cols += '<td class="product-title"><strong>' + data[0] + '<br><span>' + data[1] + '</span>' + stockDisplay + ' <strong class="product-price d-md-none"></strong>';
     } else {
         if(data[20].trim() == 'standard' || data[20].trim() == 'combo'){
             if (!data[18] || data[18] == 'null') {
                 stockDisplay = ` | {{ __('db.In Stock') }} : <span class="in-stock">` + data[19] + `</span>`;
             }
         }
-        cols += '<td class="product-title"><strong class="edit-product btn btn-link pl-0 pr-0" data-toggle="modal" data-target="#editModal">' + data[0] + ' <i class="dripicons-document-edit"></i></strong><br><span>' + data[1] + '</span>' + stockDisplay + ' <strong class="product-price-mobile d-md-none"></strong>';
+        cols += '<td class="product-title"><strong class="edit-product btn btn-link pl-0 pr-0" data-toggle="modal" data-target="#editModal">' + data[0] + ' <i class="dripicons-document-edit"></i></strong><br><span>' + data[1] + '</span>' + stockDisplay + ' <strong class="product-price d-md-none"></strong>';
     }
 
     if(data[12]) {
@@ -1731,11 +1406,11 @@ function addNewProduct(data){
 
     cols += '</span></div></td>';
 
-    cols += '<td class="net-unit-price-col text-right"></td>';
-    cols += '<td class="line-discount-cell"><input type="text" inputmode="decimal" class="form-control form-control-sm line-unit-discount numkey text-right" style="min-width:72px;max-width:96px" autocomplete="off" value="{{ number_format(0, $general_setting->decimal, '.', '') }}" /></td>';
-    cols += '<td class="tax text-right"></td>';
+    cols += '<td class="product-price"></td>';
+    cols += '<td class="discount">0.00</td>';
+    cols += '<td class="tax">0.00</td>';
 
-    cols += '<td class="sub-total text-right"></td>';
+    cols += '<td class="sub-total"></td>';
     // Always show delete button
     cols += '<td><button type="button" class="ibtnDel btn btn-danger btn-sm mr-2"><i class="dripicons-trash"></i></button></td>';
 
@@ -1824,10 +1499,10 @@ function addNewProduct(data){
                 newRow.find('.topping_product').val(matchedProduct.topping_id);
                 newRow.find('.topping-price').val(totalToppingPrice.toFixed({{$general_setting->decimal}}));
 
-                const currentPrice = parseFloat(newRow.find('.net-unit-price-col').text()) || 0;
+                const currentPrice = parseFloat(newRow.find('.product-price').text()) || 0;
                 const newPrice = currentPrice + totalToppingPrice;
                 newPrice -= product_discount[rowindex];
-                newRow.find('.net-unit-price-col, .product-price-mobile').text(newPrice.toFixed({{$general_setting->decimal}}));
+                newRow.find('.product-price').text(newPrice.toFixed({{$general_setting->decimal}}));
                 newRow.find('.sub-total').text(newPrice.toFixed({{$general_setting->decimal}}));
 
                 // Remove used item from array
@@ -1926,10 +1601,10 @@ function addNewProduct(data){
                     newRow.find('.topping_product').val(selectedToppingsJson); // Store JSON in hidden field
 
                     // Update the total price
-                    const currentPrice = parseFloat(newRow.find('.net-unit-price-col').text()) || 0;
+                    const currentPrice = parseFloat(newRow.find('.product-price').text()) || 0;
                     let newPrice = currentPrice + totalAdditionalPrice;
                     newPrice -= product_discount[rowindex];
-                    newRow.find('.net-unit-price-col, .product-price-mobile').text(newPrice.toFixed({{$general_setting->decimal}}));
+                    newRow.find('.product-price').text(newPrice.toFixed({{$general_setting->decimal}}));
                     newRow.find('.sub-total').text(newPrice.toFixed({{$general_setting->decimal}}));
                     newRow.find('.topping-price').val(totalAdditionalPrice.toFixed({{$general_setting->decimal}}));
                 }
@@ -2085,68 +1760,36 @@ function checkDiscount(qty, flag, price = 0) {
 }
 
 function checkQuantity(sale_qty, flag) {
-    var $row = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')');
-    var maxAttr = $row.find('.qty').attr('max');
-    var maxStock = parseFloat(maxAttr);
-    if (maxAttr === undefined || maxAttr === '' || isNaN(maxStock)) {
-        maxStock = Infinity;
-    }
-    var product_type = ($row.find('.product_type').val() || '').trim();
+    var row_product_code = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product-code').val();
+    var qty = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').attr('max');
+    var product_type = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product_type').val();
     if(without_stock == 'no') {
-        if(product_type == 'standard' || product_type == 'combo') {
-            var operator = (unit_operator[rowindex] || '*').split(',');
-            var operation_value = (unit_operation_value[rowindex] || '1').split(',');
-            var saleQtyNum = parseFloat(sale_qty);
-            if (isNaN(saleQtyNum)) {
-                saleQtyNum = 0;
-            }
-            var total_qty;
+        if(product_type.trim() == 'standard' || product_type.trim() == 'combo') {
+            var operator = unit_operator[rowindex].split(',');
+            var operation_value = unit_operation_value[rowindex].split(',');
             if(operator[0] == '*')
-                total_qty = saleQtyNum * parseFloat(operation_value[0] || 1);
+                total_qty = sale_qty * operation_value[0];
             else if(operator[0] == '/')
-                total_qty = saleQtyNum / parseFloat(operation_value[0] || 1);
-            else
-                total_qty = saleQtyNum;
-
-            if (maxStock !== Infinity && maxStock <= 0 && total_qty > 0) {
-                showOutOfStockModal(null, function () {
-                    if (!flag) {
-                        edit();
-                    }
-                });
+                total_qty = sale_qty / operation_value[0];
+            if (total_qty > parseFloat(qty)) {
+                alert('Quantity exceeds stock quantity!');
                 if (flag) {
-                    $row.find('.ibtnDel').trigger('click');
-                } else {
-                    $row.find('.qty').val(0);
+                    sale_qty = (sale_qty - 1);
+                    checkQuantity(sale_qty, true);
                 }
-                return;
-            }
-
-            if (maxStock !== Infinity && total_qty > maxStock) {
-                showOutOfStockModal(null, function () {
-                    if (!flag) {
-                        edit();
-                    }
-                });
-                var maxSaleQty = operator[0] == '*'
-                    ? maxStock / parseFloat(operation_value[0] || 1)
-                    : maxStock * parseFloat(operation_value[0] || 1);
-                if (!isFinite(maxSaleQty) || maxSaleQty < 0) {
-                    maxSaleQty = 0;
+                else {
+                    edit();
+                    return;
                 }
-                sale_qty = maxSaleQty;
-                $row.find('.qty').val(sale_qty);
-                calculateRowProductData(sale_qty);
-                return;
             }
-            $row.find('.qty').val(sale_qty);
+            $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val(sale_qty);
         }
     }
     else
-        $row.find('.qty').val(sale_qty);
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val(sale_qty);
     if(!flag) {
         $('#editModal').modal('hide');
-        $row.find('.qty').val(sale_qty);
+        $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.qty').val(sale_qty);
     }
     calculateRowProductData(sale_qty);
 }
@@ -2173,8 +1816,7 @@ function calculateRowProductData(quantity) {
         @endif
     }
 
-    var rowProductType = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product_type').val();
-    if (rowProductType == 'standard')
+    if(product_type[pos] == 'standard')
         unitConversion();
     else
         row_product_price = product_price[rowindex];
@@ -2197,16 +1839,13 @@ function calculateRowProductData(quantity) {
 
     var topping_price = ($('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.topping-price').val() * quantity) || 0;
 
-    var $row = $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')');
-    $row.find('.discount-value').val((product_discount[rowindex] * quantity).toFixed({{$general_setting->decimal}}));
-    $row.find('.tax-rate').val(tax_rate[rowindex].toFixed({{$general_setting->decimal}}));
-    $row.find('.net_unit_price').val(net_unit_price.toFixed({{$general_setting->decimal}}));
-    $row.find('.tax-value').val(tax.toFixed({{$general_setting->decimal}}));
-    $row.find('.net-unit-price-col, .product-price-mobile').text(net_unit_price.toFixed({{$general_setting->decimal}}));
-    $row.find('.tax').text(tax.toFixed({{$general_setting->decimal}}));
-    $row.find('.line-unit-discount').val(parseFloat(product_discount[rowindex]).toFixed({{$general_setting->decimal}}));
-    $row.find('.sub-total').text((sub_total+topping_price).toFixed({{$general_setting->decimal}}));
-    $row.find('.subtotal-value').val((sub_total+topping_price).toFixed({{$general_setting->decimal}}));
+    $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.discount-value').val((product_discount[rowindex] * quantity).toFixed({{$general_setting->decimal}}));
+    $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.tax-rate').val(tax_rate[rowindex].toFixed({{$general_setting->decimal}}));
+    $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.net_unit_price').val(net_unit_price.toFixed({{$general_setting->decimal}}));
+    $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.tax-value').val(tax.toFixed({{$general_setting->decimal}}));
+    $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.product-price').text(sub_total_unit.toFixed({{$general_setting->decimal}}));
+    $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.sub-total').text((sub_total+topping_price).toFixed({{$general_setting->decimal}}));
+    $('table.order-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.subtotal-value').val((sub_total+topping_price).toFixed({{$general_setting->decimal}}));
 
     calculateTotal();
 }
@@ -2312,9 +1951,6 @@ function calculateGrandTotal() {
     $('#grand_total').text(grand_total.toFixed({{$general_setting->decimal}}));
     $('input[name="grand_total"]').val(grand_total.toFixed({{$general_setting->decimal}}));
     currencyChange = false;
-    if (typeof window.salePaymentRecalc === 'function') {
-        window.salePaymentRecalc();
-    }
 }
 
 function cancel(rownumber) {
@@ -2353,33 +1989,40 @@ $('select[name="order_tax_rate"]').on("change", function() {
     calculateGrandTotal();
 });
 
+$('select[name="payment_status"]').on("change", function() {
+    payment_amount()
+});
+
 function payment_amount(){
-    $("#payment").show();
-    $('.payment-line input[name="paid_amount[]"]').prop('required', false);
-    var sumPaid = __saleSumPaid();
-    var ps = parseInt($('#payment_status').val(), 10) || 1;
-    var showAcct = sumPaid > 1e-9 || ps === 3 || ps === 4;
-    if ($('#account-list').length) {
-        if (showAcct) {
-            $('#account-list').removeAttr('hidden');
-        } else {
-            $('#account-list').attr('hidden', 'hidden');
+    var payment_status = $('#payment_status').val();
+    if (payment_status == 3 || payment_status == 4) {
+        $("#paid-amount").prop('disabled',false);
+        $("#payment").show();
+        $("#paying-amount").prop('required',true);
+        $("#paid-amount").prop('required',true);
+        if(payment_status == 4){
+            $("#paid-amount").prop('disabled',true);
+            $('input[name="paying_amount[]"]').val($('input[name="grand_total"]').val());
+            $('input[name="paid_amount[]"]').val($('input[name="grand_total"]').val());
         }
-        var $acc = $('#account_id');
-        if ($acc.length) {
-            $acc.prop('required', showAcct);
-        }
+        $("#account-list").attr("hidden", false);
+    }
+    else{
+        $("#paying-amount").prop('required',false);
+        $("#paid-amount").prop('required',false);
+        $('input[name="paying_amount[]"]').val('');
+        $('input[name="paid_amount[]"]').val('');
+        $("#payment").hide();
+        $("#account-list").attr("hidden", true);
     }
 }
 
-$(document).on("change", '.js-paid-by-select', function() {
-    var id = String($(this).val());
-    var $line = $(this).closest('.payment-line');
-    var $paidInLine = $line.find('input[name="paid_amount[]"]');
+$('select[name="paid_by_id[]"]').on("change", function() {
+    var id = $(this).val();
     $(".payment-form").off("submit");
-    $('.js-cheque-no-input').prop('required', false);
+    $('input[name="cheque_no"]').attr('required', false);
     $('select[name="gift_card_id"]').attr('required', false);
-    if(id === '2') {
+    if(id == 2) {
         $("#gift-card").show();
         $.ajax({
             url: 'get_gift_card',
@@ -2396,41 +2039,42 @@ $(document).on("change", '.js-paid-by-select', function() {
             }
         });
         $(".card-element").hide();
+        $("#cheque").hide();
         $('select[name="gift_card_id"]').attr('required', true);
     }
-    else if (id === '3') {
+    else if (id == 3) {
         @if($lims_pos_setting_data && (strlen($lims_pos_setting_data->stripe_public_key)>0) && (strlen($lims_pos_setting_data->stripe_secret_key )>0))
             $.getScript( "../vendor/stripe/checkout.js" );
             $(".card-element").show();
             $(".card-errors").show();
         @endif
         $("#gift-card").hide();
+        $("#cheque").hide();
     }
-    else if (id === '4') {
+    else if (id == 4) {
+        $("#cheque").show();
         $("#gift-card").hide();
         $(".card-element").hide();
+        $('input[name="cheque_no"]').attr('required', true);
     }
     else {
         $("#gift-card").hide();
         $(".card-element").hide();
-        if (id === '6') {
-            if(parseFloat($paidInLine.val()) > deposit[$('#customer_id').val()]){
+        $("#cheque").hide();
+        if (id == 6) {
+            if($('input[name="paid_amount[]"]').val() > deposit[$('#customer_id').val()]){
                 alert('Amount exceeds customer deposit! Customer deposit : '+ deposit[$('#customer_id').val()]);
             }
         }
-        else if (id === '7') {
+        else if (id == 7) {
             pointCalculation();
         }
-    }
-    __saleRefreshAllChequeFields();
-    if (typeof window.salePaymentRecalc === 'function') {
-        window.salePaymentRecalc();
     }
 });
 
 function pointCalculation() {
-    var paid_amount = __saleSumPaid();
-    var required_point = Math.ceil(paid_amount / reward_point_setting['per_point_amount']);
+    paid_amount = $('input[name="paid_amount[]"]').val();
+    required_point = Math.ceil(paid_amount / reward_point_setting['per_point_amount']);
     if(required_point > points[$('#customer_id').val()]) {
         alert('Customer does not have sufficient points. Available points: '+points[$('#customer_id').val()]);
     }
@@ -2441,10 +2085,46 @@ function pointCalculation() {
 
 $('select[name="gift_card_id"]').on("change", function() {
     var balance = gift_card_amount[$(this).val()] - gift_card_expense[$(this).val()];
-    var sumPaid = __saleSumPaid();
-    if(sumPaid > balance){
+    if($('input[name="paid_amount[]"]').val() > balance){
         alert('Amount exceeds card balance! Gift Card balance: '+ balance);
     }
+});
+
+$('input[name="paid_amount[]"]').on("input", function() {
+    if( $(this).val() > parseFloat($('input[name="paying_amount[]"]').val()) ) {
+        $('#paying-amount-error').addClass('d-none');
+        $("#submit-button").prop('disabled', true).css('cursor', 'default');
+        alert('Paying amount cannot be bigger than recieved amount');
+        // $(this).val('');
+    }
+    else if( $(this).val() > parseFloat($('#grand_total').text()) ){
+        $('#paying-amount-error').addClass('d-none');
+        $("#submit-button").prop('disabled', true).css('cursor', 'default');
+        alert('Paying amount cannot be bigger than grand total');
+        // $(this).val('');
+    } else if ($(this).val() <= 0) {
+        $("#submit-button").prop('disabled', true).css('cursor', 'default');
+        $('#paying-amount-error').removeClass('d-none');
+    } else {
+        $('#paying-amount-error').addClass('d-none');
+        $("#submit-button").prop('disabled', false).css('cursor', 'pointer');
+    }
+
+    $("#change").text( parseFloat($("#paying-amount").val() - $(this).val()).toFixed({{$general_setting->decimal}}) );
+    var id = $('select[name="paid_by_id[]"]').val();
+    if(id == 2){
+        var balance = gift_card_amount[$("#gift_card_id").val()] - gift_card_expense[$("#gift_card_id").val()];
+        if($(this).val() > balance)
+            alert('Amount exceeds card balance! Gift Card balance: '+ balance);
+    }
+    else if(id == 6){
+        if( $('input[name="paid_amount[]"]').val() > deposit[$('#customer_id').val()] )
+            alert('Amount exceeds customer deposit! Customer deposit : '+ deposit[$('#customer_id').val()]);
+    }
+});
+
+$('input[name="paying_amount[]"]').on("input", function() {
+    $("#change").text( parseFloat( $(this).val() - $("#paid-amount").val()).toFixed({{$general_setting->decimal}}));
 });
 
 $(window).keydown(function(e){
@@ -2471,14 +2151,8 @@ $("#submit-button").on("click", function() {
 });
 
 $(document).on('submit', '.payment-form', function(e) {
-    if (typeof __saleSyncPayingFromPaid === 'function') {
-        __saleSyncPayingFromPaid();
-    }
-    if (typeof window.salePaymentRecalc === 'function') {
-        window.salePaymentRecalc();
-    }
     let customer_type = $('#customer_id option:selected').data('type');
-    let current_payment_status = parseInt($('#payment_status').val(), 10);
+    let current_payment_status = parseInt($('select[name="payment_status"]').val());
 
     var rownumber = $('table.order-list tbody tr:last').index();
     $("table.order-list tbody .qty").each(function(index) {
@@ -2500,31 +2174,12 @@ $(document).on('submit', '.payment-form', function(e) {
         alert('Product quantity is 0');
         e.preventDefault();
     }
-    else if( (function(){
-        var s = 0;
-        $('input[name="paid_amount[]"]').each(function () { s += parseFloat($(this).val()) || 0; });
-        var gt = parseFloat($('input[name="grand_total"]').val()) || 0;
-        return s > gt + 1e-9;
-    })()){
-        alert('Total received cannot exceed grand total.');
+    else if( parseFloat($("#paying-amount").val()) < parseFloat($("#paid-amount").val()) ){
+        alert('Paying amount cannot be bigger than recieved amount');
         e.preventDefault();
     }
-    else if ((function () {
-        var bad = false;
-        $('.payment-line').each(function () {
-            var id = String($(this).find('.js-paid-by-select').val() || '');
-            var amt = parseFloat($(this).find('input[name="paid_amount[]"]').val()) || 0;
-            if (id === '4' && amt > 1e-9) {
-                var c = ($(this).find('.js-cheque-no-input').val() || '').trim();
-                if (!c) {
-                    bad = true;
-                    return false;
-                }
-            }
-        });
-        return bad;
-    })()) {
-        alert('Cheque number is required for each cheque payment row that has an amount.');
+    else if( $('select[name="payment_status"]').val() == 3 && parseFloat($("#paid-amount").val()) == parseFloat($('input[name="grand_total"]').val()) ) {
+        alert('Paying amount equals to grand total! Please change payment status.');
         e.preventDefault();
     }
     else if(!$('#biller_id').val()) {
@@ -2532,18 +2187,14 @@ $(document).on('submit', '.payment-form', function(e) {
         e.preventDefault();
     }
     else {
-        $('input[name="paid_amount[]"], input[name="paying_amount[]"]').prop('disabled', false);
         $("#submit-button").prop('disabled', true);
+        $("#paid-amount").prop('disabled',false);
         $(".batch-no").prop('disabled', false);
 
         e.preventDefault(); // Prevents the default form submission behavior
         $.ajax({
             url: $('.payment-form').attr('action'),
             type: $('.payment-form').attr('method'),
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            },
             data: $('.payment-form').serialize(),
             success: function(response) {
 
@@ -2582,22 +2233,7 @@ $(document).on('submit', '.payment-form', function(e) {
                 }
             },
             error: function(xhr) {
-                $("#submit-button").prop('disabled', false);
-                var msg = 'Form submission failed. Please check your input.';
-                if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
-                    var parts = [];
-                    $.each(xhr.responseJSON.errors, function (k, arr) {
-                        if ($.isArray(arr)) {
-                            $.each(arr, function (_, m) { parts.push(m); });
-                        }
-                    });
-                    if (parts.length) {
-                        msg = parts.join('\n');
-                    }
-                } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                    msg = xhr.responseJSON.message;
-                }
-                alert(msg);
+                console.log('Form submission failed.');
             }
         });
 

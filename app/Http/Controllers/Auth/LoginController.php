@@ -59,11 +59,9 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        ///////////////////////
-        if (!config('app.user_verified') && $request->has('demo_db_name')) {
+        if ($request->has('demo_db_name')) {
             session(['database' => $request->query('demo_db_name')]);
         }
-        ///////////////////////
 
         $input = $request->all();
 

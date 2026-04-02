@@ -658,7 +658,7 @@
     $("ul#sale").addClass("show");
     $("ul#sale #sale-list-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         if(localStorage.getItem("message")) {
             alert(localStorage.getItem("message"));
             localStorage.removeItem("message");
@@ -723,7 +723,7 @@
         var reward_point_setting = <?php echo json_encode($lims_reward_point_setting_data) ?>;
     @endif
     var sale_id = [];
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
     var starting_date = <?php echo json_encode($starting_date); ?>;
     var ending_date = <?php echo json_encode($ending_date); ?>;
     var warehouse_id = <?php echo json_encode($warehouse_id); ?>;

@@ -1,5 +1,5 @@
 @php
-    $layout = config('database.connections.saleprosaas_landlord') ? 'landlord.layout.main' : 'backend.layout.main';
+    $layout = config('database.connections.retailnexis_landlord') ? 'landlord.layout.main' : 'backend.layout.main';
 @endphp
 
 @extends($layout)
@@ -36,6 +36,7 @@
                     <h4 class="text-center text-success"> A new version <b>{{ $versionUpgradeData['demo_version'] }}</b> has
                         been released.</h4>
                     <p>Before upgrading, we highly recomended you to keep a backup of your current script and database.</p>
+                    <p><a target="_blank" href="{{ config('database.connections.retailnexis_landlord') ? 'https://tryonedigital.com/software/retail-nexis' : 'https://tryonedigital.com/software/retail-nexis-inventory-management-system-with-pos-hrm-accounting' }}">Change Log</a></p>
                 </div>
             </div>
 
@@ -44,7 +45,7 @@
                     <span class="sr-only">Loading...</span>
                 </div>
             </div>
-            <form action="{{ config('database.connections.saleprosaas_landlord') ? route('saas-version-upgrade') : route('version-upgrade') }}" method="post">
+            <form action="{{ config('database.connections.retailnexis_landlord') ? route('saas-version-upgrade') : route('version-upgrade') }}" method="post">
                 @csrf
                 <label>Purchase Code</label>
 		        <input type='text' placeholder="Ex: 123456789XXXXXXXX" required class="form-control" name="purchasecode">

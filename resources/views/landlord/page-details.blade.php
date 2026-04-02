@@ -5,17 +5,17 @@
     <!-- Metas -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="Nexa Technologies" />
+    <meta name="author" content="TryOneDigital" />
     <meta name="csrf-token" content="CmSeExxpkZmScDB9ArBZKMGKAyzPqnxEriplXWrS">
     <link rel="icon" type="image/png" href="{{url('public/landlord/images/logo', $general_setting->site_logo)}}" />
     <!-- Document Title -->
-    <title>{{$general_setting->meta_title ?? 'Nexa Technologies'}}</title>
+    <title>{{$general_setting->meta_title ?? 'Retail Nexis'}}</title>
     <!-- Links -->
-    <meta name="description" content="{{$general_setting->meta_description ?? 'Nexa Technologies'}}" />
+    <meta name="description" content="{{$general_setting->meta_description ?? 'Retail Nexis'}}" />
     <meta property="og:url" content="{{url()->full()}}" />
-    <meta property="og:title" content="{{$general_setting->og_title ?? 'Nexa Technologies'}}" />
-    <meta property="og:description" content="{{$general_setting->og_description ?? 'Nexa Technologies'}}" />
-    <meta property="og:image" content="{{url('/public/landlord/images/og-image')}}/{{$general_setting->og_image ?? 'saleprosaas.jpg'}}" />
+    <meta property="og:title" content="{{$general_setting->og_title ?? 'Retail Nexis'}}" />
+    <meta property="og:description" content="{{$general_setting->og_description ?? 'Retail Nexis'}}" />
+    <meta property="og:image" content="{{url('/public/landlord/images/og-image')}}/{{$general_setting->og_image ?? 'retail-nexis-default-og.jpg'}}" />
     
     <!-- Bootstrap CSS -->
     <link href="{{url('/')}}/landlord/css/bootstrap.min.css" rel="stylesheet">
@@ -131,6 +131,13 @@
     <!-- Footer section Starts-->
     <div class="footer-wrapper">
         <div class="container">
+            @if(!config('app.demo_unlocked'))
+            <div class="mt-5 mb-5 cta">
+                <h3 class="h1 mb-5">Start your software subscription business</h3>
+                <a class="button lg style2" href="https://tryonedigital.com/software/retail-nexis">Get Retail Nexis</a>
+            </div>
+            <hr>
+            @endif
             <div class="d-flex justify-content-between mt-5">
                 <div class="footer-links">
                     @foreach($pages as $page)

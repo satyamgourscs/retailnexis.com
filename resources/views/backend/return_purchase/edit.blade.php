@@ -466,6 +466,13 @@ $.get('../getproduct/' + id, function(data) {
             return matcher.test(item);
         }));
     },
+    response: function(event, ui) {
+        if (ui.content.length == 1) {
+            var data = ui.content[0].value;
+            $(this).autocomplete( "close" );
+            productSearch(data);
+        };
+    },
     select: function(event, ui) {
         var data = ui.item.value;
         productSearch(data);

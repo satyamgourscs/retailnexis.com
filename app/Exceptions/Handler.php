@@ -48,26 +48,8 @@ class Handler extends ExceptionHandler
      *
      * @throws \Throwable
      */
-    public function render($request, Throwable $exception)
+    public function render($request, Throwable  $exception)
     {
-        try {
-            return parent::render($request, $exception);
-        } catch (\Throwable $inner) {
-            // When bootstrap fails early, View may not be bound yet; parent::render() then throws
-            // BindingResolutionException: Target class [view] does not exist — hide the real error.
-            if (str_contains($inner->getMessage(), 'Target class [view] does not exist')) {
-                return response(
-                    "Application error (could not render error page).\n\n"
-                    . 'Original: '.$exception->getMessage()."\n"
-                    . $exception->getFile().':'.$exception->getLine()."\n\n"
-                    . "Fix on server: php artisan optimize:clear && php artisan config:cache\n"
-                    . 'Ensure bootstrap/cache is writable and vendor/ is complete (composer install).',
-                    500,
-                    ['Content-Type' => 'text/plain; charset=UTF-8']
-                );
-            }
-
-            throw $inner;
-        }
+        return parent::render($request, $exception);
     }
 }

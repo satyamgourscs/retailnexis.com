@@ -90,9 +90,7 @@ class ProductController extends Controller
             foreach($custom_fields as $fieldName) {
                 $field_name[] = str_replace(" ", "_", strtolower($fieldName));
             }
-            $nav_product_search = $request->input('search', '');
-
-            return view('backend.product.index', compact('warehouse_id', 'product_type', 'brand_id', 'category_id', 'unit_id', 'tax_id', 'imeiorvariant', 'all_permission', 'role_id', 'numberOfProduct', 'custom_fields', 'field_name','lims_warehouse_list', 'lims_brand_list', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'nav_product_search'));
+            return view('backend.product.index', compact('warehouse_id', 'product_type', 'brand_id', 'category_id', 'unit_id', 'tax_id', 'imeiorvariant', 'all_permission', 'role_id', 'numberOfProduct', 'custom_fields', 'field_name','lims_warehouse_list', 'lims_brand_list', 'lims_category_list', 'lims_unit_list', 'lims_tax_list'));
         }
         else
             return redirect()->back()->with('not_permitted', __('db.Sorry! You are not allowed to access this module'));
@@ -497,7 +495,7 @@ class ProductController extends Controller
                 $imageName = date("Ymdhis") . ($key + 1);
 
                 // Handle multi-tenant logic if necessary
-                if (!config('database.connections.saleprosaas_landlord')) {
+                if (!config('database.connections.retailnexis_landlord')) {
                     $imageName = $imageName . '.' . $ext;
 
                 } else {
@@ -1187,7 +1185,7 @@ class ProductController extends Controller
     public function updateProduct(Request $request)
     {
 
-        if(!config('app.user_verified')) {
+        if(!config('app.demo_unlocked')) {
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
         }
 
@@ -1319,7 +1317,7 @@ class ProductController extends Controller
                 foreach ($images as $key => $image) {
                     $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
 
-                    if (!config('database.connections.saleprosaas_landlord')) {
+                    if (!config('database.connections.retailnexis_landlord')) {
                         $imageName = date("Ymdhis") . ($length + $key + 1) . '.' . $ext;
                     } else {
                         $imageName = $this->getTenantId() . '_' . date("Ymdhis") . ($length + $key + 1) . '.' . $ext;
@@ -2075,7 +2073,7 @@ if (!empty($data['image']) && $data['image'] != 'zummXD2dvAtI.png') {
 
     public function destroy($id)
     {
-        if(!config('app.user_verified')) {
+        if(!config('app.demo_unlocked')) {
             return redirect()->back()->with('not_permitted', __('db.This feature is disable for demo!'));
         }
         else {

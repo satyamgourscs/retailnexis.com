@@ -16,7 +16,7 @@
                     </div>
                     <div class="card-body">
                         <p class="italic"><small>{{__('db.The field labels marked with * are required input fields')}}.</small></p>
-                        {!! Form::open(['url' => route('packages.update', ['package' => $packageData->id], false), 'method' => 'put', 'id' => 'package-form']) !!}
+                        {!! Form::open(['route' => ['packages.update', $packageData->id], 'method' => 'put', 'id' => 'package-form']) !!}
                             <div class="row">
                                 <div class="col-md-3 form-group">
                                 	<label>{{__('db.name')}} *</label>

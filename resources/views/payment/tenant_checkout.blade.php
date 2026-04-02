@@ -14,7 +14,8 @@
             <input type="hidden" name="name" value="{{$request->name}}">
             <input type="hidden" name="password" value="{{$request->password}}">
             <input type="hidden" name="tenant" value="{{$request->tenant}}">
-            <input type="hidden" name="expiry_date" value="{{date('Y-m-d', strtotime('+'.$request->numberOfDaysToExpired.' days'))}}">
+            @php $renewDays = (int) ($request->numberOfDaysToExpired ?? 0); $renewDays = $renewDays > 0 ? $renewDays : 30; @endphp
+            <input type="hidden" name="expiry_date" value="{{ now()->addDays($renewDays)->format('Y-m-d') }}">
             <input type="hidden" name="permission_ids" value="{{$request->permission_ids}}">
             <input type="hidden" name="abandoned_permission_ids" value="{{$request->abandoned_permission_ids}}">
             <input type="hidden" name="renewal" value="{{$request->renewal}}">

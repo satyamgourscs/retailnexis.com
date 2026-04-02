@@ -712,17 +712,10 @@ class SaleController extends Controller
                 if (is_array($data['paid_amount'])) {
                     $data['paid_amount'] = array_sum($data['paid_amount']);
                 }
-                // Align with standard sale payment_status: 1 Pending, 3 Partial, 4 Paid
-                $paid = (float) $data['paid_amount'];
-                $gt = (float) $data['grand_total'];
-                $eps = 0.00001;
-                if ($paid <= $eps && $gt > $eps) {
-                    $data['payment_status'] = 1;
-                } elseif ($paid + $eps < $gt) {
-                    $data['payment_status'] = 3;
-                } else {
+                if($balance > 0 || $balance < 0)
+                    $data['payment_status'] = 2;
+                else
                     $data['payment_status'] = 4;
-                }
 
                 if($data['draft']) {
                     $lims_sale_data = Sale::find($data['sale_id']);
@@ -754,7 +747,7 @@ class SaleController extends Controller
 
                 $ext = pathinfo($document->getClientOriginalName(), PATHINFO_EXTENSION);
                 $documentName = date("Ymdhis");
-                if(!config('database.connections.saleprosaas_landlord')) {
+                if(!config('database.connections.retailnexis_landlord')) {
                     $documentName = $documentName . '.' . $ext;
                     $document->move(public_path('documents/sale'), $documentName);
                 }
@@ -1125,6 +1118,7 @@ class SaleController extends Controller
 
                         if(isset($data['cash']) && $data['cash'] > 0 &&  isset($data['bank']) && $data['bank'])
 
+                        $lims_payment_data = Payment::latest()->first();
                         $data['payment_id'] = $lims_payment_data->id;
                         $lims_pos_setting_data = PosSetting::latest()->first();
                         // Check Payment Method is Card
@@ -1145,8 +1139,7 @@ class SaleController extends Controller
                             PaymentWithGiftCard::create($data);
                         }
                         else if ($paying_method == 'Cheque') {
-                            $chequeNo = $this->resolveSaleChequeNumberForRow($data, (int) $key);
-                            $this->recordPaymentWithCheque((int) $lims_payment_data->id, $chequeNo);
+                            PaymentWithCheque::create($data);
                         }
                         else if($paying_method == 'Deposit'){
                             $lims_customer_data->expense += $data['paid_amount'][$key];
@@ -2172,8 +2165,8 @@ class SaleController extends Controller
         $noDiscountApplied = true;
 
         foreach ($discounts as $discount) {
-            $applicableProducts = array_filter(explode(',', (string) ($discount->product_list ?? '')));
-            $applicableDays = array_filter(explode(',', (string) ($discount->days ?? '')));
+            $applicableProducts = explode(',', $discount->product_list);
+            $applicableDays = explode(',', $discount->days);
             $todayDay = date('D');
 
             if ((
@@ -2233,73 +2226,8 @@ class SaleController extends Controller
         }
 
         // check if batch product
-        $batch = null;
-        if (! empty($batch_id)) {
+        if(!empty($batch_id)){
             $batch = ProductBatch::find($batch_id);
-        }
-
-        $warehouseId = (int) ($request->input('data.warehouse_id') ?? 0);
-        $requestedQty = (float) ($request->input('data.pre_qty') ?? 1);
-        if ($requestedQty < 0) {
-            $requestedQty = 0;
-        }
-
-        $enforceStock = (config('without_stock') === 'no' || config('without_stock') == 'no');
-        $stockSensitiveTypes = ['standard', 'combo'];
-
-        $warehouseQtyForDisplay = (float) ($request->input('data.qty') ?? 0);
-
-        if ($warehouseId > 0 && $enforceStock && in_array($product->type, $stockSensitiveTypes, true)) {
-            $pwQuery = Product_Warehouse::query()
-                ->where('product_id', $product->id)
-                ->where('warehouse_id', $warehouseId);
-
-            if ($productVariantId) {
-                $pwQuery->where('variant_id', $productVariantId);
-            } else {
-                $pwQuery->where(function ($q) {
-                    $q->whereNull('variant_id')->orWhere('variant_id', 0);
-                });
-            }
-
-            if (! empty($batch_id)) {
-                $pwQuery->where('product_batch_id', $batch_id);
-            } else {
-                $pwQuery->where(function ($q) {
-                    $q->whereNull('product_batch_id')->orWhere('product_batch_id', 0);
-                });
-            }
-
-            $imeiRaw = $request->input('data.imei');
-            if ($imeiRaw !== null && $imeiRaw !== '' && (string) $imeiRaw !== 'null' && (int) $product->is_imei === 1) {
-                $imeiStr = (string) $imeiRaw;
-                $pwQuery->where(function ($q) use ($imeiStr) {
-                    $q->where('imei_number', $imeiStr)
-                        ->orWhere('imei_number', 'like', '%'.$imeiStr.'%');
-                });
-            }
-
-            $pw = $pwQuery->orderByDesc('qty')->first();
-
-            if (! $pw && $product->type === 'combo' && empty($batch_id)) {
-                $pw = Product_Warehouse::query()
-                    ->where('product_id', $product->id)
-                    ->where('warehouse_id', $warehouseId)
-                    ->orderByDesc('qty')
-                    ->first();
-            }
-
-            $availableQty = $pw ? (float) $pw->qty : 0.0;
-
-            if ($requestedQty > $availableQty) {
-                return response()->json([
-                    'error' => 'out_of_stock',
-                    'message' => __('db.Out of Stock'),
-                    'available_qty' => $availableQty,
-                ], 422);
-            }
-
-            $warehouseQtyForDisplay = $availableQty;
         }
 
         $productArray = [
@@ -2322,7 +2250,7 @@ class SaleController extends Controller
             $product->wholesale_price, //16
             ProductPurchase::query()->where('product_id',$product->id)->latest()->first()->net_unit_cost ?? $product->cost, //17
             $request->data['imei'], // IMEI number //18
-            $warehouseQtyForDisplay, // warehouse qty (server-verified when stock enforced) //19
+            $request->data['qty'], // warehouse qty //19
             $product->type, //20
             $batch_id, // batch ID //21
             $batch->batch_no ?? '' //22
@@ -2637,7 +2565,7 @@ class SaleController extends Controller
 
                 $ext = pathinfo($document->getClientOriginalName(), PATHINFO_EXTENSION);
                 $documentName = date("Ymdhis");
-                if(!config('database.connections.saleprosaas_landlord')) {
+                if(!config('database.connections.retailnexis_landlord')) {
                     $documentName = $documentName . '.' . $ext;
                     $document->move(public_path('documents/sale'), $documentName);
                 }
@@ -2803,7 +2731,7 @@ class SaleController extends Controller
 
             $ext = pathinfo($document->getClientOriginalName(), PATHINFO_EXTENSION);
             $documentName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
+            if(!config('database.connections.retailnexis_landlord')) {
                 $documentName = $documentName . '.' . $ext;
                 $document->move(public_path('documents/sale'), $documentName);
             }
@@ -3612,20 +3540,6 @@ class SaleController extends Controller
             //new invoice view file(dev:maynuddin)
             $invoice_settings = InvoiceSetting::active_setting();
 
-            $upiQrText = null;
-            $upiIdDisplay = null;
-            if ($invoice_settings && filled((string) $invoice_settings->upi_id)) {
-                $upiIdDisplay = trim((string) $invoice_settings->upi_id);
-                $general_setting_invoice = DB::table('general_settings')->latest()->first();
-                $payeeName = ($general_setting_invoice->company_name ?? null)
-                    ?: ($lims_biller_data->company_name ?? 'Merchant');
-                $upiQrText = \App\Support\UpiUri::build(
-                    $upiIdDisplay,
-                    (string) $payeeName,
-                    (float) $lims_sale_data->grand_total
-                );
-            }
-
             $receipt_printer = Printer::where('warehouse_id', $lims_sale_data->warehouse_id)->first();
             if ($receipt_printer) {
                 if ($invoice_settings->size == '58mm' || $invoice_settings->size == '80mm') {
@@ -3653,24 +3567,24 @@ class SaleController extends Controller
                 }
             }
             elseif($invoice_settings->size == 'a4') {
-                    return view('backend.setting.invoice_setting.a4', compact('invoice_settings','lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'paid_by_info', 'change_amount', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by', 'upiQrText', 'upiIdDisplay'));
+                    return view('backend.setting.invoice_setting.a4', compact('invoice_settings','lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'paid_by_info', 'change_amount', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by'));
             }elseif($invoice_settings->size == '58mm'){
-                return view('backend.setting.invoice_setting.58mm', compact('invoice_settings','lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by', 'upiQrText', 'upiIdDisplay'));
+                return view('backend.setting.invoice_setting.58mm', compact('invoice_settings','lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by'));
             }elseif($invoice_settings->size == '80mm'){
-                return view('backend.setting.invoice_setting.80mm', compact('invoice_settings','lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by', 'upiQrText', 'upiIdDisplay'));
+                return view('backend.setting.invoice_setting.80mm', compact('invoice_settings','lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by'));
             }
             // old invoice code
             elseif($lims_pos_setting_data->invoice_option == 'A4') {
-                return view('backend.sale.a4_invoice', compact('lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'paid_by_info', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by', 'upiQrText', 'upiIdDisplay'));
+                return view('backend.sale.a4_invoice', compact('lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'paid_by_info', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by'));
             }
             elseif($lims_sale_data->sale_type == 'online'){
-                return view('backend.sale.a4_invoice', compact('lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'paid_by_info', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by', 'upiQrText', 'upiIdDisplay'));
+                return view('backend.sale.a4_invoice', compact('lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'paid_by_info', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by'));
             }
             elseif($lims_pos_setting_data->invoice_option == 'thermal' && $lims_pos_setting_data->thermal_invoice_size == '58'){
-                return view('backend.sale.invoice58', compact('lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by', 'upiQrText', 'upiIdDisplay'));
+                return view('backend.sale.invoice58', compact('lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by'));
             }
             else{
-                return view('backend.sale.invoice', compact('lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by', 'upiQrText', 'upiIdDisplay'));
+                return view('backend.sale.invoice', compact('lims_sale_data', 'currency_code', 'lims_product_sale_data', 'lims_biller_data', 'lims_warehouse_data', 'lims_customer_data', 'lims_payment_data', 'numberInWords', 'sale_custom_fields', 'customer_custom_fields', 'product_custom_fields', 'qrText', 'totalDue', 'lims_bill_by'));
             }
 
             DB::commit();
@@ -3706,7 +3620,7 @@ class SaleController extends Controller
 
             $ext = pathinfo($document->getClientOriginalName(), PATHINFO_EXTENSION);
             $documentName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
+            if(!config('database.connections.retailnexis_landlord')) {
                 $documentName = $documentName . '.' . $ext;
                 $document->move(public_path('documents/add-payment'), $documentName);
             }
@@ -3718,19 +3632,6 @@ class SaleController extends Controller
         }
         if(!$data['amount'])
             $data['amount'] = 0.00;
-
-        $paidByAdd = $data['paid_by_id'] ?? null;
-        if ((int) $paidByAdd === 4 && (float) $data['amount'] > 0) {
-            $rawCn = $data['cheque_no'] ?? null;
-            $cn = is_array($rawCn)
-                ? trim((string) ($rawCn[0] ?? ''))
-                : trim((string) ($rawCn ?? ''));
-            if ($cn === '') {
-                return redirect()->back()
-                    ->withErrors(['cheque_no' => 'Cheque number is required for cheque payments.'])
-                    ->withInput();
-            }
-        }
 
         $lims_sale_data = Sale::find($data['sale_id']);
         
@@ -3794,6 +3695,7 @@ class SaleController extends Controller
         $lims_payment_data->save();
         $lims_sale_data->save();
 
+        $lims_payment_data = Payment::latest()->first();
         $data['payment_id'] = $lims_payment_data->id;
 
         if($paying_method == 'Gift Card'){
@@ -3842,8 +3744,7 @@ class SaleController extends Controller
             }
         }
         elseif ($paying_method == 'Cheque') {
-            $chequeNo = isset($data['cheque_no']) ? trim((string) $data['cheque_no']) : '';
-            $this->recordPaymentWithCheque((int) $lims_payment_data->id, $chequeNo === '' ? null : $chequeNo);
+            PaymentWithCheque::create($data);
         }
         elseif ($paying_method == 'Paypal') {
             $provider = new ExpressCheckout;
@@ -4113,8 +4014,8 @@ class SaleController extends Controller
             }
             else{
                 $lims_payment_data->paying_method = 'Cheque';
-                $cn = isset($data['edit_cheque_no']) ? trim((string) $data['edit_cheque_no']) : '';
-                $this->recordPaymentWithCheque((int) $lims_payment_data->id, $cn === '' ? null : $cn);
+                $data['cheque_no'] = $data['edit_cheque_no'];
+                PaymentWithCheque::create($data);
             }
         }
         elseif($data['edit_paid_by_id'] == 5){
@@ -4845,12 +4746,12 @@ class SaleController extends Controller
         $merchantreference = rand(1, 1000000000000000000);
         $phone = $data->phone_number; //0768168060
         $amount = $amount;
-        $callbackurl = "salepro.test/ipn";
+        $callbackurl = "retailnexis.test/ipn";
         $branch = $company;
         $first_name = $data->name;
         //$middle_name = "Coders";
         $last_name = $data->name;
-        $email_address = $data->email ? $data->email : (config('mail.from.address') ?: 'noreply@example.com');
+        $email_address = $data->email ? $data->email : "hello@tryonedigital.com";
         if( $APP_ENVIROMENT == 'sandbox'){
         $submitOrderUrl = "https://cybqa.pesapal.com/pesapalv3/api/Transactions/SubmitOrderRequest";
         }elseif($APP_ENVIROMENT == 'live'){
@@ -5001,10 +4902,11 @@ class SaleController extends Controller
 
     public function search($warehouse_id, $search)
     {
-        $search = trim((string) $search);
-        if ($search === '') {
+        if (strlen($search) < 2) {
             return response()->json([]);
         }
+
+        $search = trim($search);
         $exactMatchFound = false;
         $products = [];
 
@@ -5296,39 +5198,6 @@ class SaleController extends Controller
             )
             ->where('product_variants.product_id', $product->id)
             ->get();
-    }
-
-    /**
-     * Cheque number for sale multi-payment row: cheque_no[] per index, or legacy single cheque_no.
-     */
-    protected function resolveSaleChequeNumberForRow(array $data, int $rowIndex): ?string
-    {
-        $raw = $data['cheque_no'] ?? null;
-        if (is_array($raw)) {
-            $val = $raw[$rowIndex] ?? null;
-        } else {
-            $val = $raw;
-        }
-        if ($val === null) {
-            return null;
-        }
-        $s = trim((string) $val);
-
-        return $s === '' ? null : $s;
-    }
-
-    /**
-     * Only persist cheque metadata when a non-empty cheque number is present (avoids DB / NOT NULL errors).
-     */
-    protected function recordPaymentWithCheque(int $paymentId, ?string $chequeNo): void
-    {
-        if ($chequeNo === null || $chequeNo === '') {
-            return;
-        }
-        PaymentWithCheque::create([
-            'payment_id' => $paymentId,
-            'cheque_no' => $chequeNo,
-        ]);
     }
 
 }

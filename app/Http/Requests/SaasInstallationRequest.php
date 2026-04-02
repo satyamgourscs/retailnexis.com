@@ -23,14 +23,12 @@ class SaasInstallationRequest extends FormRequest
     {
 
         $rules = [
-            'server_type' => 'required|in:cpanel,plesk,localhost,hostinger,vps',
+            'server_type' => 'required',
             'purchasecode' => 'required',
             'db_host' => 'required|string',
             'db_port' => 'required|numeric',
             'db_name' => ['required', 'regex:/^\S*$/'],
             'db_username' => ['required', 'regex:/^\S*$/'],
-            // XAMPP/root often has no password locally; allow empty safely.
-            'db_password' => ['nullable', 'string'],
         ];
 
         if($this->server_type==='cpanel') {

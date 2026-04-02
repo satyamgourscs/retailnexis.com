@@ -41,7 +41,7 @@ class TicketController extends Controller
     public function store(Request $request)
     {
 
-        if (!config('app.user_verified')) {
+        if (!config('app.demo_unlocked')) {
             return redirect()->back()->with('not_permitted', 'This feature is disabled for demo!');
         }
 
@@ -61,7 +61,7 @@ class TicketController extends Controller
             ]);
 
             $mail_setting = MailSetting::latest()->first();
-            $ticketUrl = rtrim((string) config('app.url'), '/')."/superadmin/tickets/{$ticket->id}";
+            $ticketUrl = env('CENTRAL_DOMAIN') . "/superadmin/tickets/{$ticket->id}";
             $toEmail = DB::table('general_settings')->latest()->first()->email;
         });
 
@@ -107,7 +107,7 @@ class TicketController extends Controller
 
     public function reply(Request $request, $id)
     {
-        if (!config('app.user_verified')) {
+        if (!config('app.demo_unlocked')) {
             return redirect()->back()->with('not_permitted', 'This feature is disabled for demo!');
         }
 
@@ -127,7 +127,7 @@ class TicketController extends Controller
             ]);
 
             $mail_setting = MailSetting::latest()->first();
-            $ticketUrl = 'https://'.$ticket->tenant_id.'.'.config('app.central_domain')."/tickets/{$ticket->id}";
+            $ticketUrl = $ticket->tenant_id . '.' . env('CENTRAL_DOMAIN') . "/tickets/{$ticket->id}";
             $toEmail = Tenant::find($ticket->tenant_id)->email;
         }
         else {
@@ -144,7 +144,7 @@ class TicketController extends Controller
                 ]);
 
                 $mail_setting = MailSetting::latest()->first();
-                $ticketUrl = rtrim((string) config('app.url'), '/')."/superadmin/tickets/{$ticket->id}";
+                $ticketUrl = env('CENTRAL_DOMAIN') . "/superadmin/tickets/{$ticket->id}";
                 $toEmail = DB::table('general_settings')->latest()->first()->email;
             });
         }
@@ -168,7 +168,7 @@ class TicketController extends Controller
 
     public function destroy($id)
     {
-        if (!config('app.user_verified')) {
+        if (!config('app.demo_unlocked')) {
             return redirect()->back()->with('not_permitted', 'This feature is disabled for demo!');
         }
 

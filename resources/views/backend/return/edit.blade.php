@@ -32,24 +32,10 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>{{ __('db.Sale Reference') }}</label>
-                                                <p><strong>{{ optional($lims_return_data->sale)->reference_no ?? '—' }}</strong></p>
+                                                <p><strong>{{ $lims_return_data->sale->reference_no }}</strong></p>
                                             </div>
                                         </div>
                                     </div>
-                                    @php
-                                        $__returnPerPointEdit = (float) (optional($lims_reward_point_setting_data ?? null)->per_point_amount ?? 0);
-                                        $__usedPtsEdit = $lims_return_first_payment ? ($lims_return_first_payment->used_points ?? 0) : 0;
-                                    @endphp
-                                    @if ($__returnPerPointEdit > 0)
-                                        <div class="col-md-12">
-                                            <p class="small text-muted">
-                                                Reward points: {{ number_format($__returnPerPointEdit, $general_setting->decimal, '.', '') }} per point.
-                                                @if ($lims_return_first_payment && $lims_return_first_payment->used_points !== null && (float) $__usedPtsEdit > 0)
-                                                    Points used on this sale: {{ (int) $__usedPtsEdit }}.
-                                                @endif
-                                            </p>
-                                        </div>
-                                    @endif
                                     <input type="hidden" name="warehouse_id" value="{{ $lims_return_data->warehouse_id ?? 1 }}">
                                     <input type="hidden" name="customer_id" value="{{ $lims_return_data->customer_id ?? 1 }}">
 

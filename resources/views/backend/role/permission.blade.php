@@ -1800,7 +1800,7 @@
     $("ul#setting").addClass("show");
     $("ul#setting #role-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
     	$.ajax({
         type: 'GET',
         async: false,

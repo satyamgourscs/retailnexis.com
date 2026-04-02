@@ -9,7 +9,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-            {!! Form::open(['url' => route('superadmin.page.store', [], false), 'files' => true, 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'superadmin.page.store', 'files' => true, 'method' => 'post']) !!}
                 <button type="button" class="btn btn-success mb-3" data-toggle="collapse" href="#collapse" aria-expanded="false" aria-controls="collapse"/>{{__('db.Add Page')}}</button>
                 <div class="collapse" id="collapse">
                     <div class="card">
@@ -65,7 +65,7 @@
                     <td>{{ $page->title }}</td>
                     <td>
                         <button type="button" data-id="{{$page->id}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal" ><i class="dripicons-document-edit"></i></button>
-                        <form class="d-inline" method="post" action="{{ route('superadmin.page.delete', ['id' => $page->id], false) }}">
+                        <form class="d-inline" method="post" action="{{ route('superadmin.page.delete', $page->id) }}">
                         @csrf
                             <button type="submit" class="btn btn-link" onclick="return confirm('{{__('db.Are you sure you want to delete?')}}')"><i class="dripicons-trash"></i></button>
                         </form>
@@ -81,7 +81,7 @@
     <div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
         <div role="document" class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action="{{ route('superadmin.page.update', [], false) }}" enctype="multipart/form-data">
+            <form method="post" action="{{route('superadmin.page.update')}}" enctype="multipart/form-data">
             @csrf
             <div class="modal-header">
             <h5 id="exampleModalLabel" class="modal-title">{{__('db.Update Page')}}</h5>
