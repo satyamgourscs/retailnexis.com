@@ -19,13 +19,7 @@ $("#payCancelBtn").click(function(){
             data: {},
             dataType: 'JSON',
             success: function (data) {
-                try {
-                    window.top.location.href = redirectURLAfterCancel;
-                } catch (e) {
-                    try {
-                        window.open(redirectURLAfterCancel, '_blank', 'noopener');
-                    } catch (e2) {}
-                }
+                window.location.href = redirectURLAfterCancel;
             }
         });
     }

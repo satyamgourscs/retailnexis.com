@@ -21,11 +21,11 @@ class GeneralSettingsTableSeeder extends Seeder
                 0 =>
                 array(
                     'id' => 1,
-                    'site_title' => 'Nexa technologies POS SaaS',
-                    'meta_title' => 'Nexa technologies POS SaaS — inventory, POS, accounting & HRM',
-                    'meta_description' => 'Nexa technologies POS SaaS — inventory, POS, accounting & HRM solutions',
-                    'og_title' => 'Nexa technologies POS SaaS — inventory, POS, accounting & HRM',
-                    'og_description' => 'Nexa technologies POS SaaS — inventory, POS, accounting & HRM solutions',
+                    'site_title' => 'Retail Nexis POS SaaS',
+                    'meta_title' => 'Retail Nexis inventory, POS, accounting & HRM',
+                    'meta_description' => 'Retail Nexis lets your customers subscribe to Retail Nexis inventory, POS, accounting & HRM solution',
+                    'og_title' => 'Retail Nexis inventory, POS, accounting & HRM',
+                    'og_description' => 'Retail Nexis lets your customers subscribe to Retail Nexis inventory, POS, accounting & HRM solution',
                     'og_image' => '20230307010632.jpg',
                     'site_logo' => '20231113033910.png',
                     'is_rtl' => 0,
@@ -33,9 +33,9 @@ class GeneralSettingsTableSeeder extends Seeder
                     'currency' => 'USD',
                     'frontend_layout' => 'regular',
                     'currency_position' => NULL,
-                    'developed_by' => 'Try One Digital',
+                    'developed_by' => 'TryOneDigital',
                     'phone' => '+8801924-756759',
-                    'email' => 'support@example.com',
+                    'email' => 'support@tryonedigital.com',
                     'dedicated_ip' => '192.168.x.x',
                     'free_trial_limit' => 7.0,
                     'chat_script' => '<!-- Chat Snippet Start -->

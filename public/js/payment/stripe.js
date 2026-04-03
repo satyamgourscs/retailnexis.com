@@ -26,20 +26,6 @@ $(document).ready(function () {
     function stripeResponseHandler(status, response) {
         /*console.log(response.error);
         console.log(response.stripeToken);*/
-        // If this page is being shown inside an iframe, navigating via
-        // `window.location` can be blocked. Prefer navigating the top window.
-        function go(url) {
-            try {
-                window.top.location.href = url;
-            } catch (e) {
-                // If top navigation is blocked (sandbox/permissions), open in a new tab.
-                try {
-                    window.open(url, '_blank', 'noopener');
-                } catch (e2) {
-                    // No-op: last resort is intentionally avoided to prevent unsafe frame errors.
-                }
-            }
-        }
         if (response.error) {
                 //console.log(response.error);
                 let errorCode = response.error.code;
@@ -67,7 +53,7 @@ $(document).ready(function () {
                 dataType: "json",
                 success: function (response) {
                     $('#payNowBtn').text('Payment Succeeded...Please wait');
-                    go(redirectURL);
+                    window.location.href = redirectURL;
                 }
             })
         }
@@ -82,13 +68,7 @@ $(document).ready(function () {
                 data: {},
                 dataType: 'JSON',
                 success: function (data) {
-                    try {
-                        window.top.location.href = redirectURLAfterCancel;
-                    } catch (e) {
-                        try {
-                            window.open(redirectURLAfterCancel, '_blank', 'noopener');
-                        } catch (e2) {}
-                    }
+                    window.location.href = redirectURLAfterCancel;
                 }
             });
         }

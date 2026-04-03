@@ -38,7 +38,7 @@ $(document).ready(function () {
     }
 
     //Custom select
-    $('select').not('[data-sale-payment-line="1"]').selectpicker();
+    $('select').selectpicker();
 
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -86,17 +86,12 @@ $(document).ready(function () {
     // ------------------------------------------------------- //
     // Header Dropdown / Right Sidebar
     // ------------------------------------------------------ //
-    $(document).on('click', 'header .nav-item > a.dropdown-item', function () {
-        var $panel = $(this).siblings('.right-sidebar');
-        if (!$panel.length) {
-            return;
-        }
+    $(document).on('click', 'header .dropdown-item', function(){
         $('.right-sidebar.open').removeClass('open');
-        $panel.addClass('open');
-        $('.page, .pos-page').off('click.premiumSidebar').on('click.premiumSidebar', function () {
+        $(this).siblings('.right-sidebar').addClass('open');
+        $('.page, .pos-page').on('click', function(){
             $('.right-sidebar.open').removeClass('open');
-            $('.page, .pos-page').off('click.premiumSidebar');
-        });
+        })
     });
 
 

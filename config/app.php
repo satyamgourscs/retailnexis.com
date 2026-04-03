@@ -56,7 +56,7 @@ return [
 
     'asset_url' => env('ASSET_URL', null),
 
-    'central_domain' => env('CENTRAL_DOMAIN', 'localhost'),
+    'central_domain' => env('CENTRAL_DOMAIN', (string) (parse_url((string) env('APP_URL', ''), PHP_URL_HOST) ?: '')),
 
     'landlord_db' => env('LANDLORD_DB'),
 

@@ -1,6 +1,12 @@
 /node_modules
 /public/hot
+/public/storage
+/public/build
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
 /storage/*.key
+/storage/logs/*
+!/storage/logs/.gitkeep
 /vendor
 .env
 .env.backup
@@ -10,3 +16,8 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 .DS_Store
+
+# Local SQL dumps and backups (do not push secrets or huge dumps)
+/saas_landlord.sql
+/public/saas_landlord*.sql
+/public/db_backup_*/

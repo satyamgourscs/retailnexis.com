@@ -61,40 +61,14 @@ use App\Http\Controllers\LabelsController;
 use App\Http\Controllers\TranslationController;
 use App\Http\Controllers\PrinterController;
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware'=>['web', InitializeTenancyByDomain::class,PreventAccessFromCentralDomains::class] ], function () {
 
-        Route::get('migrate', function() {
-            Artisan::call('migrate');
-            //Artisan::call('db:seed');
-            dd('migrated');
-        });
+        Route::get('migrate', [\App\Http\Controllers\Tenant\TenantUtilitiesController::class, 'migrate']);
 
-        Route::get('clear',function() {
-            Artisan::call('optimize:clear');
-            cache()->forget('biller_list');
-            cache()->forget('brand_list');
-            cache()->forget('category_list');
-            cache()->forget('coupon_list');
-            cache()->forget('customer_list');
-            cache()->forget('customer_group_list');
-            cache()->forget('product_list');
-            cache()->forget('product_list_with_variant');
-            cache()->forget('warehouse_list');
-            cache()->forget('table_list');
-            cache()->forget('tax_list');
-            cache()->forget('currency');
-            cache()->forget('general_setting');
-            cache()->forget('pos_setting');
-            cache()->forget('user_role');
-            cache()->forget('permissions');
-            cache()->forget('role_has_permissions');
-            cache()->forget('role_has_permissions_list');
-            dd('cleared');
-        });
+        Route::get('clear', [\App\Http\Controllers\Tenant\TenantUtilitiesController::class, 'clearCaches']);
 
         Route::get('update-coupon', [CouponController::class, 'updateCoupon']);
 
@@ -103,6 +77,9 @@ Route::group(['middleware'=>['web', InitializeTenancyByDomain::class,PreventAcce
         Route::get('/ecommerce-documentation', [HomeController::class, 'ecomDocumentation']);
 
         Route::post('/session-renew', [HomeController::class, 'sessionRenew'])->name('session');
+
+        // Public tenant root: guests were 404 because "/" lived only inside auth middleware.
+        Route::get('/', [HomeController::class, 'index']);
 
         Route::group(['middleware' => 'auth'], function() {
             Route::controller(HomeController::class)->group(function () {
@@ -125,7 +102,6 @@ Route::group(['middleware'=>['web', InitializeTenancyByDomain::class,PreventAcce
             Route::delete('/translations/{id}', [TranslationController::class, 'destroy']);
 
             Route::controller(HomeController::class)->group(function () {
-                Route::get('/', 'index');
                 Route::get('/dashboard', 'dashboard');
 
                 Route::get('new-release', 'newVersionReleasePage')->name('new-release');
@@ -138,7 +114,7 @@ Route::group(['middleware'=>['web', InitializeTenancyByDomain::class,PreventAcce
                 Route::get('/recent-purchase', 'recentPurchase');
                 Route::get('/recent-quotation', 'recentQuotation');
                 Route::get('/recent-payment', 'recentPayment');
-                Route::get('switch-theme/{theme}', 'switchTheme')->name('switchTheme');
+                Route::get('switch-theme/{theme}', 'switchTheme')->name('tenant.switchTheme');
                 Route::get('/dashboard-filter/{start_date}/{end_date}/{warehouse_id}', 'dashboardFilter');
                 Route::get('addon-list', 'addonList');
                 Route::get('my-transactions/{year}/{month}', 'myTransaction');
@@ -640,9 +616,7 @@ Route::group(['middleware'=>['web', InitializeTenancyByDomain::class,PreventAcce
             });
             Route::resource('coupons', CouponController::class);
 
-            Route::get('phpfileinfo', function () {
-                phpinfo();
-            })->name('phpfileinfo');
+            Route::get('phpfileinfo', [\App\Http\Controllers\Tenant\TenantUtilitiesController::class, 'phpFileInfo'])->name('phpfileinfo');
 
 
             //accounting routes

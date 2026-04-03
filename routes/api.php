@@ -82,7 +82,7 @@ Route::group(['middleware' => $middleware], function () {
             Route::get('/recent-purchase', [HomeController::class, 'recentPurchase']);
             Route::get('/recent-quotation', [HomeController::class, 'recentQuotation']);
             Route::get('/recent-payment', [HomeController::class, 'recentPayment']);
-            Route::get('switch-theme/{theme}', [HomeController::class, 'switchTheme'])->name('switchTheme');
+            Route::get('switch-theme/{theme}', [HomeController::class, 'switchTheme'])->name('api.switchTheme');
             Route::get('/dashboard-filter/{start_date}/{end_date}/{warehouse_id}', [HomeController::class, 'dashboardFilter']);
             Route::get('addon-list', [HomeController::class, 'addonList']);
             Route::get('my-transactions/{year}/{month}', [HomeController::class, 'myTransaction']);

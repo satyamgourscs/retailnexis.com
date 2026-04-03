@@ -174,7 +174,10 @@ trait TenantInfo
             $paid_by = '';
         //creating tenant
         $tenant = Tenant::create(['id' => $request->tenant]);
-        $centralDomain = env('CENTRAL_DOMAIN', 'localhost');
+        $centralDomain = (string) config('app.central_domain');
+        if ($centralDomain === '') {
+            throw new \RuntimeException('Configure CENTRAL_DOMAIN or APP_URL in .env for tenant subdomain creation.');
+        }
         $fullDomain = $request->tenant.'.'.$centralDomain;
         $tenant->domains()->firstOrCreate([
             'domain' => $fullDomain,

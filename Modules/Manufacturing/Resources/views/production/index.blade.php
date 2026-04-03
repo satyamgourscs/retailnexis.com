@@ -50,7 +50,7 @@
             </div>
             {{-- {!! Form::close() !!} --}}
         </div>
-        <a href="{{route('manufacturing.productions.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> {{__('db.Add Production')}}</a>&nbsp;
+        <a href="{{route('productions.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> {{__('db.Add Production')}}</a>&nbsp;
     </div>
     <div class="table-responsive">
         <table id="production-table" class="table production-list" style="width: 100%">
@@ -144,7 +144,7 @@
 
 
     var production_id = [];
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
     var starting_date = <?php echo json_encode($starting_date); ?>;
     var ending_date = <?php echo json_encode($ending_date); ?>;
     var warehouse_id = <?php echo json_encode($warehouse_id); ?>;
@@ -233,7 +233,7 @@
             "processing": true,
             "serverSide": true,
             "ajax":{
-                url:"{{ url('manufacturing/productions/production-data') }}",
+                url:"productions/production-data",
                 data: {
                     starting_date: starting_date,
                     ending_date: ending_date,
@@ -383,7 +383,7 @@
                 htmltext += '<strong>{{__("db.Attach Document")}}: </strong><a href="documents/production/'+production[25]+'">Download</a><br>';
 
             $(".product-production-list tbody").remove();
-        $.get("{{ url('manufacturing/productions') }}" + '/product_production/' + production[3], function(response) {
+        $.get('productions/product_production/' + production[3], function(response) {
 
         var newBody = $("<tbody>");
 

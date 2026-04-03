@@ -180,7 +180,10 @@ class ClientController extends Controller
             'email' => $request->email,
         ]);
 
-        $centralDomain = env('CENTRAL_DOMAIN', 'localhost');
+        $centralDomain = (string) config('app.central_domain');
+        if ($centralDomain === '') {
+            abort(503, 'Configure CENTRAL_DOMAIN or APP_URL in .env for tenant subdomain creation.');
+        }
         $fullDomain = $tenantKey.'.'.$centralDomain;
         $tenant->domains()->firstOrCreate([
             'domain' => $fullDomain,

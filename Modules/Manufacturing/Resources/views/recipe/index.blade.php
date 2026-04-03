@@ -9,7 +9,7 @@
 <section>
     <div class="container-fluid">
         @if(in_array("products-add", $all_permission))
-            <a href="{{route('manufacturing.recipes.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('db.add_recipes')}}</a>
+            <a href="{{route('recipes.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('db.add_recipes')}}</a>
 
         @endif
         @if( in_array("products-edit", $all_permission) && in_array('ecommerce',explode(',',$general_setting->modules)) )
@@ -126,7 +126,7 @@
     $("ul#product").addClass("show");
     $("ul#product #product-list-menu").addClass("active");
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         if(localStorage.getItem("message")) {
             alert(localStorage.getItem("message"));
             localStorage.removeItem("message");
@@ -168,7 +168,7 @@
     var product_id = [];
     var all_permission = <?php echo json_encode($all_permission) ?>;
     var role_id = <?php echo json_encode($role_id) ?>;
-    var user_verified = <?php echo json_encode(config('app.user_verified')) ?>;
+    var user_verified = <?php echo json_encode(config('app.demo_unlocked')) ?>;
     var logoUrl = <?php echo json_encode(url('logo', $general_setting->site_logo)) ?>;
     var warehouse_id = <?php echo json_encode($warehouse_id); ?>;
 
@@ -267,7 +267,7 @@
             $(product_list).each(function(i) {
                 if(!variant_list[i])
                     variant_list[i] = 0;
-                let url = '{{ route("manufacturing.products.getdata", [":product", ":variant"]) }}';
+                let url = '{{ route("products.getdata", [":product", ":variant"]) }}';
                 url = url.replace(':product', product_list[i]).replace(':variant', variant_list[i]);
                 $.get(url, function(data) {
                     var newRow = $("<tr>");

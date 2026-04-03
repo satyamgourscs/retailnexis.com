@@ -408,13 +408,13 @@
         $('#switch-theme').click(function() {
             if(theme == 'light') {
                 theme = 'dark';
-                var url = <?php echo json_encode(route('switchTheme', 'dark')); ?>;
+                var url = <?php echo json_encode(route('web.switchTheme', 'dark')); ?>;
                 $('body').addClass('dark-mode');
                 $('#switch-theme i').addClass('dripicons-brightness-low');
             }
             else {
                 theme = 'light';
-                var url = <?php echo json_encode(route('switchTheme', 'light')); ?>;
+                var url = <?php echo json_encode(route('web.switchTheme', 'light')); ?>;
                 $('body').removeClass('dark-mode');
                 $('#switch-theme i').addClass('dripicons-brightness-max');
             }

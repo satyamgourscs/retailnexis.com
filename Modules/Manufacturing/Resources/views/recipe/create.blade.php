@@ -26,7 +26,7 @@
                     </div>
                     <div class="card-body">
                         <p class="italic"><small>{{__('db.The field labels marked with * are required input fields')}}.</small></p>
-                        <form id="product-form" method="post" action="{{ route('manufacturing.recipes.store') }}" enctype="multipart/form-data">
+                        <form id="product-form" method="post" action="{{ route('recipes.store') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                     <div class="col-md-4">
@@ -217,7 +217,7 @@
     });
     @endif
 
-    @if(config('database.connections.saleprosaas_landlord'))
+    @if(config('database.connections.retailnexis_landlord'))
         numberOfProduct = <?php echo json_encode($numberOfProduct)?>;
         $.ajax({
             type: 'GET',
@@ -756,7 +756,7 @@
             var data = ui.item.value;
             $.ajax({
                 type: 'GET',
-                url: '{{ route("manufacturing.product.search") }}',
+                url: '{{ route("product.search") }}',
                 data: {
                     data: data
                 },
@@ -957,7 +957,7 @@
 
         // Ajax Request
         $.ajax({
-                url: '{{ route("manufacturing.get-Ingredients") }}',
+                url: '{{ route("get-Ingredients") }}',
                 type: 'POST',
                 data: {
                         product_id: productId,

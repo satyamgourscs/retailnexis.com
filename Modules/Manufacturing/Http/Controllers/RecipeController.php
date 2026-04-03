@@ -145,7 +145,7 @@ class RecipeController extends Controller
             $data['price'] = array_sum($request->unit_price);
             $product->update($data);
             DB::commit();
-            return redirect()->route('manufacturing.recipes.index')->with('success','Successfully Recipe Created');
+            return redirect()->route('recipes.index')->with('success','Successfully Recipe Created');
 
         } catch (\Throwable $e){
             DB::rollBack();
@@ -417,11 +417,11 @@ class RecipeController extends Controller
 
                 if(in_array("products-edit", $request['all_permission']))
                     $nestedData['options'] .= '<li>
-                            <a href="'.route('manufacturing.recipes.edit', $product->id).'" class="btn btn-link"><i class="fa fa-edit"></i> '.__('db.edit').'</a>
+                            <a href="'.route('recipes.edit', $product->id).'" class="btn btn-link"><i class="fa fa-edit"></i> '.__('db.edit').'</a>
                         </li>';
 
                 if(in_array("products-delete", $request['all_permission']))
-                    $nestedData['options'] .= \Form::open(["route" => ["manufacturing.recipes.destroy", $product->id], "method" => "DELETE"] ).'
+                    $nestedData['options'] .= \Form::open(["route" => ["recipes.destroy", $product->id], "method" => "DELETE"] ).'
                             <li>
                               <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="fa fa-trash"></i> '.__("db.delete").'</button>
                             </li>'.\Form::close().'

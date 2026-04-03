@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="{{$general_setting->developed_by}}" />
     <meta name="csrf-token" content="CmSeExxpkZmScDB9ArBZKMGKAyzPqnxEriplXWrS">
-    <link rel="icon" type="image/png" href="{{url('landlord/images/logo', $general_setting->site_logo)}}" />
+    <link rel="icon" type="image/png" href="{{ asset('landlord/images/logo/'.$general_setting->site_logo) }}" />
     <!-- Document Title -->
     <title>{{$general_setting->meta_title ?? 'Retail Nexis'}}</title>
     <!-- Links -->
@@ -15,22 +15,22 @@
     <meta property="og:url" content="{{url()->full()}}" />
     <meta property="og:title" content="{{$general_setting->og_title ?? 'Retail Nexis'}}" />
     <meta property="og:description" content="{{$general_setting->og_description ?? 'Buy Retail Nexis inventory management & POS SaaS php script'}}" />
-    <meta property="og:image" content="{{url('/landlord/images/og-image')}}/{{$general_setting->og_image ?? 'retail-nexis-default-og.jpg'}}" />
+    <meta property="og:image" content="{{ asset('landlord/images/og-image/'.($general_setting->og_image ?? 'retail-nexis-default-og.jpg')) }}" />
 
     <!-- Bootstrap CSS -->
-    <link href="{{url('/')}}/landlord/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('landlord/css/bootstrap.min.css') }}" rel="stylesheet">
     <!-- Font Awesome CSS-->
     <link rel="preload" href="<?php echo asset('vendor/font-awesome/css/font-awesome.min.css') ?>" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="<?php echo asset('vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet"></noscript>
 
     <!-- Plugins CSS -->
-    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="{{url('/')}}/landlord/css/plugins.css">
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="{{ asset('landlord/css/plugins.css') }}">
     <noscript>
-        <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="{{url('/')}}/landlord/css/plugins.css">
+        <link href="{{ asset('landlord/css/plugins.css') }}" rel="stylesheet">
     </noscript>
 
     <!-- common style CSS -->
-    <link id="switch-style" href="{{url('/')}}/landlord/css/common-style-light.css" rel="stylesheet">
+    <link id="switch-style" href="{{ asset('landlord/css/common-style-light.css') }}" rel="stylesheet">
 
     <!-- google fonts-->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,7 +73,7 @@
                     <div class="mobile-menu-icon d-lg-none"><i class="ti-menu"></i></div>
                     <div class="logo">
                         <a href="{{url('/')}}">
-                            <img class="lazy" src="{{url('landlord/images/logo', $general_setting->site_logo)}}" alt="Brand logo">
+                            <img class="lazy" src="{{ asset('landlord/images/logo/'.$general_setting->site_logo) }}" alt="Brand logo">
                         </a>
                     </div>
                 </div>
@@ -121,7 +121,7 @@
         </div>
     </section>
     <section class="hero-img">
-        <img src="{{url('/landlord/images')}}/{{$hero->image}}" alt=""/>
+        <img src="{{ asset('landlord/images/'.$hero->image) }}" alt=""/>
     </section>
     <section>
         <div class="container">
@@ -145,7 +145,7 @@
                             <div class="review-text">
                                 {!!$testimonial->text!!}
                             </div>
-                            <div class="reviewer"><img src="{{asset('/landlord/images/testimonial')}}/{{$testimonial->image}}" alt="{{$testimonial->name}}" /> {{$testimonial->name}}@if($testimonial->business_name), {{$testimonial->business_name}}@endif</div>
+                            <div class="reviewer"><img src="{{ asset('landlord/images/testimonial/'.$testimonial->image) }}" alt="{{$testimonial->name}}" /> {{$testimonial->name}}@if($testimonial->business_name), {{$testimonial->business_name}}@endif</div>
                         </div>
                     </div>
                 @endforeach
@@ -442,7 +442,7 @@
                 <div class="col-md-4">
                     <a href="{{url('/blog')}}/{{$blog->slug}}">
                         <div class="blog-item">
-                            <img src="{{asset('landlord/images/blog')}}/{{$blog->featured_image}}" alt="{{$blog->title}}"/>
+                            <img src="{{ asset('landlord/images/blog/'.$blog->featured_image) }}" alt="{{$blog->title}}"/>
                             <h4 class="mt-3">{{$blog->title}}</h4>
                         </div>
                     </a>
@@ -625,7 +625,7 @@
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                 </div>
                 <div class="modal-body">
-                    <img src="landlord/images/setup_custom_domain.png">
+                    <img src="{{ asset('landlord/images/setup_custom_domain.png') }}" alt="">
                 </div>
             </div>
         </div>

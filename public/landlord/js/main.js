@@ -14,15 +14,6 @@
     if (!isMobile) {
         $(window).scroll(function() {
             var sc = $(window).scrollTop();
-            /* Landlord Nova landing: single navbar — do not clone menu (prevents duplicate nav) */
-            if ($("body").hasClass("nova-landing")) {
-                if (sc > 300) {
-                    $("#header-middle").addClass("fixed");
-                } else {
-                    $("#header-middle").removeClass("fixed");
-                }
-                return;
-            }
             var menu = $('#main-menu').clone();
             if (sc > 300) {
                 $("#header-middle").addClass("fixed");
@@ -50,14 +41,6 @@
         
         $(window).scroll(function() {
             var sc = $(window).scrollTop();
-            if ($("body").hasClass("nova-landing")) {
-                if (sc > 100) {
-                    $("#header-middle").addClass("fixed");
-                } else {
-                    $("#header-middle").removeClass("fixed");
-                }
-                return;
-            }
             var menu = $('#main-menu').clone();
             if (sc > 100) {
                 $("#header-middle").addClass("fixed");
@@ -68,26 +51,19 @@
             }
         });
 
-        if (!$("body").hasClass("nova-landing")) {
-            var menu = $('#main-menu').clone();
-            // $(".header-middle .middle-column").html('');
-            $("#mobile-nav .container").html(menu);
+        var menu = $('#main-menu').clone();
+        // $(".header-middle .middle-column").html('');
+        $("#mobile-nav .container").html(menu);
 
-            $(".mobile-menu-icon").on("click", function() {
-                $('.body__overlay').addClass('is-visible');
-                $("#mobile-nav").toggleClass("show");
-            });
-            
-            $("#mobile-nav ul li a,.mobile-menu-close-icon,.body__overlay").on("click", function() {
-                $('.body__overlay').removeClass('is-visible');
-                $("#mobile-nav").toggleClass("show");
-            });
-        } else {
-            /* Bootstrap collapse navbar for Nova landing mobile */
-            $("#landingNavbarDesk .nav-link, #landingNavbarDesk .saas-nav-cta").on("click", function() {
-                $("#landingNavbarDesk").collapse("hide");
-            });
-        }
+        $(".mobile-menu-icon").on("click", function() {
+            $('.body__overlay').addClass('is-visible');
+            $("#mobile-nav").toggleClass("show");
+        });
+        
+        $("#mobile-nav ul li a,.mobile-menu-close-icon,.body__overlay").on("click", function() {
+            $('.body__overlay').removeClass('is-visible');
+            $("#mobile-nav").toggleClass("show");
+        });
 
     }
 
@@ -131,10 +107,6 @@
 
     $(document).ready(function() {
         
-        if (!$(".mySwiper").length) {
-            return;
-        }
-
         if (isMobile) {
             var swiper = new Swiper(".mySwiper", {
                 slidesPerView: 1,

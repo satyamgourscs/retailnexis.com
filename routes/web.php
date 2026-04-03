@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 
@@ -22,15 +21,13 @@ Route::redirect('saas/install/step-4', '/install/step-4', 301);
 
 
 
-Route::get('/payment_cancel',function() {
-    return 'payment_cancel';
-});
-Route::get('/fail_url',function() {
-    return 'fail_url';
-});
+Route::get('/payment_cancel', [\App\Http\Controllers\WebUtilitiesController::class, 'paymentCancel']);
+Route::get('/fail_url', [\App\Http\Controllers\WebUtilitiesController::class, 'failUrl']);
 
 
-Route::get('switch-theme/{theme}', 'HomeController@switchTheme')->name('switchTheme');
+// Must not use the same URI as routes/tenant.php (switch-theme/{theme}) — Laravel keeps only one
+// route per method+domain+URI, so the named route web.switchTheme was lost after tenant routes load.
+Route::get('superadmin/switch-theme/{theme}', 'HomeController@switchTheme')->name('web.switchTheme');
 Route::post('contact-form', 'landlord\LandingPageController@contactForm')->name('contactForm');
 Route::post('tenant-checkout', 'Payment\PaymentController@tenantCheckout')->name('tenant.checkout');
 Route::get('payment_success', 'Payment\PaymentController@success')->name('payment.success');
@@ -51,14 +48,7 @@ Route::post('payment/{payment_method}/pay/cancel', 'Payment\PaymentController@pa
 Route::get('/payment/paystack/pay/callback', 'Payment\PaymentController@handleGatewayCallback')->name('payment.pay.callback');
 
 
-Route::get('clear',function() {
-    Artisan::call('optimize:clear');
-    cache()->forget('hero');
-    cache()->forget('module_descriptions');
-    cache()->forget('faq_descriptions');
-    cache()->forget('tenant_signup_descriptions');
-    dd('cleared');
-});
+Route::get('clear', [\App\Http\Controllers\WebUtilitiesController::class, 'clearCaches']);
 
 Route::middleware(['cors'])->group(function () {
     Route::get('fetch-package-data/{id}', 'landlord\PackageController@fetchPackageData')->name('package.fetchData');
@@ -71,7 +61,7 @@ Route::controller(Auth\SuperAdminLoginController::class)->group(function () {
 
 //landing page routes
 Route::controller(landlord\LandingPageController::class)->group(function () {
-    // GET / is registered once at the bottom of this file (after tenant routes) so it wins over routes/tenant.php.
+    // Central GET / is in routes/central.php (loaded before tenant routes).
     //Route::get('sign-up', 'signUp')->name('signup');
     Route::post('send-otp', 'sendOTP')->name('send.otp');
     Route::post('verify-otp', 'verifyOTP')->name('verify.otp');
@@ -97,9 +87,7 @@ Route::controller(landlord\PageController::class)->group(function () {
 
 
 Route::group(['prefix' => 'superadmin', 'middleware' => ['superadminauth']], function() {
-    Route::get('/', function () {
-        return redirect()->route('superadmin.dashboard');
-    })->name('superadmin.home');
+    Route::get('/', [\App\Http\Controllers\WebUtilitiesController::class, 'superadminHomeRedirect'])->name('superadmin.home');
     Route::controller(landlord\DashboardController::class)->group(function () {
         Route::get('dashboard', 'index')->name('superadmin.dashboard');
         Route::get('new-release', 'newVersionReleasePage')->name('saas-new-release');
@@ -234,71 +222,4 @@ Route::group(['prefix' => 'superadmin', 'middleware' => ['superadminauth']], fun
     });
 });
 
-// Central landing: must be Route::domain(...) so it does not share the same route key as routes/tenant.php GET /
-// (no domain). Otherwise GET / hits tenant HomeController (auth) → guests redirect to /login.
-//
-// Merge app URL + central_domain into the host list: config:cache + empty CENTRAL_DOMAIN in tenancy.php can leave
-// only localhost in tenancy.central_domains, so production apex (retailnexis.com) would never get a landing route.
-$extraHosts = array_filter([
-    strtolower(rtrim((string) config('app.central_domain'), '.')),
-], static fn (string $h): bool => $h !== '');
-$appUrlHost = parse_url((string) config('app.url'), PHP_URL_HOST);
-if (is_string($appUrlHost) && $appUrlHost !== '') {
-    $extraHosts[] = strtolower(rtrim($appUrlHost, '.'));
-}
-$publicUrlHost = parse_url((string) config('app.public_url', ''), PHP_URL_HOST);
-if (is_string($publicUrlHost) && $publicUrlHost !== '') {
-    $extraHosts[] = strtolower(rtrim($publicUrlHost, '.'));
-}
-$centralDomains = array_values(array_unique(array_filter(
-    array_merge((array) config('tenancy.central_domains', []), $extraHosts),
-    static fn ($h): bool => (string) $h !== ''
-)));
-$expanded = [];
-foreach ($centralDomains as $host) {
-    $host = strtolower((string) $host);
-    if ($host === '') {
-        continue;
-    }
-    $expanded[] = $host;
-    $isLocal = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
-    if (! $isLocal && ! str_starts_with($host, 'www.')) {
-        $expanded[] = 'www.'.$host;
-    }
-}
-$centralDomains = array_values(array_unique($expanded));
-$canonicalCentral = strtolower((string) config('app.central_domain'));
-if ($canonicalCentral !== '') {
-    usort($centralDomains, function ($a, $b) use ($canonicalCentral) {
-        $a = strtolower((string) $a);
-        $b = strtolower((string) $b);
-        if ($a === $canonicalCentral) {
-            return -1;
-        }
-        if ($b === $canonicalCentral) {
-            return 1;
-        }
-
-        return strcmp($a, $b);
-    });
-}
-$namedCentralHome = false;
-foreach ($centralDomains as $domain) {
-    $domain = strtolower((string) $domain);
-    if ($domain === '') {
-        continue;
-    }
-    Route::domain($domain)->group(function () use (&$namedCentralHome) {
-        if (empty(config('app.landlord_db'))) {
-            Route::get('/', function () {
-                return redirect()->route('saas-install-step-1');
-            });
-            return;
-        }
-        $route = Route::get('/', [\App\Http\Controllers\landlord\LandingPageController::class, 'index']);
-        if (! $namedCentralHome) {
-            $route->name('central.home');
-            $namedCentralHome = true;
-        }
-    });
-}
+// Central domain GET / is registered in routes/central.php (loaded before this file and tenant routes).

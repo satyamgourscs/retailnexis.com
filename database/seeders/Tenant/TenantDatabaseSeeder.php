@@ -32,7 +32,7 @@ class TenantDatabaseSeeder extends Seeder
             DB::table('general_settings')->insert([
                 [
                     'id' => 1,
-                    'site_title' => !empty(self::$tenantData) ? self::$tenantData['site_title'] : 'Nexa Technologies POS SaaS',
+                    'site_title' => !empty(self::$tenantData) ? self::$tenantData['site_title'] : 'Retail Nexis POS SaaS',
                     'site_logo' => !empty(self::$tenantData) ? self::$tenantData['site_logo'] : '20250102042651.png',
                     'is_rtl' => 0,
                     'currency' => '1',
@@ -41,15 +41,16 @@ class TenantDatabaseSeeder extends Seeder
                     'staff_access' => 'own',
                     'without_stock' => 'no',
                     'date_format' => 'd/m/Y',
-                    // Default to rebranded/non-legacy name (avoid old vendor branding).
-                    'developed_by' => !empty(self::$tenantData) ? self::$tenantData['developed_by'] : (env('APP_NAME') ?: config('app.name', 'TryOneDigital')),
+                    'developed_by' => !empty(self::$tenantData) ? self::$tenantData['developed_by'] : 'TryOneDigital',
                     'invoice_format' => 'standard',
                     'decimal' => 2,
                     'state' => 1,
                     'theme' => 'default.css',
                     'modules' => !empty(self::$tenantData) ? self::$tenantData['modules'] : NULL,
                     'currency_position' => 'prefix',
-                    'expiry_date' => !empty(self::$tenantData) ? self::$tenantData['expiry_date'] : '1970-01-01',
+                    'expiry_date' => ! empty(self::$tenantData['expiry_date'] ?? null)
+                        ? self::$tenantData['expiry_date']
+                        : now()->addDays(30)->format('Y-m-d'),
                     'expiry_type' => 'days',
                     'expiry_value' => '0',
                     'is_zatca' => NULL,
@@ -69,8 +70,7 @@ class TenantDatabaseSeeder extends Seeder
                     'password' => !empty(self::$tenantData) ? self::$tenantData['password'] : '$2y$10$DWAHTfjcvwCpOCXaJg11MOhsqns03uvlwiSUOQwkHL2YYrtrXPcL6',
                     'remember_token' => '6mN44MyRiQZfCi0QvFFIYAU9LXIUz9CdNIlrRS5Lg8wBoJmxVu8auzTP42ZW',
                     'phone' => !empty(self::$tenantData) ? self::$tenantData['phone'] : '12112',
-                    // Default to a neutral tenant label (avoid old vendor branding).
-                    'company_name' => !empty(self::$tenantData) ? self::$tenantData['company_name'] : 'Tenant',
+                    'company_name' => !empty(self::$tenantData) ? self::$tenantData['company_name'] : 'tryonedigital',
                     'role_id' => 1,
                     'biller_id' => NULL,
                     'warehouse_id' => NULL,
@@ -844,7 +844,7 @@ class TenantDatabaseSeeder extends Seeder
 
         $basic_permissions_role = [];
 
-        if(!config('database.connections.saleprosaas_landlord')) {
+        if(!config('database.connections.retailnexis_landlord')) {
             foreach ($permission_data as $row) {
                 $basic_permissions_role[] = [
                     'permission_id' => $row['id'],

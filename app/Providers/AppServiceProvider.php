@@ -10,16 +10,73 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\App;
 use Stancl\Tenancy\Events\TenancyBootstrapped;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap any application services.
-     *
-     * @return void
+     * URL path prefix before `/public` (e.g. `/saas`) so asset()/url() work on XAMPP subfolders.
      */
+    protected function webBasePath(\Illuminate\Http\Request $request): string
+    {
+        $base = (string) $request->getBasePath();
+        if ($base !== '' && str_ends_with($base, '/public')) {
+            $base = substr($base, 0, -strlen('/public')) ?: '';
+        }
+        if ($base !== '') {
+            return $base;
+        }
+
+        $script = str_replace('\\', '/', (string) $request->server->get('SCRIPT_NAME', ''));
+        if ($script !== '' && $script[0] !== '/') {
+            $script = '/'.$script;
+        }
+        if (str_ends_with($script, '/public/index.php')) {
+            $base = substr($script, 0, -strlen('/public/index.php'));
+
+            return ($base === '/' || $base === '') ? '' : $base;
+        }
+
+        $path = parse_url((string) config('app.url'), PHP_URL_PATH);
+        if (is_string($path)) {
+            $path = rtrim($path, '/');
+            if ($path !== '' && $path !== '/') {
+                return $path;
+            }
+        }
+
+        return '';
+    }
 
     /**
+     * Merge resources/lang/{locale}/db.php early so error views never show raw db.* keys.
+     */
+    protected function registerEarlyDbLangFallbacks(): void
+    {
+        foreach (array_unique(array_filter([config('app.locale'), config('app.fallback_locale')])) as $locale) {
+            $path = resource_path("lang/{$locale}/db.php");
+            if (! is_file($path)) {
+                continue;
+            }
+            /** @var mixed $data */
+            $data = include $path;
+            if (! is_array($data)) {
+                continue;
+            }
+            $lines = [];
+            foreach ($data as $key => $value) {
+                $lines['db.'.$key] = $value;
+            }
+            if ($lines !== []) {
+                app('translator')->addLines($lines, (string) $locale);
+            }
+        }
+    }
+
+    /**
+     * Bootstrap any application services.
+     *
+     * 
      * Register any application services.
      *
      * @return void
@@ -37,6 +94,31 @@ class AppServiceProvider extends ServiceProvider
 
         if (app()->runningInConsole()) {
             return;
+        }
+
+        $this->registerEarlyDbLangFallbacks();
+
+        try {
+            $request = request();
+            if ($request !== null) {
+                $basePath = $this->webBasePath($request);
+                $forwardedProto = strtolower((string) $request->header('X-Forwarded-Proto', ''));
+                $scheme = ($request->secure()
+                    || $forwardedProto === 'https'
+                    || $request->server('HTTPS') === 'on'
+                    || $request->server('HTTP_X_FORWARDED_SSL') === 'on')
+                    ? 'https'
+                    : $request->getScheme();
+                $host = $request->getHttpHost();
+                $root = rtrim($scheme.'://'.$host.$basePath, '/');
+                if ($root !== '') {
+                    URL::forceRootUrl($root);
+                }
+                if ($scheme === 'https') {
+                    URL::forceScheme('https');
+                }
+            }
+        } catch (\Throwable $e) {
         }
 
         $translationLogic = function () {

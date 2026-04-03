@@ -12,8 +12,10 @@ class ExampleTest extends TestCase
      *
      * @return void
      */
-    public function test_placeholder(): void
-    {
-        $this->assertTrue(true);
-    }
+    // public function testBasicTest()
+    // {
+    //     $response = $this->get('/check');
+
+    //     $response->assertStatus(200);
+    // }
 }

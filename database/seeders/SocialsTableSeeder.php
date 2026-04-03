@@ -22,8 +22,7 @@ class SocialsTableSeeder extends Seeder
                 array(
                     'id' => 1,
                     'name' => 'facebook',
-                    // Remove legacy vendor handle.
-                    'link' => 'https://facebook.com/',
+                    'link' => 'https://facebook.com/tryonedigital',
                     'icon' => 'fa fa-facebook',
                     'order' => 1,
                     'created_at' => '2023-03-11 16:35:05',
@@ -33,8 +32,7 @@ class SocialsTableSeeder extends Seeder
                 array(
                     'id' => 2,
                     'name' => 'twitter',
-                    // Remove legacy vendor handle.
-                    'link' => 'https://twitter.com/',
+                    'link' => 'https://twitter.com/tryonedigital',
                     'icon' => 'fa fa-twitter',
                     'order' => 2,
                     'created_at' => '2023-03-11 16:35:05',
@@ -44,8 +42,7 @@ class SocialsTableSeeder extends Seeder
                 array(
                     'id' => 3,
                     'name' => 'youtube',
-                    // Remove legacy vendor handle.
-                    'link' => 'https://youtube.com/',
+                    'link' => 'https://youtube.com/tryonedigital',
                     'icon' => 'fa fa-youtube',
                     'order' => 3,
                     'created_at' => '2023-03-11 16:35:05',

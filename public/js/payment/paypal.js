@@ -39,13 +39,7 @@ paypal_sdk.Buttons({
                             $('#errorMessage').html(html);
                         }
                         else if(response.success){
-                            try {
-                                window.top.location.href = redirectURL;
-                            } catch (e) {
-                                try {
-                                    window.open(redirectURL, '_blank', 'noopener');
-                                } catch (e2) {}
-                            }
+                            window.location.href = redirectURL;
                         }
                     }
                 });
@@ -64,13 +58,7 @@ $("#payCancelBtn").click(function(e){
             data: {},
             dataType: 'JSON',
             success: function (data) {
-                try {
-                    window.top.location.href = redirectURLAfterCancel;
-                } catch (e) {
-                    try {
-                        window.open(redirectURLAfterCancel, '_blank', 'noopener');
-                    } catch (e2) {}
-                }
+                window.location.href = redirectURLAfterCancel;
             }
         });
     }

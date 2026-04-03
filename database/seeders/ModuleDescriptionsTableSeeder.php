@@ -22,7 +22,7 @@ class ModuleDescriptionsTableSeeder extends Seeder
                 array(
                     'id' => 2,
                     'heading' => 'One App, all the features',
-                    'sub_heading' => 'Nexa Technologies is packed with all the features you\'ll need to seamlessly run your business',
+                    'sub_heading' => 'Retail Nexis is packed with all the features you\'ll need to seamlessly run your business',
                     'image' => '20230716072050.png',
                     'lang_id' => 1,
                     'created_at' => '2023-05-23 16:28:16',
@@ -32,7 +32,7 @@ class ModuleDescriptionsTableSeeder extends Seeder
                 array(
                     'id' => 4,
                     'heading' => 'Una aplicación, todas las funciones',
-                    'sub_heading' => 'Nexa Technologies incluye todas las funciones que necesitará para administrar su negocio sin problemas',
+                    'sub_heading' => 'Retail Nexis incluye todas las funciones que necesitará para administrar su negocio sin problemas',
                     'image' => NULL,
                     'lang_id' => 5,
                     'created_at' => '2023-11-13 13:30:37',

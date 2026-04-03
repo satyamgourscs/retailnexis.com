@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # XAMPP http://localhost/saas/public — required for correct rewrites. VHost with DocumentRoot=public/: comment out.
+    RewriteBase /saas/public/
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

@@ -44,7 +44,5 @@ class DatabaseSeeder extends Seeder
         $this->call(FaqsTableSeeder::class);
         $this->call(BlogsTableSeeder::class);
         $this->call(ExternalServicesSeeder::class);
-        $this->call(LandingModulesTopupSeeder::class);
-        $this->call(LandingFaqTopupSeeder::class);
     }
 }

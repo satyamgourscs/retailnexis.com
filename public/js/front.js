@@ -40,8 +40,8 @@ $(document).ready(function () {
         });
     }
 
-    // Custom select (skip native rows, e.g. sale create payment lines that must clone cleanly)
-    $('select').not('[data-sale-payment-line="1"]').selectpicker();
+    //Custom select
+    $('select').selectpicker();
 
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -89,19 +89,12 @@ $(document).ready(function () {
     // ------------------------------------------------------- //
     // Header Dropdown / Right Sidebar
     // ------------------------------------------------------ //
-    // Only open legacy right-sidebar panels when the trigger is a direct child of .nav-item
-    // (avoids stacking duplicate .page click handlers when using Bootstrap .dropdown-menu items).
-    $(document).on('click', 'header .nav-item > a.dropdown-item', function () {
-        var $panel = $(this).siblings('.right-sidebar');
-        if (!$panel.length) {
-            return;
-        }
+    $(document).on('click', 'header .dropdown-item', function(){
         $('.right-sidebar.open').removeClass('open');
-        $panel.addClass('open');
-        $('.page,.pos-page').off('click.premiumSidebar').on('click.premiumSidebar', function () {
+        $(this).siblings('.right-sidebar').addClass('open');
+        $('.page,.pos-page').on('click', function(){
             $('.right-sidebar.open').removeClass('open');
-            $('.page,.pos-page').off('click.premiumSidebar');
-        });
+        })
     });
 
 

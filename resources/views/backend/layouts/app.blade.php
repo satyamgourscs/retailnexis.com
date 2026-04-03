@@ -14,18 +14,13 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,600" rel="stylesheet" type="text/css">
-    @if(!config('database.connections.retailnexis_landlord'))
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
-    <!-- <script type="text/javascript" src="{{ asset('js/barcode-qrcode-scanner_plugin.js') }}"></script> -->
+    @if (file_exists(public_path('build/manifest.json')))
+        @vite(['resources/sass/vite-app.scss'])
     @else
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+        <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     @endif
+    {{-- JS stays Mix-built (includes Vue); run npm run build:mix if you change resources/js/app.js --}}
+    <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
 <body>
     <div id="app">

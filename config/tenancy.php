@@ -16,10 +16,27 @@ return [
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
-    'central_domains' => [
-        'localhost',
-        '127.0.0.1',
-    ],
+    'central_domains' => array_values(array_unique(array_filter(array_map(
+        static function (string $host): string {
+            return strtolower(rtrim(trim($host), '.'));
+        },
+        explode(',', (string) env('TENANCY_CENTRAL_DOMAINS', 'localhost,127.0.0.1,::1'))
+    )))),
+
+    /**
+     * TenantCreated pipeline: CreateDatabase → tenants:migrate → FinalizeNewTenantJob.
+     * When false (default), everything runs in-process (dispatch_sync) — no queue worker needed.
+     * Set TENANT_QUEUE_PROVISIONING=true only with a non-sync queue driver and running workers.
+     * If QUEUE_CONNECTION=sync, this stays false regardless of TENANT_QUEUE_PROVISIONING.
+     */
+    'provisioning_uses_queue' => filter_var(env('TENANT_QUEUE_PROVISIONING', false), FILTER_VALIDATE_BOOLEAN)
+        && (string) config('queue.default', 'sync') !== 'sync',
+
+    /**
+     * Before connecting to the tenant DB: if it is missing, run CreateDatabase + migrate (no finalize).
+     * Heals failed TenantCreated jobs and pre-release tenants. Set false to only rely on the pipeline.
+     */
+    'auto_provision_missing_database' => filter_var(env('TENANT_AUTO_PROVISION_MISSING_DB', true), FILTER_VALIDATE_BOOLEAN),
 
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.
@@ -30,7 +47,7 @@ return [
     'bootstrappers' => [
         Stancl\Tenancy\Bootstrappers\DatabaseTenancyBootstrapper::class,
         App\Bootstrappers\SafeCacheTenancyBootstrapper::class,
-        Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
+        App\Bootstrappers\SafeFilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
         // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
     ],
@@ -44,9 +61,9 @@ return [
 
         /**
          * Connection used as a "template" for the dynamically created tenant database connection.
-         * Note: don't name your template connection tenant. That name is reserved by package.
+         * Must match a key in config/database.php connections (see "local"). Name "tenant" is reserved.
          */
-        'template_tenant_connection' => 'retailnexis_tenant',
+        'template_tenant_connection' => env('TENANT_TEMPLATE_CONNECTION', 'local'),
 
         /**
          * Tenant database names are created like this:
